@@ -12,7 +12,12 @@ app.use(cors());
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
-// app.use("/api", publicRoutes);
+// Health check route
+app.get("/", (req, res) => {
+  res.json({ message: "Server is running", status: "OK" });
+});
+
+app.use("/api", publicRoutes);
 // app.use("/api/admin", adminRoutes);
 // app.use("/api/client", clientRoutes);
 // app.use("/api/seller", sellerRoutes);
