@@ -7,7 +7,7 @@ const createHttpError = (message, statusCode) => {
   err.statusCode = statusCode;
   return err;
 };
-
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const createCategory = async (payload) => {
   const name = payload.name?.trim();
 
@@ -22,7 +22,10 @@ const createCategory = async (payload) => {
   });
 };
 
-const getAllCategories = async () => {
+const getAllCategories = async (name) => {
+  if (name && name.trim()) {
+    return categoryRepository.searchByName(escapeRegex(name.trim()));
+  }
   return categoryRepository.findAll();
 };
 

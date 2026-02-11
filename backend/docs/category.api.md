@@ -2,6 +2,7 @@
 POST /api/admin/categories -> créer catégorie
 GET /api/categories -> lister catégories
 GET /api/categories/:id -> détail catégorie
+GET /api/categories?name=info -> rechercher des catégories par nom
 PATCH /api/admin/categories/:id -> modifier catégorie
 DELETE /api/admin/categories/:id -> supprimer catégorie
 2) Règles métier MVP
