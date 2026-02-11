@@ -2,7 +2,11 @@
 module.exports = {
   content: ["./src/**/*.{html,ts,js,jsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        nexa: ["Nexa", "sans-serif"],
+      },
+    },
   },
   plugins: [],
 }
