@@ -45,7 +45,7 @@ const createOrder = async ({ userId, items, deliveryAddress }) => {
 
         orderItems.push({
             product: product._id,
-            seller: product.user,
+            seller: product.seller,
             name: product.name,
             price: product.price,
             quantity: item.quantity,

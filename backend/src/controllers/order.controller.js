@@ -4,10 +4,10 @@ const orderService = require("../services/order.service");
 const PostOrder = async (req, res, next) => {
   try {
     
-    // const userId = req.userId;
+    const userId = req.userId;
 
     // For testing without auth middleware
-    const { userId, items, deliveryAddress } = req.body;
+    const { items, deliveryAddress } = req.body;
 
     // Call service layer
     const createdOrder = await orderService.createOrder({
