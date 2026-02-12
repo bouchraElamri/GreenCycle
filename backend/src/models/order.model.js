@@ -15,6 +15,11 @@ const orderSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
+        seller: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
         name: String,        
         price: Number,      
         quantity: {
@@ -39,8 +44,8 @@ const orderSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["pending", "confirmed", "shipped", "delivered"],
-      default: "pending",
+      enum: ["confirmed", "delivered"],
+      default: "confirmed",
     },
   },
   { timestamps: true }
