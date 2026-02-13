@@ -2,7 +2,7 @@ const productServ = require("../services/product.service");
 
 const getProducts = async (req, res, next)=>{
     try{
-    const products = await productServ.getAllProducts();
+    const products = await productServ.getAllProducts(req.query.name);
     res.status(200).json(products);
     }
     catch(error){
@@ -93,4 +93,28 @@ const productSortedByPrice = async (req, res, next)=> {
   }
 };
 
-module.exports = {getProducts, createProduct, findProductById, updateProduct , filterByPrice , deleteProduct , getNewstProducts , productSortedByPrice};
+const searchByCategory = async (req, res, next) => {
+  try {
+    if(req.body){
+      const products = await productServ.searchByCategory(req.body.categoryName);
+      return res.status(200).json(products);
+    }
+    const products = await productServ.searchByCategory(req.query.categoryName);
+    res.status(200).json(products);
+  }
+  catch(error){
+    next(error);
+  }
+};
+
+module.exports = {
+  getProducts, 
+  createProduct, 
+  findProductById, 
+  updateProduct , 
+  filterByPrice , 
+  deleteProduct , 
+  getNewstProducts , 
+  productSortedByPrice, 
+  searchByCategory,
+};

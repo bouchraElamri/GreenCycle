@@ -1,5 +1,6 @@
 const express = require('express');
-const { getProducts, findProductById , filterByPrice , getNewstProducts , productSortedByPrice } = require('../controllers/product.controller');
+const { getProducts, findProductById , filterByPrice , getNewstProducts , 
+    productSortedByPrice , searchByCategory  } = require('../controllers/product.controller');
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
 const { authenticate } = require("../middlewares/auth.middleware");
@@ -14,6 +15,7 @@ router.get('/getProductById/:id', findProductById);
 router.get('/filterByPrice', filterByPrice);
 router.get('/getNewstProducts', getNewstProducts);
 router.get('/productSortedByPrice', productSortedByPrice);
+router.get('/searchByCategory', searchByCategory);
 
 router.get('/categories', categoryController.getAllCategories);
 router.get('/categories/:id', categoryController.getCategoryById);

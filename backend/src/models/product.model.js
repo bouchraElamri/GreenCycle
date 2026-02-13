@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
   {
-    user: {
+    client: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Client",
       required: true,
     },
 
@@ -37,11 +37,6 @@ const productSchema = new mongoose.Schema(
       required: true, 
       min: 0 
     },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
 
     description: { 
       type: String, 
@@ -61,7 +56,7 @@ const productSchema = new mongoose.Schema(
 
     seller: {
       type: mongoose.Schema.Types.ObjectId, 
-      ref: "User", 
+      ref: "Seller", 
       required: true, 
     },
 

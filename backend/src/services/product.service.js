@@ -2,7 +2,11 @@ const productRepo = require("../repositories/product.repository");
 const categoryModel = require("../models/category.model");
 const { default: mongoose } = require("mongoose");
 
-const getAllProducts = () => productRepo.findAll();
+const getAllProducts = (name) => {
+  if (name) 
+    return productRepo.searchByName(name); 
+  return productRepo.findAll()
+};
 
 const getProductById =(id) => productRepo.findById(id);
 
@@ -49,4 +53,16 @@ const getNewstProducts = async () => productRepo.getNewstProducts();
 
 const productSortedByPrice = async (order) => productRepo.productSortedByPrice(order);
 
-module.exports = { getAllProducts, getProductById, createProduct, updateProduct, filterByPrice , deleteProduct , getNewstProducts , productSortedByPrice};
+const searchByCategory = async (categoryName) => productRepo.searchByCategory(categoryName);
+
+module.exports = { 
+  getAllProducts, 
+  getProductById, 
+  createProduct, 
+  updateProduct, 
+  filterByPrice , 
+  deleteProduct , 
+  getNewstProducts , 
+  productSortedByPrice, 
+  searchByCategory,
+};

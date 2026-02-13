@@ -1,4 +1,5 @@
 const Product = require("../models/product.model.js");
+const categoryModel = require("../models/category.model");
 
 const findAll = () => Product.find().populate("category");
 
@@ -47,6 +48,23 @@ const productSortedByPrice = async (order) => {
 
 };
 
+const searchByName = (name) =>
+  Product.find({
+    name: { $regex: name, $options: "i" },
+  }).sort({ createdAt: -1 });
+
+const searchByCategory = async (categoryName) => {
+//   const category = await categoryModel.findOne({name: { $regex: categoryName, $options: "i" }});
+//   if(!category){
+//     const error = new Error("No category found with the specified name");
+//     error.status = 404;
+//     throw error;
+//   };
+  const categoryId = category._id;
+  const products = await Product.find({ category: categoryName});
+  return products;
+};
 
 
-module.exports = { findAll, findById, createProduct, updateProduct, deleteProduct , filterByPrice , getNewstProducts , productSortedByPrice};
+
+module.exports = { findAll, findById, createProduct, updateProduct, deleteProduct , filterByPrice , getNewstProducts , productSortedByPrice, searchByName, searchByCategory};
