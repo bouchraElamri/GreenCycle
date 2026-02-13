@@ -19,6 +19,12 @@ const createOrderSchema = Joi.object({
   deliveryAddress: Joi.string().trim().min(3).required(),
 });
 
+const getOrdersQuerySchema = Joi.object({
+  userId: Joi.string().pattern(objectIdRegex).required(),
+});
+
+
 module.exports = {
   createOrderSchema,
+  getOrdersQuerySchema
 };

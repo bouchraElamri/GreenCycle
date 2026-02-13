@@ -34,7 +34,7 @@ const createOrder = async ({ userId, items, deliveryAddress }) => {
             err.statusCode = 404;
             throw err;
         }
-        if (!item.quantity || item.quantity < 1) {
+        if (!item.quantity || item.quantity < 1 || item.quantity > product.quantity) {
             const err = new Error("Invalid quantity for product: " + product.name);
             err.statusCode = 400;
             throw err;
@@ -64,4 +64,19 @@ const createOrder = async ({ userId, items, deliveryAddress }) => {
     
 };
 
-module.exports = { createOrder };
+const getClientOrders = async ({ userId }) => {
+  // userId validation is done by Joi, so here we focus on logic
+  console.log("Fetching orders for userId:", userId);
+  return orderRepo.findMyOrders(userId);
+};
+
+const getSellerOrders = async ({ userId }) => {
+  console.log("Fetching orders for seller userId:", userId);
+  return orderRepo.findBySellerUser(userId);
+};
+
+if (!getClientOrders || !getSellerOrders) {
+  throw new Error("Required order service functions are missing");
+}
+
+module.exports = { createOrder, getClientOrders, getSellerOrders };
