@@ -18,9 +18,9 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", publicRoutes);
-// app.use("/api/admin", adminRoutes);
-// app.use("/api/client", clientRoutes);
-// app.use("/api/seller", sellerRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/client", clientRoutes);
+app.use("/api/seller", sellerRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use(errorHandler);
 

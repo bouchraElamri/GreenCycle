@@ -19,7 +19,7 @@ const registerSchema = Joi.object({
       "any.required": "La confirmation du mot de passe est obligatoire",
     }),
 
-  role: Joi.string().valid("client", "admin", "seller").required().messages({
+  role: Joi.string().valid("client", "admin", "seller").messages({
     "any.only": "Le rôle doit être 'client', 'admin' ou 'seller'",
   }),
 
