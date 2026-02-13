@@ -38,15 +38,14 @@ const productSchema = new mongoose.Schema(
       min: 0 
     },
 
-    images: [
-        {
-            type: String
-        }
-    ],
-
     description: { 
       type: String, 
       trim: true 
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
     },
 
     category: { 
@@ -54,8 +53,11 @@ const productSchema = new mongoose.Schema(
       ref: "Category", 
       required: true 
     },
+    seller: {
+      type: mongoose.Schema.Types.ObjectId, ref: "User", 
+      required: true, 
+    },
 
-    // Global rating summary
     rating: {
       average: { type: Number, default: 0, min: 0, max: 5 },
       count: { type: Number, default: 0 },
@@ -63,6 +65,13 @@ const productSchema = new mongoose.Schema(
 
     // Comments list
     comments: [commentSchema],
+    
+    images: [
+        {
+            type: String
+        }
+    ],
+
   },
   { timestamps: true }
 );

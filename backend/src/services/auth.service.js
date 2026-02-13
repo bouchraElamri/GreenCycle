@@ -10,10 +10,10 @@ const Admin = require("../models/admin.model");
 
  const register = async ({ firstName, lastName, email, password, phone, role, extraData, createdBy }) => {
   const existing = await userRepo.findByEmail(email);
-  if (existing) throw new Error("Email déjà utilisé");
+  if (existing) throw new Error("Email already in use");
 
   const phoneExisting = await User.findOne({ phone });
-  if (phoneExisting) throw new Error("Ce numéro de téléphone est déjà utilisé");
+  if (phoneExisting) throw new Error("This phone number is already in use");
 
   const activationToken = crypto.randomBytes(32).toString("hex");
 
@@ -49,7 +49,7 @@ const Admin = require("../models/admin.model");
 
   // Envoi email activation
   const activationLink = `${process.env.FRONTEND_URL}/activate/${activationToken}`;
-  await sendEmail(email, "Activation du compte", `Cliquez ici pour activer : ${activationLink}`);
+  await sendEmail(email, "Account activation", `Click here to activate : ${activationLink}`);
 
   return user;
 };
@@ -66,7 +66,7 @@ const activateAccount = async (token) => {
       return; 
     }
 
-    throw new Error("Token invalide ou expiré");
+    throw new Error("Invalid or expired token");
   }
 
   user.isActive = true;
@@ -77,11 +77,11 @@ const activateAccount = async (token) => {
 
 const login = async ({ email, password }) => {
   const user = await userRepo.findByEmail(email);
-  if (!user) throw new Error("Utilisateur non trouvé");
-  if (!user.isActive) throw new Error("Compte non activé");
+  if (!user) throw new Error("User not found");
+  if (!user.isActive) throw new Error("Account not activated");
 
   const isMatch = await user.comparePassword(password);
-  if (!isMatch) throw new Error("Mot de passe incorrect");
+  if (!isMatch) throw new Error("Incorrect password");
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
   return { token, user: { id: user._id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role } };
@@ -89,7 +89,7 @@ const login = async ({ email, password }) => {
 
 const forgotPassword = async (email) => {
   const user = await userRepo.findByEmail(email);
-  if (!user) throw new Error("Utilisateur non trouvé");
+  if (!user) throw new Error("User not found");
 
   const resetToken = crypto.randomBytes(32).toString("hex");
   user.resetPasswordToken = resetToken;
@@ -97,12 +97,12 @@ const forgotPassword = async (email) => {
   await user.save();
 
   const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-  await sendEmail(email, "Réinitialisation mot de passe", `Cliquez ici pour réinitialiser : ${resetLink}`);
+  await sendEmail(email, "Password reset", `Click here to reset your password : ${resetLink}`);
 };
 
 const resetPassword = async (token, newPassword) => {
   const user = await userRepo.findByResetToken(token);
-  if (!user) throw new Error("Token invalide ou expiré");
+  if (!user) throw new Error("Invalid or expired token");
   user.password = newPassword;
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
