@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
   {
-    user: {
+    client: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Client",
       required: true,
     },
 
@@ -54,7 +54,7 @@ const productSchema = new mongoose.Schema(
       required: true 
     },
     seller: {
-      type: mongoose.Schema.Types.ObjectId, ref: "User", 
+      type: mongoose.Schema.Types.ObjectId, ref: "Seller", 
       required: true, 
     },
 

@@ -21,7 +21,12 @@ const authenticate = async (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-  if (req.user.role !== "admin") return res.status(403).json({ error: "Denied Access" });
+  const roles = req.user?.role;
+
+  if (!Array.isArray(roles) || !roles.includes("admin")) {
+    return res.status(403).json({ error: "Denied Access" });
+  }
+
   next();
 };
 
