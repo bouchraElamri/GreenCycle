@@ -3,9 +3,12 @@ const { createProduct , updateProduct , deleteProduct } = require('../controller
 const upload = require('../middlewares/upload.middleware');
 const {productSchema } = require('../validators/product.validator');
 const validate = require('../middlewares/validate.middleware');
+
+const { authenticate } = require('../middlewares/auth.middleware');
 const router = express.Router();
 
 // Seller routes placeholder
+router.use(authenticate); // protège toutes les routes du vendeur
 router.get('/', (req, res) => res.json({ message: 'Seller API root' }));
 router.post('/addProduct',upload.array('images', 5), validate(productSchema ) ,createProduct );
 router.put('/editProduct/:id' ,upload.array('images', 5) ,validate(productSchema) ,updateProduct );
