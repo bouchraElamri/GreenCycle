@@ -14,6 +14,7 @@ const sellerSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+      required: true,
     },
 
     profileUrl: String,
@@ -23,10 +24,10 @@ const sellerSchema = new mongoose.Schema(
 
     // address (same spirit as client addresses)
     address: {
-      street: String,
-      city: String,
-      zip: String,
-      country: String,
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+      zip: { type: String, required: true },
+      country: { type: String, required: true },
     },
 
     // business verification
@@ -50,9 +51,9 @@ const sellerSchema = new mongoose.Schema(
 
     // payout / banking (simplified)
     bankAccount: {
-      accountHolder: String,
-      iban: String,
-      bankName: String,
+      accountHolder: { type: String, required: true },
+      iban: { type: String, required: true },
+      bankName: { type: String, required: true },
     },
   },
   { timestamps: true }

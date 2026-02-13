@@ -4,6 +4,6 @@ const { authenticate } = require('../middlewares/auth.middleware');
 
 // Client routes placeholder
 router.use(authenticate);
-router.get('/', (req, res) => res.json({ message: 'Client API root' }));
+router.get('/', (req, res) => res.json({ message: 'Client API root' }));6
 
 module.exports = router;
