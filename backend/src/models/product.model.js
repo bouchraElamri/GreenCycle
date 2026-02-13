@@ -37,6 +37,11 @@ const productSchema = new mongoose.Schema(
       required: true, 
       min: 0 
     },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
 
     description: { 
       type: String, 
@@ -48,8 +53,10 @@ const productSchema = new mongoose.Schema(
       ref: "Category", 
       required: true 
     },
+
     seller: {
-      type: mongoose.Schema.Types.ObjectId, ref: "User", 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "User", 
       required: true, 
     },
 
