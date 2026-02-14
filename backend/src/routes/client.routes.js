@@ -4,11 +4,15 @@ const { authenticate } = require('../middlewares/auth.middleware');
 const {validateSwitchToSeller} = require('../validators/seller.validator');
 const sellerController = require('../controllers/seller.controller');
 
-// Client routes placeholder
 router.use(authenticate);
+
+// Client routes placeholder
+
+router.get('/', (req, res) => res.json({ message: 'Client API root' }));
+
 // Switch to seller
 router.post('/switch-to-seller', validateSwitchToSeller, sellerController.switchToSeller);
 
-router.get('/', (req, res) => res.json({ message: 'Client API root' }));
+
 
 module.exports = router;
