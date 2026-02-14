@@ -6,6 +6,9 @@ const { GetSellerOrders } = require("../controllers/order.controller");
 // Seller routes placeholder
 router.use(authenticate); // protège toutes les routes du vendeur
 router.get('/', (req, res) => res.json({ message: 'Seller API root' }));
+router.post('/addProduct',upload.array('images', 5), validate(productSchema ) ,createProduct );
+router.put('/editProduct/:id' ,upload.array('images', 5) ,validate(productSchema) ,updateProduct );
+router.delete('/deleteProduct/:id' ,deleteProduct );
 
 router.get("/orders/:sellerId", GetSellerOrders); // use req.user.id inside controller/service
 

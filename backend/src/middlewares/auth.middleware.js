@@ -30,4 +30,25 @@ const isAdmin = (req, res, next) => {
   next();
 };
 
-module.exports = { authenticate, isAdmin };
+const isSeller = async (req, res, next) => {
+  // Prefer reading roles from the authenticated request (set by authenticate middleware)
+  const roles = req.user?.role;
+
+  if (Array.isArray(roles) && roles.includes("seller")) {
+    return next();
+  }
+
+  // Fallback: fetch fresh user from DB in case req.user is stale
+  try {
+    const user = await userRepo.findById(req.user?.id);
+    if (user && Array.isArray(user.role) && user.role.includes("seller")) {
+      return next();
+    }
+  } catch (err) {
+    // ignore DB error and fall through to deny access
+  }
+
+  return res.status(403).json({ error: "Denied Access: sellers only" });
+};
+
+module.exports = { authenticate, isAdmin, isSeller };
