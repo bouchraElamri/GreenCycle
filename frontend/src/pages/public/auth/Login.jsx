@@ -119,7 +119,7 @@ export default function Login() {
 
                 <div className="mt-2">
                   <Link
-                    to="/forgotPasswordPage"
+                    to="/forgot-password"
                     className="block text-sm md:text-base font-nexa text-gray-950 hover:text-lime-900"
                   >
                     <small>Forgot Password?</small>
