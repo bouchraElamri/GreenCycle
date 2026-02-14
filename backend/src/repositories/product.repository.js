@@ -54,17 +54,28 @@ const searchByName = (name) =>
   }).sort({ createdAt: -1 });
 
 const searchByCategory = async (categoryName) => {
-//   const category = await categoryModel.findOne({name: { $regex: categoryName, $options: "i" }});
-//   if(!category){
-//     const error = new Error("No category found with the specified name");
-//     error.status = 404;
-//     throw error;
-//   };
-  const categoryId = category._id;
-  const products = await Product.find({ category: categoryName});
+    const category = await categoryModel.findOne({name: { $regex: categoryName, $options: "i" }});
+    if(!category){
+      const error = new Error("No category found with the specified name");
+      error.status = 404;
+      throw error;
+    };
+    const categoryId = category._id.toString();
+    const products = await Product.find({ category: categoryId });
   return products;
 };
 
 
 
-module.exports = { findAll, findById, createProduct, updateProduct, deleteProduct , filterByPrice , getNewstProducts , productSortedByPrice, searchByName, searchByCategory};
+module.exports = { 
+    findAll, 
+    findById, 
+    createProduct, 
+    updateProduct, 
+    deleteProduct , 
+    filterByPrice , 
+    getNewstProducts , 
+    productSortedByPrice, 
+    searchByName, 
+    searchByCategory,
+};
