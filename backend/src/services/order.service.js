@@ -75,8 +75,12 @@ const getClientOrders = async ({ authUserId, clientId }) => {
   return orderRepo.findMyOrders(client._id);
 };
 
-const getSellerOrders = async ({ userId }) => {
-  const seller = await Seller.findOne({ userId });
+const getSellerOrders = async ({ authUserId, sellerId }) => {
+  const sellerQuery = sellerId
+    ? { _id: sellerId, userId: authUserId }
+    : { userId: authUserId };
+
+  const seller = await Seller.findOne(sellerQuery);
   if (!seller) {
     const err = new Error("Seller profile not found");
     err.statusCode = 404;

@@ -2,6 +2,10 @@ const express = require('express');
 const { authenticate } = require('../middlewares/auth.middleware');
 const router = express.Router();
 const { GetSellerOrders } = require("../controllers/order.controller");
+const upload = require("../middlewares/upload.middleware");
+const validate = require("../middlewares/validate.middleware");
+const { productSchema } = require("../validators/product.validator");
+const { createProduct, updateProduct, deleteProduct } = require("../controllers/product.controller");
 
 // Seller routes placeholder
 router.use(authenticate); // protège toutes les routes du vendeur

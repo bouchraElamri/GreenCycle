@@ -39,8 +39,11 @@ const GetClientOrders = async (req, res, next) => {
 
 const GetSellerOrders = async (req, res, next) => {
   try {
-    const { userId } = req.params; // validated by Joi
-    const orders = await orderService.getSellerOrders({ userId });
+    const { sellerId } = req.params; // validated by Joi
+    const orders = await orderService.getSellerOrders({
+      authUserId: req.user.id,
+      sellerId: req.params.sellerId,
+  });
     return res.status(200).json(orders);
   } catch (error) {
     next(error);
