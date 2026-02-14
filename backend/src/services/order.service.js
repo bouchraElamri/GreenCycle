@@ -87,7 +87,37 @@ const getSellerOrders = async ({ authUserId, sellerId }) => {
     throw err;
   }
 
-  return orderRepo.findBySellerUser(seller._id);
+  const orders = await orderRepo.findBySellerUser(seller._id);
+
+  return orders
+    .map((order) => {
+      const sellerItems = (order.items || []).filter(
+        (item) => String(item.seller) === String(seller._id)
+      );
+
+      if (sellerItems.length === 0) {
+        return null;
+      }
+
+      const user = order.clientId?.userId || {};
+
+      return {
+        orderId: order._id,
+        items: sellerItems.map((item) => ({
+          productName: item.name || item.product?.name,
+          quantity: item.quantity,
+        })),
+        client: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          email: user.email,
+        },
+        status: order.status,
+        orderDate: order.createdAt,
+      };
+    })
+    .filter(Boolean);
 };
 
 if (!getClientOrders || !getSellerOrders) {
