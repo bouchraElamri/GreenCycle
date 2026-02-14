@@ -18,11 +18,6 @@ const registerSchema = Joi.object({
       "any.only": "Les mots de passe ne correspondent pas",
       "any.required": "La confirmation du mot de passe est obligatoire",
     }),
-
-  role: Joi.string().valid("client", "admin", "seller").messages({
-    "any.only": "Le rôle doit être 'client', 'admin' ou 'seller'",
-  }),
-
   extraData: Joi.object().optional(),
 });
 
@@ -56,3 +51,4 @@ module.exports = {
   emailSchema,
   resetPasswordSchema,
 };
+
