@@ -1,4 +1,5 @@
 const productServ = require("../services/product.service");
+const sellerRepo = require("../repositories/seller.repository");
 
 const getProducts = async (req, res, next)=>{
     try{
@@ -15,9 +16,15 @@ const createProduct = async (req, res, next) => {
       (file) => `/uploads/products/${file.filename}`
     );
 
+    // Ensure user has a seller profile
+    const sellerProfile = await sellerRepo.findByUserId(req.user.id);
+    if (!sellerProfile) {
+      return res.status(403).json({ message: "User is not a seller" });
+    }
+
     const product = await productServ.createProduct({
       ...req.body,
-      seller: req.user.id ,
+      seller: sellerProfile._id,
       images,
     });
 
@@ -39,8 +46,19 @@ const findProductById = async (req, res, next) => {
 
 const deleteProduct = async (req, res, next) => {
     try{
-        await productServ.deleteProduct(req.params.id);
-        res.status(204).send();
+    // Authorization: ensure the requester owns the product
+    const product = await productServ.getProductById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    const sellerProfile = await sellerRepo.findByUserId(req.user.id);
+    if (!sellerProfile) return res.status(403).json({ message: "User is not a seller" });
+
+    if (product.seller.toString() !== sellerProfile._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to delete this product" });
+    }
+
+    await productServ.deleteProduct(req.params.id);
+    res.status(204).send();
     } 
     catch(error){
         next(error);
@@ -56,8 +74,19 @@ const updateProduct = async (req, res, next) => {
     const data = { ...(req.body || {}) };
     if (newImages.length) data.images = newImages;
 
-    const product = await productServ.updateProduct(req.params.id, data);
-    res.status(200).json(product);
+      // Authorization: ensure the requester owns the product
+      const productBefore = await productServ.getProductById(req.params.id);
+      if (!productBefore) return res.status(404).json({ message: "Product not found" });
+
+      const sellerProfile = await sellerRepo.findByUserId(req.user.id);
+      if (!sellerProfile) return res.status(403).json({ message: "User is not a seller" });
+
+      if (productBefore.seller.toString() !== sellerProfile._id.toString()) {
+        return res.status(403).json({ message: "Not authorized to edit this product" });
+      }
+
+      const product = await productServ.updateProduct(req.params.id, data);
+      res.status(200).json(product);
   } catch (error) {
     next(error);
   }
