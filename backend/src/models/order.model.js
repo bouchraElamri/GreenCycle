@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const sellerModel = require("./seller.model");
 
 const orderSchema = new mongoose.Schema(
   {
@@ -13,6 +14,11 @@ const orderSchema = new mongoose.Schema(
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
+          required: true,
+        },
+        seller : {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Seller",
           required: true,
         },
         name: String,        

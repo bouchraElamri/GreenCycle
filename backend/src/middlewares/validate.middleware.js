@@ -1,6 +1,6 @@
 
-const validate = (schema) => (req, res, next) => {
-  const { error, value } = schema.validate(req.body, {
+const validate = (schema, target = "body") => (req, res, next) => {
+  const { error, value } = schema.validate(req[target], {
     abortEarly: false,
     stripUnknown: true,
   });
@@ -10,7 +10,7 @@ const validate = (schema) => (req, res, next) => {
     return next(error); // on laisse errorHandler gérer
   }
 
-  req.body = value;
+  req[target] = value;
   next();
 };
 module.exports = validate;

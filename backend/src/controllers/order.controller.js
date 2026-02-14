@@ -1,17 +1,17 @@
 const orderService = require("../services/order.service");
+const { authenticate } = require("../middlewares/auth.middleware");
 
 
 const PostOrder = async (req, res, next) => {
   try {
-    
-    //onst userId = req.userId;
 
+    const clientId = req.user.id;
     // For testing without auth middleware
-    const { userId, items, deliveryAddress } = req.body;
+    const { items, deliveryAddress } = req.body;
 
     // Call service layer
     const createdOrder = await orderService.createOrder({
-      userId,
+      userId: clientId,
       items,
       deliveryAddress,
     });
@@ -26,8 +26,11 @@ const PostOrder = async (req, res, next) => {
 
 const GetClientOrders = async (req, res, next) => {
   try {
-    const { userId } = req.params; // validated by Joi
-    const orders = await orderService.getClientOrders({ userId });
+    const { clientId } = req.params; // validated by Joi
+    const orders = await orderService.getClientOrders({
+      authUserId: req.user.id,
+      clientId: req.params.clientId,
+  });
     return res.status(200).json(orders);
   } catch (error) {
     next(error);

@@ -4,7 +4,7 @@ const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
 const createOrderSchema = Joi.object({
   // for testing without auth (later you remove this and use req.userId)
-  userId: Joi.string().pattern(objectIdRegex).required(),
+
 
   items: Joi.array()
     .items(
@@ -16,15 +16,21 @@ const createOrderSchema = Joi.object({
     .min(1)
     .required(),
 
-  deliveryAddress: Joi.string().trim().min(3).required(),
+  deliveryAddress: {
+    street: Joi.string().required(),
+    city: Joi.string().required(),
+    zip: Joi.string().required(),
+    country: Joi.string().required(),
+  },
 });
 
-const getOrdersQuerySchema = Joi.object({
-  userId: Joi.string().pattern(objectIdRegex).required(),
+const getClientOrdersParamsSchema = Joi.object({
+  clientId: Joi.string().pattern(objectIdRegex).required(),
 });
+
 
 
 module.exports = {
   createOrderSchema,
-  getOrdersQuerySchema
+  getClientOrdersParamsSchema
 };

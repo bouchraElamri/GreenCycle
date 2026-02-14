@@ -1,21 +1,22 @@
 const orderRepo = require('../repositories/order.repository');
 const Product = require("../models/product.model");
+// order.service.js
+const Client = require("../models/client.model");
+const Order = require("../models/order.model");
+const Seller = require("../models/seller.model");
 
 const createOrder = async ({ userId, items, deliveryAddress }) => {
-    if (!userId){
-        const error = new Error("Unauthorized");
-        error.statusCode = 401;
-        throw error;
+
+    const client = await Client.findOne({ userId });
+
+    if (!client) {
+      const err = new Error("Client profile not found");
+      err.statusCode = 404;
+      throw err;
     }
 
     if(!Array.isArray(items) || items.length === 0){
         const error = new Error("Invalid items");
-        error.statusCode = 400;
-        throw error;
-    }
-
-    if (!deliveryAddress || typeof deliveryAddress !== 'string') {
-        const error = new Error("Invalid delivery address");
         error.statusCode = 400;
         throw error;
     }
@@ -53,7 +54,7 @@ const createOrder = async ({ userId, items, deliveryAddress }) => {
     }
 
     const created = await orderRepo.create({
-        user: userId,
+        clientId: client._id, // this is what Order model expects
         items: orderItems,
         deliveryAddress,
         totalPrice,
@@ -61,18 +62,28 @@ const createOrder = async ({ userId, items, deliveryAddress }) => {
     });
 
     return created;
-    
 };
 
-const getClientOrders = async ({ userId }) => {
-  // userId validation is done by Joi, so here we focus on logic
-  console.log("Fetching orders for userId:", userId);
-  return orderRepo.findMyOrders(userId);
+const getClientOrders = async ({ authUserId, clientId }) => {
+  const client = await Client.findOne({ _id: clientId, userId: authUserId });
+  if (!client) {
+    const err = new Error("Forbidden");
+    err.statusCode = 403;
+    throw err;
+  }
+
+  return orderRepo.findMyOrders(client._id);
 };
 
 const getSellerOrders = async ({ userId }) => {
-  console.log("Fetching orders for seller userId:", userId);
-  return orderRepo.findBySellerUser(userId);
+  const seller = await Seller.findOne({ userId });
+  if (!seller) {
+    const err = new Error("Seller profile not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  return orderRepo.findBySellerUser(seller._id);
 };
 
 if (!getClientOrders || !getSellerOrders) {
