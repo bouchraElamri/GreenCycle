@@ -29,7 +29,7 @@ const publicApi = {
   },
 
   // Register
-  register: async ({ firstName, lastName, email, phone, password, passwordConfirmation}) => {
+  register: async ({ firstName, lastName, email, phone, password, passwordConfirmation }) => {
     return handleResponse(
       await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
