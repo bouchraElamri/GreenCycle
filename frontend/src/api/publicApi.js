@@ -29,14 +29,13 @@ const publicApi = {
   },
 
   // Register
-  register: async ({ firstName, lastName, email, phone, password, passwordConfirmation, role }) => {
+  register: async ({ firstName, lastName, email, phone, password, passwordConfirmation}) => {
     return handleResponse(
       await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName, lastName, email, phone, password, passwordConfirmation,
-          role
+          firstName, lastName, email, phone, password, passwordConfirmation
         }),
       })
     );

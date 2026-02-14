@@ -25,7 +25,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await publicApi.register({ firstName, lastName, email, password, phone, passwordConfirmation, role: "client" });
+      await publicApi.register({ firstName, lastName, email, password, phone, passwordConfirmation});
       setSuccess("Compte créé ! Vérifiez votre email pour l'activation.");
       setFirstName("");
       setLastName("");

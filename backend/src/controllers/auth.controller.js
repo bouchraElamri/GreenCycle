@@ -4,9 +4,9 @@ const userRepo = require("../repositories/user.repository");
 
 const register = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, phone, password, role, extraData } = req.body;
+    const { firstName, lastName, email, phone, password, extraData } = req.body;
     const createdBy = req.user?._id || null; // si admin crée admin/seller
-    await authService.register({ firstName, lastName, email, phone, password, role, extraData, createdBy });
+    await authService.register({ firstName, lastName, email, phone, password, extraData, createdBy });
     res.status(201).json({ message: "Compte créé. Vérifiez votre email pour l'activation." });
   } catch (err) {
     if (typeof next === "function") return next(err);
