@@ -63,6 +63,27 @@ const getCurrentUser = async (req, res, next) => {
   res.json({ user: req.user });
 };
 
+const getAllUsers = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10, q = "" } = req.query;
+
+    const users = await userRepo.findAllUsers({ page, limit, q });
+    const total = await userRepo.countUsers({ q });
+
+    return res.status(200).json({
+      data: users,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        totalPages: Math.ceil(total / Number(limit)),
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 module.exports = {
   register,
   activateAccount,
@@ -71,4 +92,5 @@ module.exports = {
   resetPassword,
   verifyToken,
   getCurrentUser,
+  getAllUsers,
 };

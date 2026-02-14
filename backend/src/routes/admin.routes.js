@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const categoryController = require("../controllers/category.controller");
+const authController = require("../controllers/auth.controller"); 
 const validate = require("../middlewares/validate.middleware");
 const {
   createCategorySchema,
@@ -15,6 +16,10 @@ router.use(isAdmin);
 
 router.get('/', (req, res) => res.json({ message: 'Admin API root' }));
 
+// users 
+router.get("/users", authController.getAllUsers);
+
+// categories
 router.post(
   "/categories",
   validate(createCategorySchema),
