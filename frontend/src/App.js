@@ -1,24 +1,34 @@
-import logo from './logo.svg';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
+import PublicRoutes from './router/PublicRoutes';
+import AuthProvider from './contexts/AuthProvider';
+import AdminRoutes from './router/AdminRoutes';
+import ClientRoutes from './router/ClientRoutes';
+import { CartProvider } from './contexts/CartProvider';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
+ 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <Routes>
+            <Route path="/*" element={<PublicRoutes />} />
+            <Route path="/admin/*" element={<AdminRoutes />} />
+            <Route path="/client/*" element={<ClientRoutes />} />
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
+       <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+        }}
+      />
+    </BrowserRouter>
+    
+
   );
 }
 

@@ -5,7 +5,7 @@ const registerSchema = Joi.object({
   firstName: Joi.string().min(2).max(50).required(),
   lastName: Joi.string().min(2).max(50).required(),
   email: Joi.string().email().required(),
-  phone: Joi.string().required().messages({
+  phone: Joi.string().pattern(/^(\+212|0)[\d\s-]{9,15}$/).required().messages({
     "any.required": "Le numéro de téléphone est obligatoire",
   }),
 

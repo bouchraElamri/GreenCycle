@@ -24,13 +24,23 @@ const register = async ({ firstName, lastName, email, password, phone, extraData
     createdBy: createdBy || null,
   });
 
-  await Client.create({
-    userId: user._id,
-    addresses: Array.isArray(extraData?.addresses) ? extraData.addresses : [],
-  });
+  try {
+    await Client.create({
+      userId: user._id,
+      addresses: Array.isArray(extraData?.addresses) ? extraData.addresses : [],
+    });
+  } catch (err) {
+    console.error("Client creation failed:", err.message);
+    throw new Error(`Failed to create client profile: ${err.message}`);
+  }
 
   const activationLink = `${process.env.FRONTEND_URL}/activate/${activationToken}`;
-  await sendEmail(email, "Account activation", `Click here to activate : ${activationLink}`);
+  try {
+    await sendEmail(email, "Account activation", `Click here to activate : ${activationLink}`);
+  } catch (err) {
+    console.warn("Email sending failed:", err.message);
+    // Continue registration even if email fails
+  }
 
   return user;
 };

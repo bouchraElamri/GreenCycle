@@ -14,4 +14,5 @@ router.get('/', (req, res) => res.json({ message: 'Client API root' }));
 router.post('/switch-to-seller', validateSwitchToSeller, sellerController.switchToSeller);
 
 
+
 module.exports = router;
