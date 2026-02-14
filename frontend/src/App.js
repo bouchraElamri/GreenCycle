@@ -1,15 +1,35 @@
-import logo from './logo.svg';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import Login from './pages/public/auth/Login';
+import PublicRoutes from './router/PublicRoutes';
+import AuthProvider from './contexts/AuthProvider';
+import AdminRoutes from './router/AdminRoutes';
+import ClientRoutes from './router/ClientRoutes';
+import { CartProvider } from './contexts/CartProvider';
+import { Toaster } from 'react-hot-toast';
 
-import { Routes, Route } from "react-router-dom";
-
-export default function App() {
+function App() {
+ 
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/register" element={<div>Register</div>} />
-      <Route path="/forgot-password" element={<div>Forgot Password</div>} />
-    </Routes>
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <Routes>
+            <Route path="/*" element={<PublicRoutes />} />
+            <Route path="/admin/*" element={<AdminRoutes />} />
+            <Route path="/client/*" element={<ClientRoutes />} />
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
+       <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+        }}
+      />
+    </BrowserRouter>
+    
+
   );
 }
+
+export default App;
