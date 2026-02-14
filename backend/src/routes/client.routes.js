@@ -9,6 +9,6 @@ router.use(authenticate);
 // Switch to seller
 router.post('/switch-to-seller', validateSwitchToSeller, sellerController.switchToSeller);
 
-router.get('/', (req, res) => res.json({ message: 'Client API root' }));6
+router.get('/', (req, res) => res.json({ message: 'Client API root' }));
 
 module.exports = router;
