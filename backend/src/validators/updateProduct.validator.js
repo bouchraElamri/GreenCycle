@@ -1,10 +1,9 @@
 const Joi = require("joi");
 
-const productSchema = Joi.object({
+const updateProductSchema = Joi.object({
   name: Joi.string()
     .min(3)
     .max(100)
-    .required()
     .messages({
       "string.base": "the name must be a string",
       "string.empty": "the name is required",
@@ -15,7 +14,6 @@ const productSchema = Joi.object({
   description: Joi.string()
     .min(5)
     .max(500)
-    .required()
     .messages({
       "string.base": "the description must be a string",
       "string.empty": "the description is required",
@@ -25,27 +23,24 @@ const productSchema = Joi.object({
     }),
   price: Joi.number()
     .positive()
-    .required()
     .messages({
       "number.base": "the price must be a number",
       "number.positive": "the price must be positive",
       "any.required": "the price is required",
     }),
   category: Joi.string()
-    .required()
     .messages({
       "string.base": "the category must be a string",
       "string.empty": "the category is required",
       "any.required": "the category is required",
     }),
   quantity: Joi.number()
-    .positive()
-    .required()
+    .integer()
+    .min(0)
     .messages({
       "number.base": "the quantity must be a number",
-      "number.positive": "the quantity must be positive",
-      "any.required": "the quantity is required",
+      "number.integer": "the quantity must be an integer",
     }),
 });
 
-module.exports = { productSchema };
+module.exports = { updateProductSchema };
