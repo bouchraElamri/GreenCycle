@@ -8,6 +8,12 @@ const {
   updateCategorySchema,
 } = require("../validators/category.validator");
 const { getProducts } = require("../controllers/product.controller");
+const {
+  GetAdminOrders,
+  GetAdminDeliveredOrders,
+  GetAdminConfirmedOrders,
+  GetAdminOrderDetails,
+} = require("../controllers/order.controller");
 const { authenticate , isAdmin} = require("../middlewares/auth.middleware");
 
 // Admin routes placeholder
@@ -31,5 +37,9 @@ router.patch("/categories/:id",validate(updateCategorySchema),categoryController
 router.delete("/categories/:id", categoryController.deleteCategory);
 
 router.get('/getProducts', getProducts);
+router.get("/orders", GetAdminOrders);
+router.get("/orders/delivered", GetAdminDeliveredOrders);
+router.get("/orders/confirmed", GetAdminConfirmedOrders);
+router.get("/orders/:id", GetAdminOrderDetails);
 
 module.exports = router;
