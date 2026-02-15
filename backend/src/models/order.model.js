@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const sellerModel = require("./seller.model");
+const Product = require("./product.model");
 
 const orderSchema = new mongoose.Schema(
   {
@@ -51,5 +52,25 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+orderSchema.pre("save", async function () {
+  if (!this.isNew) {
+    return;
+  }
+
+  for (const item of this.items || []) {
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: item.product, quantity: { $gte: item.quantity } },
+      { $inc: { quantity: -item.quantity } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedProduct) {
+      const err = new Error("Insufficient stock for one or more products");
+      err.statusCode = 400;
+      throw err;
+    }
+  }
+});
 
 module.exports = mongoose.model("Order", orderSchema);

@@ -1,18 +1,13 @@
 const express = require('express');
-const { createProduct , updateProduct , deleteProduct } = require('../controllers/product.controller');
-const upload = require('../middlewares/upload.middleware');
-const {productSchema } = require('../validators/product.validator');
 const {updateProductSchema } = require('../validators/updateProduct.validator');
-const validate = require('../middlewares/validate.middleware');
-
-const { authenticate } = require('../middlewares/auth.middleware');
-const router = express.Router();
 const { GetSellerOrders } = require("../controllers/order.controller");
 const upload = require("../middlewares/upload.middleware");
 const validate = require("../middlewares/validate.middleware");
 const { productSchema } = require("../validators/product.validator");
 const { createProduct, updateProduct, deleteProduct } = require("../controllers/product.controller");
 
+const { authenticate } = require('../middlewares/auth.middleware');
+const router = express.Router();
 // Seller routes placeholder
 router.use(authenticate); // protège toutes les routes du vendeur
 router.get('/', (req, res) => res.json({ message: 'Seller API root' }));
