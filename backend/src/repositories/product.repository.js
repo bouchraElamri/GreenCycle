@@ -1,13 +1,13 @@
 const Product = require("../models/product.model.js");
 const categoryModel = require("../models/category.model");
 
-const findAll = () => Product.find().populate("category");
+const findAll = () => Product.find()
 
 const findById = (id) => Product.findById(id).populate("category");
 
 const createProduct = (data) => new Product(data).save();
 
-const updateProduct = (id, data) => Product.findByIdAndUpdate(id, data, { new: true });
+const updateProduct = (id, data) => Product.findByIdAndUpdate(id, data, { new: true , runValidators: true });
 
 const deleteProduct = (id) => Product.findByIdAndDelete(id);
 
@@ -17,7 +17,7 @@ const filterByPrice = async (minP, maxP) => {
         const max = maxP !== undefined ? Number(maxP) : Number.MAX_SAFE_INTEGER;
 
         const result = await  Product.find({ 
-            price:{ $gte : min , $lte : max } 
+            price:{ $gte : min , $lte : max }         
         })
         return result;
     }
@@ -30,7 +30,7 @@ const getNewstProducts = async () => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate( oneWeekAgo.getDate() - 7 );
     const products = await Product.find({
-        createdAt : { $gte: oneWeekAgo }
+        createdAt : { $gte: oneWeekAgo }    
     }).sort({ createdAt: -1 });
     return products;
 };
@@ -51,6 +51,7 @@ const productSortedByPrice = async (order) => {
 const searchByName = (name) =>
   Product.find({
     name: { $regex: name, $options: "i" },
+
   }).sort({ createdAt: -1 });
 
 const searchByCategory = async (categoryName) => {
@@ -60,8 +61,8 @@ const searchByCategory = async (categoryName) => {
       error.status = 404;
       throw error;
     };
-    const categoryId = category._id.toString();
-    const products = await Product.find({ category: categoryId });
+    const categoryId = category._id;
+    const products = await Product.find({ category: categoryId  }).populate("category");
   return products;
 };
 

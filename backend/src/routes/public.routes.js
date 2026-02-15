@@ -1,6 +1,7 @@
 const express = require('express');
 const { getProducts, findProductById , filterByPrice , getNewstProducts , 
     productSortedByPrice , searchByCategory  } = require('../controllers/product.controller');
+const { isAvailable } = require('../middlewares/availableProduct.middleware');
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
 const { authenticate } = require("../middlewares/auth.middleware");
@@ -10,12 +11,12 @@ const categoryController = require("../controllers/category.controller");
 
 // Public routes placeholder
 router.get('/', (req, res) => res.json({ message: 'Public API root' }));
-router.get('/getProducts', getProducts);
-router.get('/getProductById/:id', findProductById);
-router.get('/filterByPrice', filterByPrice);
-router.get('/getNewstProducts', getNewstProducts);
-router.get('/productSortedByPrice', productSortedByPrice);
-router.get('/searchByCategory', searchByCategory);
+router.get('/getProducts', isAvailable, getProducts);
+router.get('/getProductById/:id', isAvailable, findProductById);
+router.get('/filterByPrice', isAvailable, filterByPrice);
+router.get('/getNewstProducts', isAvailable, getNewstProducts);
+router.get('/productSortedByPrice', isAvailable, productSortedByPrice);
+router.get('/searchByCategory', isAvailable, searchByCategory);
 
 router.get('/categories', categoryController.getAllCategories);
 router.get('/categories/:id', categoryController.getCategoryById);

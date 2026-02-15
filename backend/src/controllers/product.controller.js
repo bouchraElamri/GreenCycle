@@ -1,5 +1,6 @@
 const productServ = require("../services/product.service");
 const sellerRepo = require("../repositories/seller.repository");
+const sellerModule = require("../models/seller.model");
 
 const getProducts = async (req, res, next)=>{
     try{
@@ -53,7 +54,12 @@ const deleteProduct = async (req, res, next) => {
     const sellerProfile = await sellerRepo.findByUserId(req.user.id);
     if (!sellerProfile) return res.status(403).json({ message: "User is not a seller" });
 
-    if (product.seller.toString() !== sellerProfile._id.toString()) {
+    if (!product.seller) {
+      console.error('Product has no seller field:', req.params.id);
+      return res.status(400).json({ message: "Product seller not set" });
+    }
+
+    if (String(product.seller) !== String(sellerProfile._id)) {
       return res.status(403).json({ message: "Not authorized to delete this product" });
     }
 
@@ -77,11 +83,14 @@ const updateProduct = async (req, res, next) => {
       // Authorization: ensure the requester owns the product
       const productBefore = await productServ.getProductById(req.params.id);
       if (!productBefore) return res.status(404).json({ message: "Product not found" });
-
-      const sellerProfile = await sellerRepo.findByUserId(req.user.id);
+      const sellerProfile = await sellerModule.findOne({ userId: req.user.id });
       if (!sellerProfile) return res.status(403).json({ message: "User is not a seller" });
+      if (!productBefore.seller) {
+        console.error('Product before update has no seller field:', req.params.id);
+        return res.status(400).json({ message: 'Product seller not set' });
+      }
 
-      if (productBefore.seller.toString() !== sellerProfile._id.toString()) {
+      if (String(productBefore.seller) !== String(sellerProfile._id)) {
         return res.status(403).json({ message: "Not authorized to edit this product" });
       }
 
