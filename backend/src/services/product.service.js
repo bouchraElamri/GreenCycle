@@ -32,13 +32,13 @@ const updateProduct = async (id, data) => {
   // Vérifier la catégorie si elle est modifiée
   if (data.category) {
       if (!mongoose.Types.ObjectId.isValid(data.category)) {
-    const error = new Error("La catégorie spécifiée est invalide");
+    const error = new Error("the specified category is not valid.");
     error.status = 400;
     throw error;
   }
     const category = await categoryModel.findById(data.category);
     if (!category) {
-      const error = new Error("La catégorie spécifiée n'existe pas");
+      const error = new Error("the specified category does not exist");
       error.status = 400;
       throw error;
     }
