@@ -45,7 +45,7 @@ const productSchema = new mongoose.Schema(
     quantity: {
       type: Number,
       required: true,
-      min: 1,
+      min: 0,
     },
 
     category: { 
@@ -65,6 +65,11 @@ const productSchema = new mongoose.Schema(
       count: { type: Number, default: 0 },
     },
 
+    isAvailable: { 
+      type: Boolean, 
+      default: true 
+    },
+
     // Comments list
     comments: [commentSchema],
     
@@ -77,5 +82,40 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+productSchema.pre("save", function () {
+  if (this.quantity === 0) {
+    this.isAvailable = false;
+  }
+});
+
+productSchema.pre("findOneAndUpdate", async function () {
+  const update = this.getUpdate();
+
+  // Check direct quantity set: update.quantity or update.$set.quantity
+  const qtyDirect =
+    update.quantity !== undefined
+      ? update.quantity
+      : update.$set && update.$set.quantity !== undefined
+      ? update.$set.quantity
+      : undefined;
+
+  if (qtyDirect !== undefined) {
+    if (update.$set) update.$set.isAvailable = qtyDirect === 0 ? false : true;
+    else update.isAvailable = qtyDirect === 0 ? false : true;
+    return;
+  }
+
+  // Handle $inc updates (e.g., decrementing quantity when creating an order)
+  const incQty = update.$inc && update.$inc.quantity !== undefined ? update.$inc.quantity : undefined;
+  if (incQty !== undefined) {
+    const doc = await this.model.findOne(this.getQuery()).select("quantity");
+    const currentQty = doc ? doc.quantity || 0 : 0;
+    const newQty = currentQty + incQty;
+    if (update.$set) update.$set.isAvailable = newQty === 0 ? false : true;
+    else update.isAvailable = newQty === 0 ? false : true;
+  }
+});
+
 
 module.exports = mongoose.model("Product", productSchema);
