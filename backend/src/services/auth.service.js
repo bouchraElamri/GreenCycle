@@ -99,10 +99,105 @@ const resetPassword = async (token, newPassword) => {
   await user.save();
 };
 
+const requestEmailChange = async ({ userId, newEmail }) => {
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await userRepo.findById(userId);
+  if (!user) throw new Error("User not found");
+
+  const normalizedNewEmail = String(newEmail || "").trim().toLowerCase();
+  const normalizedCurrentEmail = String(user.email || "").trim().toLowerCase();
+
+  if (!normalizedNewEmail) throw new Error("New email is required");
+  if (normalizedNewEmail === normalizedCurrentEmail) {
+    throw new Error("New email must be different from current email");
+  }
+
+  const existing = await userRepo.findByEmail(normalizedNewEmail);
+  if (existing && existing._id.toString() !== user._id.toString()) {
+    throw new Error("Email already in use");
+  }
+
+  const code = crypto.randomInt(100000, 1000000).toString();
+  const codeHash = crypto.createHash("sha256").update(code).digest("hex");
+
+  user.emailChangeCodeHash = codeHash;
+  user.emailChangeNewEmail = normalizedNewEmail;
+  user.emailChangeExpires = Date.now() + 15 * 60 * 1000;
+  user.emailChangeAttempts = 0;
+  await user.save();
+
+  try {
+    await sendEmail(
+      user.email,
+      "Email change confirmation code",
+      `You requested to change your email to ${normalizedNewEmail}. Your confirmation code is: ${code}. This code expires in 15 minutes.`
+    );
+  } catch (err) {
+    user.emailChangeCodeHash = undefined;
+    user.emailChangeNewEmail = undefined;
+    user.emailChangeExpires = undefined;
+    user.emailChangeAttempts = 0;
+    await user.save();
+    throw new Error("Failed to send confirmation email");
+  }
+};
+
+const confirmEmailChange = async ({ userId, confirmationCode }) => {
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await userRepo.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (!user.emailChangeCodeHash || !user.emailChangeNewEmail || !user.emailChangeExpires) {
+    throw new Error("No email change request found");
+  }
+
+  if (user.emailChangeExpires.getTime() < Date.now()) {
+    user.emailChangeCodeHash = undefined;
+    user.emailChangeNewEmail = undefined;
+    user.emailChangeExpires = undefined;
+    user.emailChangeAttempts = 0;
+    await user.save();
+    throw new Error("Confirmation code expired");
+  }
+
+  const maxAttempts = 5;
+  if ((user.emailChangeAttempts || 0) >= maxAttempts) {
+    throw new Error("Too many invalid attempts. Please request a new code.");
+  }
+
+  const normalizedCode = String(confirmationCode || "").trim();
+  const confirmationCodeHash = crypto.createHash("sha256").update(normalizedCode).digest("hex");
+
+  if (confirmationCodeHash !== user.emailChangeCodeHash) {
+    user.emailChangeAttempts = (user.emailChangeAttempts || 0) + 1;
+    await user.save();
+    throw new Error("Invalid confirmation code");
+  }
+
+  const newEmail = String(user.emailChangeNewEmail).trim().toLowerCase();
+  const existing = await userRepo.findByEmail(newEmail);
+  if (existing && existing._id.toString() !== user._id.toString()) {
+    throw new Error("Email already in use");
+  }
+
+  user.email = newEmail;
+  user.emailChangeCodeHash = undefined;
+  user.emailChangeNewEmail = undefined;
+  user.emailChangeExpires = undefined;
+  user.emailChangeAttempts = 0;
+  await user.save();
+};
+
 module.exports = {
   register,
   activateAccount,
   login,
   forgotPassword,
   resetPassword,
+  requestEmailChange,
+  confirmEmailChange,
 };

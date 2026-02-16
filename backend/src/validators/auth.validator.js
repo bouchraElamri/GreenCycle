@@ -45,10 +45,23 @@ const resetPasswordSchema = Joi.object({
     }),
 });
 
+const requestEmailChangeSchema = Joi.object({
+  newEmail: Joi.string().email().required()
+});
+
+const confirmEmailChangeSchema = Joi.object({
+  confirmationCode: Joi.string().pattern(/^\d{6}$/).required().messages({
+    "string.pattern.base": "Le code de confirmation doit contenir 6 chiffres",
+    "any.required": "Le code de confirmation est obligatoire",
+  }),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
   emailSchema,
   resetPasswordSchema,
+  requestEmailChangeSchema,
+  confirmEmailChangeSchema,
 };
 

@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     activationToken: String,
+    emailChangeCodeHash: String,
+    emailChangeNewEmail: String,
+    emailChangeExpires: Date,
+    emailChangeAttempts: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
