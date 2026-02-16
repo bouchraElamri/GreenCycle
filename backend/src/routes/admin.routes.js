@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const categoryController = require("../controllers/category.controller");
+const adminController = require("../controllers/admin.controller");
 const authController = require("../controllers/auth.controller"); 
 const validate = require("../middlewares/validate.middleware");
 const {
@@ -21,6 +22,7 @@ router.use(authenticate); // protège toutes les routes
 router.use(isAdmin);
 
 router.get('/', (req, res) => res.json({ message: 'Admin API root' }));
+router.get("/dashboard", adminController.getDashboard);
 
 // users 
 router.get("/users", authController.getAllUsers);

@@ -66,6 +66,8 @@ const searchByCategory = async (categoryName) => {
   return products;
 };
 
+const countByFilter = (filter = {}) => Product.countDocuments(filter);
+
 
 
 module.exports = { 
@@ -79,4 +81,5 @@ module.exports = {
     productSortedByPrice, 
     searchByName, 
     searchByCategory,
+    countByFilter,
 };
