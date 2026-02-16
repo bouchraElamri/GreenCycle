@@ -12,7 +12,16 @@ const router = express.Router();
 router.use(authenticate); // protège toutes les routes du vendeur
 router.get('/', (req, res) => res.json({ message: 'Seller API root' }));
 router.post('/addProduct',upload.array('images', 5), validate(productSchema ) ,createProduct );
-router.put('/editProduct/:id' ,upload.array('images', 5) ,validate(updateProductSchema) ,updateProduct );
+
+// Reject attempts to set `isApproved` from seller endpoints (multer has populated req.body at this point)
+const forbidIsApprovedField = (req, res, next) => {
+	if (req.body && Object.prototype.hasOwnProperty.call(req.body, 'isApproved')) {
+		return res.status(403).json({ message: 'Only admins can change product approval status' });
+	}
+	next();
+};
+
+router.put('/editProduct/:id', upload.array('images', 5), forbidIsApprovedField, validate(updateProductSchema), updateProduct );
 router.delete('/deleteProduct/:id' ,deleteProduct );
 
 router.get("/orders/:sellerId", GetSellerOrders); // use req.user.id inside controller/service

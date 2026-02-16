@@ -94,8 +94,30 @@ const updateProduct = async (req, res, next) => {
         return res.status(403).json({ message: "Not authorized to edit this product" });
       }
 
+      // Prevent sellers from changing approval status. Only admins may approve products.
+      if (Object.prototype.hasOwnProperty.call(data, 'isApproved')) {
+        return res.status(403).json({ message: 'Only admins can change product approval status' });
+      }
+
       const product = await productServ.updateProduct(req.params.id, data);
       res.status(200).json(product);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Admin-only: approve or unapprove a product
+const approveProduct = async (req, res, next) => {
+  try {
+    const { isApproved } = req.body;
+
+    if (typeof isApproved !== 'boolean') {
+      return res.status(400).json({ message: 'isApproved must be a boolean' });
+    }
+
+    const product = await productServ.updateProduct(req.params.id, { isApproved });
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.status(200).json(product);
   } catch (error) {
     next(error);
   }
@@ -150,6 +172,7 @@ module.exports = {
   createProduct, 
   findProductById, 
   updateProduct , 
+  approveProduct,
   filterByPrice , 
   deleteProduct , 
   getNewstProducts , 

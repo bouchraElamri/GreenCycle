@@ -7,7 +7,7 @@ const {
   createCategorySchema,
   updateCategorySchema,
 } = require("../validators/category.validator");
-const { getProducts } = require("../controllers/product.controller");
+const { getProducts, approveProduct } = require("../controllers/product.controller");
 const {
   GetAdminOrders,
   GetAdminDeliveredOrders,
@@ -37,6 +37,7 @@ router.patch("/categories/:id",validate(updateCategorySchema),categoryController
 router.delete("/categories/:id", categoryController.deleteCategory);
 
 router.get('/getProducts', getProducts);
+router.patch('/products/approve/:id', approveProduct);
 router.get("/orders", GetAdminOrders);
 router.get("/orders/delivered", GetAdminDeliveredOrders);
 router.get("/orders/confirmed", GetAdminConfirmedOrders);
