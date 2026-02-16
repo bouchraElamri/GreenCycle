@@ -7,6 +7,7 @@ const {
   updateCategorySchema,
 } = require("../validators/category.validator");
 const { getProducts } = require("../controllers/product.controller");
+const { approveProduct } = require("../controllers/product.controller");
 const { authenticate , isAdmin} = require("../middlewares/auth.middleware");
 
 // Admin routes placeholder
@@ -22,5 +23,7 @@ router.patch("/categories/:id",validate(updateCategorySchema),categoryController
 router.delete("/categories/:id", categoryController.deleteCategory);
 
 router.get('/getProducts', getProducts);
+
+router.patch('/products/approve/:id', approveProduct);
 
 module.exports = router;
