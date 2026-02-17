@@ -71,6 +71,9 @@ Fichiers principaux:
   - `usersRegistered`
   - `productsInSelling` (`isApproved: true`)
   - `productsOnHold` (`isApproved: false`)
+  - `totalOrders`
+  - `totalConfirmedOrders` (`status: confirmed`)
+  - `totalDeliveredOrders` (`status: delivered`)
 
 Fichiers principaux:
 - `src/repositories/product.repository.js`

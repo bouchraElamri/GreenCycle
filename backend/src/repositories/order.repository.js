@@ -74,6 +74,10 @@ const findAdminOrderDetailsById = async (orderId) => {
     .lean();
 };
 
+const countByFilter = async (filter = {}) => {
+  return Order.countDocuments(filter);
+};
+
 module.exports = {
   create,
   findAll,
@@ -84,4 +88,5 @@ module.exports = {
   getClientId,
   findAdminOrders,
   findAdminOrderDetailsById,
+  countByFilter,
 };
