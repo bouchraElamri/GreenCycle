@@ -9,6 +9,8 @@ const sellerController = require("../controllers/seller.controller");
 const { getOrdersQuerySchema } = require("../validators/order.validator");
 const { GetClientOrders } = require("../controllers/order.controller");
 const { getClientOrdersParamsSchema } = require("../validators/order.validator");
+const authController = require("../controllers/auth.controller");
+const { requestEmailChangeSchema, confirmEmailChangeSchema, changePasswordSchema } = require("../validators/auth.validator");
 
 router.use(authenticate);
 
@@ -23,6 +25,12 @@ router.post('/switch-to-seller', validateSwitchToSeller, sellerController.switch
 router.post("/orders/", validate(createOrderSchema), PostOrder);
 
 router.get("/orders/:clientId", validate(getClientOrdersParamsSchema, "params"), GetClientOrders);
+// Change email routes
+router.post("/email-change/request", validate(requestEmailChangeSchema), authController.requestEmailChange);
+router.post("/email-change/confirm", validate(confirmEmailChangeSchema), authController.confirmEmailChange);
+
+// Change
+router.post("/change-password", validate(changePasswordSchema), authController.changePassword);
 
 
 module.exports = router;
