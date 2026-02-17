@@ -100,7 +100,7 @@ const publicApi = {
   },
 
   getProducts: async () => {
-    const res = await fetch(`${API_BASE_URL}/home`);
+    const res = await fetch(`${API_BASE_URL}/getProducts`);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Erreur lors de la récupération des produits");
