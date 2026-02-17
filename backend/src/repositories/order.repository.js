@@ -48,6 +48,36 @@ const findBySellerUser = (sellerUserId) => {
     .lean();
 };
 
+const findAdminOrders = async ({ status } = {}) => {
+  const filter = {};
+  if (status) {
+    filter.status = status;
+  }
+
+  return Order.find(filter).sort({ createdAt: -1 }).lean();
+};
+
+const findAdminOrderDetailsById = async (orderId) => {
+  return Order.findById(orderId)
+    .populate({
+      path: "clientId",
+      select: "userId",
+    })
+    .populate({
+      path: "items.product",
+      select: "name images price",
+    })
+    .populate({
+      path: "items.seller",
+      select: "userId",
+    })
+    .lean();
+};
+
+const countByFilter = async (filter = {}) => {
+  return Order.countDocuments(filter);
+};
+
 module.exports = {
   create,
   findAll,
@@ -56,4 +86,7 @@ module.exports = {
   findByIdAndUser,
   findBySellerUser,
   getClientId,
+  findAdminOrders,
+  findAdminOrderDetailsById,
+  countByFilter,
 };
