@@ -9,12 +9,17 @@ const sellerController = require("../controllers/seller.controller");
 const { getOrdersQuerySchema } = require("../validators/order.validator");
 const { GetClientOrders } = require("../controllers/order.controller");
 const { getClientOrdersParamsSchema } = require("../validators/order.validator");
+const uploadProfile = require("../middlewares/uploadProfile.middleware");
+const authController = require("../controllers/auth.controller");
 
 router.use(authenticate);
 
 // Client routes placeholder
 
 router.get('/', (req, res) => res.json({ message: 'Client API root' }));
+
+// Upload or change profile picture
+router.post('/profile/picture', uploadProfile.single('image'), authController.uploadProfilePicture);
 
 // Switch to seller
 router.post('/switch-to-seller', validateSwitchToSeller, sellerController.switchToSeller);

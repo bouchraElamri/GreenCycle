@@ -63,6 +63,21 @@ const getCurrentUser = async (req, res, next) => {
   res.json({ user: req.user });
 };
 
+const uploadProfilePicture = async (req, res, next) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+    // store the path (or filename) in the user record
+    const filePath = req.file.path;
+    const updated = await userRepo.updateUser(req.user.id, { profileImage: filePath });
+
+    res.json({ message: "Profile image updated", user: updated });
+  } catch (err) {
+    if (typeof next === "function") return next(err);
+    res.status(err.statusCode || 500).json({ error: err.message || "Erreur serveur" });
+  }
+};
+
 module.exports = {
   register,
   activateAccount,
@@ -71,4 +86,5 @@ module.exports = {
   resetPassword,
   verifyToken,
   getCurrentUser,
+  uploadProfilePicture,
 };
