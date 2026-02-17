@@ -89,6 +89,18 @@ const getCurrentUser = async (req, res, next) => {
   res.json({ user: req.user });
 };
 
+const changePassword = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+    const { oldPassword, newPassword } = req.body;
+    await authService.changePassword({ userId, oldPassword, newPassword });
+    res.json({ message: "Mot de passe mis a jour avec succes." });
+  } catch (err) {
+    if (typeof next === "function") return next(err);
+    res.status(err.statusCode || 500).json({ error: err.message || "Erreur serveur" });
+  }
+};
+
 module.exports = {
   register,
   requestEmailChange,
@@ -99,4 +111,5 @@ module.exports = {
   resetPassword,
   verifyToken,
   getCurrentUser,
+  changePassword,
 };

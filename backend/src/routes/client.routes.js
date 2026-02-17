@@ -10,7 +10,7 @@ const { getOrdersQuerySchema } = require("../validators/order.validator");
 const { GetClientOrders } = require("../controllers/order.controller");
 const { getClientOrdersParamsSchema } = require("../validators/order.validator");
 const authController = require("../controllers/auth.controller");
-const { requestEmailChangeSchema, confirmEmailChangeSchema } = require("../validators/auth.validator");
+const { requestEmailChangeSchema, confirmEmailChangeSchema, changePasswordSchema } = require("../validators/auth.validator");
 
 router.use(authenticate);
 
@@ -28,5 +28,9 @@ router.get("/orders/:clientId", validate(getClientOrdersParamsSchema, "params"),
 // Change email routes
 router.post("/email-change/request", validate(requestEmailChangeSchema), authController.requestEmailChange);
 router.post("/email-change/confirm", validate(confirmEmailChangeSchema), authController.confirmEmailChange);
+
+// Change
+router.post("/change-password", validate(changePasswordSchema), authController.changePassword);
+
 
 module.exports = router;

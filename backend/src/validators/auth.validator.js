@@ -56,6 +56,15 @@ const confirmEmailChangeSchema = Joi.object({
   }),
 });
 
+const changePasswordSchema = Joi.object({
+  oldPassword: Joi.string().min(6).required(),
+  newPassword: Joi.string().min(6).required(),
+  newPasswordConfirmation: Joi.string().valid(Joi.ref("newPassword")).required().messages({
+    "any.only": "Les mots de passe ne correspondent pas",
+    "any.required":"La confirmation du mot de pass est obligatoire",
+  }),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
@@ -63,5 +72,6 @@ module.exports = {
   resetPasswordSchema,
   requestEmailChangeSchema,
   confirmEmailChangeSchema,
+  changePasswordSchema,
 };
 

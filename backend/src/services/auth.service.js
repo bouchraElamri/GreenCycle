@@ -192,6 +192,22 @@ const confirmEmailChange = async ({ userId, confirmationCode }) => {
   await user.save();
 };
 
+const changePassword = async ({ userId, oldPassword, newPassword }) => {
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await userRepo.findById(userId);
+  if (!user) throw new Error("User not found");
+
+  const isOldPasswordValid = await user.comparePassword(oldPassword);
+  if (!isOldPasswordValid) throw new Error("Incorrect current password");
+
+  const isSamePassword = await user.comparePassword(newPassword);
+  if (isSamePassword) throw new Error("New password must be different from current password");
+
+  user.password = newPassword;
+  await user.save();
+};
+
 module.exports = {
   register,
   activateAccount,
@@ -200,4 +216,5 @@ module.exports = {
   resetPassword,
   requestEmailChange,
   confirmEmailChange,
+  changePassword,
 };
