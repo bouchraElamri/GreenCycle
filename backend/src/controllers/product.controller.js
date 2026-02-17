@@ -1,6 +1,7 @@
 const productServ = require("../services/product.service");
 const sellerRepo = require("../repositories/seller.repository");
 const sellerModule = require("../models/seller.model");
+const userModel = require("../models/user.model");
 
 const getProducts = async (req, res, next)=>{
     try{
@@ -50,7 +51,11 @@ const deleteProduct = async (req, res, next) => {
     // Authorization: ensure the requester owns the product
     const product = await productServ.getProductById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
-
+    const adminUser = await userModel.findById(req.user.id);
+    if (adminUser && adminUser.role == 'admin') {
+      await productServ.deleteProduct(req.params.id);
+      return res.status(204).send();
+    }
     const sellerProfile = await sellerRepo.findByUserId(req.user.id);
     if (!sellerProfile) return res.status(403).json({ message: "User is not a seller" });
 
