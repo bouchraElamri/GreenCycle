@@ -20,9 +20,16 @@ const findByIdWithUser = async (id) => {
   return Seller.findById(id).populate("userId", "firstName lastName email");
 };
 
+const findAllWithUser = async () => {
+  return Seller.find()
+    .populate("userId", "firstName lastName email")
+    .sort({ createdAt: -1 });
+};
+
 module.exports = {
   createSellerProfile,
   findByUserId,
   findByUserIdWithUser,
   findByIdWithUser,
+  findAllWithUser,
 };
