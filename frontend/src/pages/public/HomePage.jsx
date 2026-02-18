@@ -1,10 +1,12 @@
 import React from 'react'
 import Navbar from '../../components/layouts/Navbar';
+import Footer from '../../components/layouts/Footer';
 const HomePage = () => {
   return (
-    <div>
+    <div className='min-h-screen flex flex-col'>
       <Navbar />
-      <div>HomePage</div>
+      <div className='flex-1'>HomePage</div>
+      <Footer />
     </div>
   )
 }
