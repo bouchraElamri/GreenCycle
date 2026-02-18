@@ -5,6 +5,7 @@ import logo from "../../assets/Logo-white 2.png";
 import searchicon from "../../assets/zoom.png";
 import profile from "../../assets/profile.jpg";
 import { useRef } from "react";
+import { RiMenuSearchFill } from "react-icons/ri";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -181,7 +182,7 @@ export default function Navbar() {
               }}
               className="flex items-center mr-6 overflow-hidden border-white-light lg:hidden"
             >
-              sidebar
+              <RiMenuSearchFill size={30} color="white" />
             </button>
           </div>
             </>
@@ -235,7 +236,7 @@ export default function Navbar() {
                 Profile
               </Link>
 
-              <div className="w-[85%] h-px bg-black/10" />
+              <div className="w-[85%] h-[0.5px] bg-black/10" />
 
               <button
                 onClick={handleLogout}
@@ -305,7 +306,7 @@ export default function Navbar() {
                 Products
               </Link>
 
-              <div className="w-[85%] h-px bg-black/10" />
+              <div className="w-[85%] h-[0.5px] bg-black/10" />
 
               {!isAuthenticated ? (
                 <>
