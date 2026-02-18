@@ -47,13 +47,13 @@ const productSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
-
+    
     category: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: "Category", 
       required: true 
     },
-
+    
     seller: {
       type: mongoose.Schema.Types.ObjectId, 
       ref: "Seller", 
@@ -68,6 +68,11 @@ const productSchema = new mongoose.Schema(
     isAvailable: { 
       type: Boolean, 
       default: true 
+    },
+
+    isApproved: {
+      type: Boolean,
+      default: false,
     },
 
     // Comments list
@@ -101,8 +106,10 @@ productSchema.pre("findOneAndUpdate", async function () {
       : undefined;
 
   if (qtyDirect !== undefined) {
-    if (update.$set) update.$set.isAvailable = qtyDirect === 0 ? false : true;
-    else update.isAvailable = qtyDirect === 0 ? false : true;
+    const qtyValue = Number(qtyDirect);
+    const available = Number.isFinite(qtyValue) ? qtyValue > 0 : qtyDirect !== 0;
+    if (update.$set) update.$set.isAvailable = available;
+    else update.isAvailable = available;
     return;
   }
 
@@ -111,9 +118,10 @@ productSchema.pre("findOneAndUpdate", async function () {
   if (incQty !== undefined) {
     const doc = await this.model.findOne(this.getQuery()).select("quantity");
     const currentQty = doc ? doc.quantity || 0 : 0;
-    const newQty = currentQty + incQty;
-    if (update.$set) update.$set.isAvailable = newQty === 0 ? false : true;
-    else update.isAvailable = newQty === 0 ? false : true;
+    const newQty = Number(currentQty) + Number(incQty);
+    const available = newQty > 0;
+    if (update.$set) update.$set.isAvailable = available;
+    else update.isAvailable = available;
   }
 });
 
