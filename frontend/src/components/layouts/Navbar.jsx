@@ -32,7 +32,7 @@ export default function Navbar() {
     e.preventDefault();
     const value = searchTerm.trim();
     const query = value ? `?name=${encodeURIComponent(value)}` : "";
-    navigate(`/products${query}`);
+    navigate(`/product_list${query}`);
   };
 
   async function handleLogout() {
@@ -98,7 +98,7 @@ export default function Navbar() {
             <ul className="flex items-center lg:gap-6 xl:gap-12 mr-0">
               <li>
                 <Link
-                  to="/products"
+                  to="/product_list"
                   className="inline-flex h-10 w-28 items-center justify-center rounded-full font-nexa text-base font-bold text-white-intense transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
                 >
                   Products
@@ -299,7 +299,7 @@ export default function Navbar() {
               <div className="w-[85%] h-px bg-black/10" />
 
               <Link
-                to="/products"
+                to="/product_list"
                 onClick={() => setSidebarOpen(false)}
                 className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
               >
@@ -342,7 +342,7 @@ export default function Navbar() {
                 <div className="w-[85%] h-px bg-black/10" />
 
                 <Link
-                to="/products"
+                to="/"
                 onClick={() => setSidebarOpen(false)}
                 className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
               >
