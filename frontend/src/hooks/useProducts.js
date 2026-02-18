@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import publicApi from "../api/publicApi";
 
-export default function useHomeService(productId = null) {
+export default function useProducts(productId = null) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [products, setProducts] = useState([]);

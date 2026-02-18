@@ -8,8 +8,8 @@ async function handleResponse(response) {
 
   if (!response.ok) {
     const message = isJson
-      ? (data.error || data.message || "Erreur API")
-      : `Erreur API (${response.status}). Réponse non JSON reçue. Vérifie REACT_APP_API_URL.`;
+      ? (data.error || data.message || "Erreur inconnue")
+      : `Error API (${response.status}). Response was not JSON.`;
     throw new Error(message);
   }
 
@@ -103,7 +103,7 @@ const publicApi = {
     const res = await fetch(`${API_BASE_URL}/getProducts`);
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error(errorData.message || "Erreur lors de la récupération des produits");
+      throw new Error(errorData.message || "Error fetching products");
     }
     return res.json();
   },
@@ -112,11 +112,18 @@ const publicApi = {
     const res = await fetch(`${API_BASE_URL}/product-details/${id}`);
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error(errorData.message || "Produit non trouvé");
+      throw new Error(errorData.message || "Product not found");
     }
     return res.json();
-  }
-
+  },
+  getCategories: async () => {
+    const res = await fetch(`${API_BASE_URL}/categories`);
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error fetching categories");
+    }
+    return res.json();
+  },
 };
 
 export default publicApi;
