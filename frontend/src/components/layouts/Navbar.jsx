@@ -1,10 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../../contexts/AuthContext";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import logo from "../../assets/Logo-white 2.png";
 import searchicon from "../../assets/zoom.png";
 import profile from "../../assets/profile.jpg";
-import { useRef } from "react";
 import { RiMenuSearchFill } from "react-icons/ri";
 
 export default function Navbar() {
@@ -37,11 +36,12 @@ export default function Navbar() {
 
   async function handleLogout() {
     setDrawerOpen(false);
+    setSidebarOpen(false);
     await logout();
     navigate("/");
   }
 
-  // Close drawer with ESC
+  // Close drawer with outside click (desktop)
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -57,6 +57,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [drawerOpen]);
 
+  // Close sidebar with outside click (mobile)
   useEffect(() => {
     function handleClickOutsidebox(event) {
       if (
@@ -75,7 +76,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-6 left-0 w-full z-50">
-      <div className="relative flex flex-col mx-6 lg:mx-10 xl:mx-24 2xl:mx-40">
+      <div className="relative flex flex-col mx-6 md:mx-10 xl:mx-24 2xl:mx-40">
         <nav
           className="flex h-12
                     justify-between 
@@ -83,19 +84,20 @@ export default function Navbar() {
                     bg-gradient-to-r from-green-tolerated to-green-dark
                     rounded-full 
                     shadow
-                    lg:h-16"
+                    md:h-16"
         >
           {/* logo */}
-          <Link className="ml-6 shrink-0 lg:ml-6" to="/">
+          <Link className="ml-6 shrink-0 md:ml-6" to="/">
             <img
               src={logo}
               alt="Logo"
-              className="w-[140px] lg:w-[170px] xl:w-[170px] h-auto"
+              className="w-[140px] md:w-[170px] xl:w-[170px] h-auto"
             />
           </Link>
+
           {/* navigation : for Desktop */}
-          <div className="hidden lg:flex lg:items-center lg:flex-1 lg:justify-end">
-            <ul className="flex items-center lg:gap-6 xl:gap-12 mr-0">
+          <div className="hidden md:flex md:items-center md:flex-1 md:justify-end">
+            <ul className="flex items-center md:gap-6 xl:gap-12 mr-0">
               <li>
                 <Link
                   to="/product_list"
@@ -104,10 +106,11 @@ export default function Navbar() {
                   Products
                 </Link>
               </li>
+
               <li>
                 <form
                   onSubmit={handleSearchSubmit}
-                  className="flex h-10 bg-white-intense rounded-full overflow-hidden lg:w-64 xl:w-96"
+                  className="flex h-10 bg-white-intense rounded-full overflow-hidden md:w-64 xl:w-96"
                 >
                   <input
                     type="text"
@@ -155,7 +158,7 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={() => {
-                        setDrawerOpen(true);
+                        setDrawerOpen(!drawerOpen);
                       }}
                       className="flex item-center mr-3 w-12 h-12 rounded-full overflow-hidden border-2 border-white-light"
                     >
@@ -174,51 +177,52 @@ export default function Navbar() {
           {/* navigation : for Mobile */}
           {!isAuthenticated ? (
             <>
-            <div className="flex items-center lg:hidden">
-            <button
-              type="button"
-              onClick={() => {
-                setSidebarOpen(true);
-              }}
-              className="flex items-center mr-6 overflow-hidden border-white-light lg:hidden"
-            >
-              <RiMenuSearchFill size={30} color="white" />
-            </button>
-          </div>
+              <div className="flex items-center md:hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSidebarOpen(true);
+                  }}
+                  className="flex items-center mr-6 overflow-hidden border-white-light md:hidden"
+                >
+                  <RiMenuSearchFill size={30} color="white" />
+                </button>
+              </div>
             </>
-          ) : ( 
-          <>
-            <div className="flex items-center lg:hidden">
-            <button
-              type="button"
-              onClick={() => {
-                setSidebarOpen(true);
-              }}
-              className="flex items-center mr-1 w-10 h-10 rounded-full overflow-hidden border-2 border-white-light lg:hidden"
-            >
-              <img
-                src={profile}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            </button>
-          </div>
+          ) : (
+            <>
+              <div className="flex items-center md:hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSidebarOpen(!sidebarOpen);
+                  }}
+                  className="flex items-center mr-1 w-10 h-10 rounded-full overflow-hidden border-2 border-white-light"
+                >
+                  <img
+                    src={profile}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              </div>
             </>
           )}
         </nav>
 
-        {/* Right sidebar drawer (desktop only) */}
+        {/* ✅ FIXED: Right sidebar drawer (desktop only) - now absolute so it doesn't take a full line */}
         <div
           ref={drawerRef}
-          className={`hidden lg:flex justify-between mt-5 transition-all duration-200 ease-out
-        ${isAuthenticated && drawerOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}
-        `}
+          className={`hidden md:block absolute right-0 top-full mt-5 transition-all duration-200 ease-out
+            ${
+              isAuthenticated && drawerOpen
+                ? "opacity-100 translate-y-0 pointer-events-auto"
+                : "opacity-0 -translate-y-2 pointer-events-none"
+            }`}
         >
-          <div></div>
           <div className="bg-white-broken w-72 shadow-[0_0_30px_rgba(0,0,0,0.1)] rounded-3xl bg-white/95 backdrop-blur">
             <div className="flex flex-col items-center py-2">
-
-                <Link
+              <Link
                 to="/cart"
                 onClick={() => setDrawerOpen(false)}
                 className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
@@ -226,7 +230,7 @@ export default function Navbar() {
                 Cart
               </Link>
 
-                <div className="w-[85%] h-px bg-black/10" />
+              <div className="w-[85%] h-px bg-black/10" />
 
               <Link
                 to="/profile"
@@ -248,12 +252,16 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Right sidebar drawer (mobile only) */}
+        {/* ✅ FIXED: Right sidebar drawer (mobile only) - now absolute so it doesn't take a full line */}
         <div
           ref={sidebarRef}
-          className={`justify-between mt-5 transition-all duration-200 ease-out lg:hidden
-            ${ sidebarOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}
-            `}
+          className={`md:hidden absolute left-0 top-full w-full mt-5 transition-all duration-200 ease-out
+            ${
+              sidebarOpen
+                ? "opacity-100 translate-y-0 pointer-events-auto"
+                : "opacity-0 -translate-y-2 pointer-events-none"
+            }
+          `}
         >
           <div className="bg-white-broken w-full shadow-[0_0_30px_rgba(0,0,0,0.1)] rounded-3xl bg-white/95 backdrop-blur">
             {/* Close button */}
@@ -281,7 +289,7 @@ export default function Navbar() {
               <div className="py-6">
                 <form
                   onSubmit={handleSearchSubmit}
-                  className="flex h-10 bg-white-intense rounded-full overflow-hidden lg:w-64 xl:w-96"
+                  className="flex h-10 bg-white-intense rounded-full overflow-hidden md:w-64 xl:w-96"
                 >
                   <input
                     type="text"
@@ -310,66 +318,64 @@ export default function Navbar() {
 
               {!isAuthenticated ? (
                 <>
-                <Link
-                to="/login"
-                onClick={() => setSidebarOpen(false)}
-                className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
-              >
-                Login
-              </Link>
+                  <Link
+                    to="/login"
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Login
+                  </Link>
 
-                <div className="w-[85%] h-px bg-black/10" />
+                  <div className="w-[85%] h-px bg-black/10" />
 
-                <Link
-                to="/signup"
-                onClick={() => setSidebarOpen(false)}
-                className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
-              >
-                Sign Up
-              </Link>
-               
+                  <Link
+                    to="/register"
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Sign Up
+                  </Link>
                 </>
               ) : (
                 <>
-                <Link
-                to="/cart"
-                onClick={() => setSidebarOpen(false)}
-                className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
-              >
-                Cart
-              </Link>
+                  <Link
+                    to="/cart"
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Cart
+                  </Link>
 
-                <div className="w-[85%] h-px bg-black/10" />
+                  <div className="w-[85%] h-px bg-black/10" />
 
-                <Link
-                to="/"
-                onClick={() => setSidebarOpen(false)}
-                className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
-              >
-                Switch To Seller
-              </Link>
+                  <Link
+                    to="/"
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Switch To Seller
+                  </Link>
 
-              <div className="w-[85%] h-px bg-black/10" />
-              <Link
-                to="/profile"
-                onClick={() => setSidebarOpen(false)}
-                className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
-              >
-                Profile
-              </Link>
+                  <div className="w-[85%] h-px bg-black/10" />
 
-              <div className="w-[85%] h-px bg-black/10" />
+                  <Link
+                    to="/profile"
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Profile
+                  </Link>
 
-              <button
-                onClick={handleLogout}
-                className="px-6 py-3 text-left font-nexa text-xl text-green-dark hover:font-bold transition"
-              >
-                Log Out
-              </button>
+                  <div className="w-[85%] h-px bg-black/10" />
+
+                  <button
+                    onClick={handleLogout}
+                    className="px-6 py-3 text-left font-nexa text-xl text-green-dark hover:font-bold transition"
+                  >
+                    Log Out
+                  </button>
                 </>
-
               )}
-
             </div>
           </div>
         </div>
