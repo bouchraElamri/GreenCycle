@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 async function handleResponse(response) {
   const contentType = response.headers.get("content-type") || "";
@@ -8,8 +8,8 @@ async function handleResponse(response) {
 
   if (!response.ok) {
     const message = isJson
-      ? (data.error || data.message || "Erreur inconnue")
-      : `Error API (${response.status}). Response was not JSON.`;
+      ? (data.error || data.message || "Erreur API")
+      : `Erreur API (${response.status}). Response non JSON received. Verify REACT_APP_API_URL.`;
     throw new Error(message);
   }
 
@@ -99,8 +99,9 @@ const publicApi = {
     return true;
   },
 
-  getProducts: async () => {
-    const res = await fetch(`${API_BASE_URL}/getProducts`);
+  getProducts: async (name = "") => {
+    const query = name ? `?name=${encodeURIComponent(name)}` : "";
+    const res = await fetch(`${API_BASE_URL}/getProducts${query}`);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Error fetching products");
@@ -109,13 +110,17 @@ const publicApi = {
   },
 
   getProductDetails: async (id) => {
-    const res = await fetch(`${API_BASE_URL}/product-details/${id}`);
+    const res = await fetch(`${API_BASE_URL}/getProductById/${id}`);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Product not found");
     }
     return res.json();
   },
+  // getProductsByCategory: async (categoryId) => {
+
+  // };
+  
   getCategories: async () => {
     const res = await fetch(`${API_BASE_URL}/categories`);
     if (!res.ok) {

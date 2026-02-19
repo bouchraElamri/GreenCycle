@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @font-face {
   font-family: "Nexa";
   src: url("../public/assets/fonts/Nexa-ExtraLight.ttf") format("truetype");
@@ -13,4 +14,31 @@
   src: url("../public/assets/fonts/Nexa-Heavy.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
+}
+input[type="range"] {
+  height: 8px;
+  border : 1px solid #ffffff;
+  border-radius: 9999px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  margin-top: -5px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
 }

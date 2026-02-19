@@ -1,14 +1,15 @@
 import React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../../assets/Logo-white 2.png";
 import background from "../../../assets/Photo_bg.png";
 import hook from "../../../assets/Hook _poster.png";
 import formimg from "../../../assets/Photobg.png";
 import publicApi from "../../../api/publicApi";
 
-export default function Login() {
-   const [firstName, setFirstName] = useState("");
+export default function SignUp() {
+  const navigate = useNavigate();
+  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -22,25 +23,44 @@ export default function Login() {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+
+    if (password !== passwordConfirmation) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await publicApi.register({ firstName, lastName, email, password, phone, passwordConfirmation });
-      setSuccess("Compte créé ! Vérifiez votre email pour l'activation.");
+      const response = await publicApi.register({
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+        passwordConfirmation,
+      });
+
+      setSuccess(response?.message || "Account created. Check your email to activate it.");
       setFirstName("");
       setLastName("");
       setPhone("");
       setEmail("");
       setPassword("");
       setPasswordConfirmation("");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1200);
     } catch (err) {
-      setError(err?.message || "Erreur lors de l'inscription");
+      setError(err?.message || "Signup failed");
       console.log(err);
     } finally {
       setLoading(false);
     }
   }
-    return (
+
+  return (
     <div
       className="min-h-screen w-full"
       style={{
@@ -56,9 +76,7 @@ export default function Login() {
             "linear-gradient(90deg,rgba(33, 80, 37, 1) 0%, rgba(196, 230, 201, 0.75) 100%)",
         }}
       >
-        {/* Wrapper: stack on mobile, 2 columns on lg */}
         <div className="w-full px-6 py-5 lg:px-10 lg:py-10 max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
-          {/* Left side (title + form) */}
           <div className="w-full lg:w-1/2">
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-nexa text-center font-bold text-white mb-4">
               Welcome to
@@ -90,9 +108,13 @@ export default function Login() {
                 >
                   Sign Up
                 </h1>
+
                 {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">{error}</div>}
-                {success && <div className="bg-green-100 text-green-700 p-3 rounded mb-4 text-sm">{success}</div>}
-                <div className=" grid grid-cols-1 sm:grid-cols-2 sm:gap-6">
+                {success && (
+                  <div className="bg-green-100 text-green-700 p-3 rounded mb-4 text-sm">{success}</div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-6">
                   <div className="mt-4 md:mt-6">
                     <label
                       htmlFor="first-name"
@@ -101,13 +123,14 @@ export default function Login() {
                       First name
                     </label>
                     <input
-                        type="text"
-                        value={firstName} 
-                        onChange={(e) => setFirstName(e.target.value)}
-                        disabled={loading}
-                        placeholder="First name"
-                        id="first-name"
-                        className="bg-white font-nexa w-full px-2 py-1 md:px-3 md:py-2 border rounded-full focus:outline-none focus:ring-2 border-green-900 text-sm md:text-base"
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      disabled={loading}
+                      required
+                      placeholder="First name"
+                      id="first-name"
+                      className="bg-white font-nexa w-full px-2 py-1 md:px-3 md:py-2 border rounded-full focus:outline-none focus:ring-2 border-green-900 text-sm md:text-base"
                     />
                   </div>
 
@@ -121,9 +144,10 @@ export default function Login() {
                     <input
                       type="text"
                       placeholder="Last name"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        disabled={loading}
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      disabled={loading}
+                      required
                       id="last-name"
                       className="bg-white text-sm md:text-base font-nexa w-full px-2 py-1 md:px-3 md:py-2 border rounded-full focus:outline-none focus:ring-2 border-green-900"
                     />
@@ -142,6 +166,7 @@ export default function Login() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     disabled={loading}
+                    required
                     placeholder="+212 xxxxxxx"
                     id="phone-number"
                     className="bg-white text-sm md:text-base font-nexa w-full px-2 py-1 md:px-3 md:py-2 border rounded-full focus:outline-none focus:ring-2 border-green-900"
@@ -155,16 +180,16 @@ export default function Login() {
                   <input
                     type="email"
                     placeholder="Email"
-
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={loading}
+                    required
                     id="email"
                     className="bg-white text-sm md:text-base font-nexa w-full px-2 py-1 md:px-3 md:py-2 border rounded-full focus:outline-none focus:ring-2 border-green-900"
                   />
                 </div>
 
-                <div className=" grid grid-cols-1 sm:grid-cols-2  sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-6">
                   <div className="mt-4 md:mt-6">
                     <label
                       htmlFor="password"
@@ -176,9 +201,10 @@ export default function Login() {
                       type="password"
                       placeholder="Password"
                       id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={loading}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                      required
                       className="bg-white text-sm md:text-base font-nexa w-full px-2 py-1 md:px-3 md:py-2 border rounded-full focus:outline-none focus:ring-2 border-green-900"
                     />
                   </div>
@@ -192,9 +218,10 @@ export default function Login() {
                     </label>
                     <input
                       type="password"
-                          value={passwordConfirmation}
-                            onChange={(e) => setPasswordConfirmation(e.target.value)}
-                            disabled={loading}
+                      value={passwordConfirmation}
+                      onChange={(e) => setPasswordConfirmation(e.target.value)}
+                      disabled={loading}
+                      required
                       placeholder="Confirm Password"
                       id="confirm-password"
                       className="bg-white text-sm md:text-base font-nexa w-full px-2 py-1 md:px-3 md:py-2 border rounded-full focus:outline-none focus:ring-2 border-green-900"
@@ -204,11 +231,12 @@ export default function Login() {
 
                 <div className="mt-4 md:mt-6 flex flex-col items-center justify-center">
                   <button
-                    type="submit"  disabled={loading}
+                    type="submit"
+                    disabled={loading}
                     style={{ backgroundColor: "#598E5C" }}
-                    className="w-full sm:w-56 font-nexa text-white font-bold mb-2 py-2 px-4 rounded-full hover:bg-green-600 hover:opacity-80 transition duration-300"
+                    className="w-full sm:w-56 font-nexa text-white font-bold mb-2 py-2 px-4 rounded-full hover:bg-green-600 hover:opacity-80 transition duration-300 disabled:opacity-60"
                   >
-                    {loading ? "Création en cours..." : "Créer un compte"}
+                    {loading ? "Creating..." : "Create account"}
                   </button>
 
                   <Link
@@ -223,7 +251,6 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Right side (poster) - hidden on small screens, shown on lg */}
           <div
             className="hidden lg:flex lg:w-1/2 items-center justify-center bg-white shadow-slate-500 shadow-md overflow-hidden"
             style={{ borderRadius: "40px" }}
