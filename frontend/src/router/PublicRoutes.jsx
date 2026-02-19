@@ -18,7 +18,6 @@ export default function PublicRoutes() {
             <Route path="/activate/:token" element={<ActivateAccountPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-
             <Route path="/product_list" element={<ProductList />} />
         </Routes>
     );
