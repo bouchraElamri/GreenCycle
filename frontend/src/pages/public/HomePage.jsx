@@ -5,7 +5,7 @@ const HomePage = () => {
   return (
     <div className='min-h-screen flex flex-col'>
       <Navbar />
-      <div className='flex-1'>HomePage</div>
+      <button className='flex-1 lg:text-white lg:mt-28'> click here</button>
       <Footer />
     </div>
   )
