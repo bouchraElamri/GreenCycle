@@ -51,4 +51,17 @@ const isSeller = async (req, res, next) => {
   return res.status(403).json({ error: "Denied Access: sellers only" });
 };
 
-module.exports = { authenticate, isAdmin, isSeller };
+const isClientOrSeller = (req, res, next) => {
+  const roles = req.user?.role;
+
+  if (
+    Array.isArray(roles) &&
+    (roles.includes("client") || roles.includes("seller"))
+  ) {
+    return next();
+  }
+
+  return res.status(403).json({ error: "Denied Access: clients or sellers only" });
+};
+
+module.exports = { authenticate, isAdmin, isSeller, isClientOrSeller };

@@ -1,7 +1,31 @@
 const userRepo = require("../repositories/user.repository");
 const sellerRepo = require("../repositories/seller.repository");
+const productRepo = require("../repositories/product.repository");
+const mongoose = require("mongoose");
 
 class SellerService {
+  formatPublicSellerProfile(seller) {
+    return {
+      _id: seller._id,
+      userId: seller.userId?._id || seller.userId,
+      fullName: seller.userId
+        ? `${seller.userId.firstName || ""} ${seller.userId.lastName || ""}`.trim()
+        : "",
+      firstName: seller.userId?.firstName,
+      lastName: seller.userId?.lastName,
+      email: seller.userId?.email,
+      description: seller.description,
+      profileUrl: seller.profileUrl,
+      bannerUrl: seller.bannerUrl,
+      address: seller.address,
+      isVerified: seller.isVerified,
+      rating: seller.rating,
+      totalSales: seller.totalSales,
+      createdAt: seller.createdAt,
+      updatedAt: seller.updatedAt,
+    };
+  }
+
   /**
    * Switch a user to seller role and create seller profile
    * @param {string} userId - The user's ID
@@ -78,6 +102,51 @@ class SellerService {
   async isUserSeller(userId) {
     const user = await userRepo.findById(userId);
     return user && user.role.includes("seller");
+  }
+
+  async getVisibleSellers() {
+    const sellers = await sellerRepo.findAllWithUser();
+    return sellers.map((seller) => this.formatPublicSellerProfile(seller));
+  }
+
+  async getSellerPublicProfile(sellerId) {
+    if (!mongoose.Types.ObjectId.isValid(sellerId)) {
+      const error = new Error("Invalid seller id");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const seller = await sellerRepo.findByIdWithUser(sellerId);
+    if (!seller) {
+      const error = new Error("Seller profile not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    return this.formatPublicSellerProfile(seller);
+  }
+
+  async getSellerPublicProducts(sellerId, type = "remaining") {
+    if (!mongoose.Types.ObjectId.isValid(sellerId)) {
+      const error = new Error("Invalid seller id");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (type !== "remaining" && type !== "sold") {
+      const error = new Error("Invalid type. Use 'remaining' or 'sold'");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const seller = await sellerRepo.findByIdWithUser(sellerId);
+    if (!seller) {
+      const error = new Error("Seller profile not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    return productRepo.findSellerProducts(sellerId, type);
   }
 }
 
