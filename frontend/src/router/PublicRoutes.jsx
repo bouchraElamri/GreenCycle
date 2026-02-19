@@ -8,6 +8,7 @@ import Login from "../pages/public/auth/Login";
 import SignUp from "../pages/public/auth/SignUp";
 
 
+
 export default function PublicRoutes() {
     return (
         <Routes>

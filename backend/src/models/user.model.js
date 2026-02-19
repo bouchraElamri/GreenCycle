@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema(
     activationToken: String,
     // URL or path to user's profile image
     profileImage: { type: String },
+    emailChangeCodeHash: String,
+    emailChangeNewEmail: String,
+    emailChangeExpires: Date,
+    emailChangeAttempts: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

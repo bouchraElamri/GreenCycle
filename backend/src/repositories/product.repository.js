@@ -66,6 +66,23 @@ const searchByCategory = async (categoryName) => {
   return products;
 };
 
+const countByFilter = (filter = {}) => Product.countDocuments(filter);
+
+const findSellerProducts = (sellerId, type = "remaining") => {
+    const filter = {
+        seller: sellerId,
+        isApproved: true,
+    };
+
+    if (type === "remaining") {
+        filter.isAvailable = true;
+    } else if (type === "sold") {
+        filter.isAvailable = false;
+    }
+
+    return Product.find(filter).sort({ createdAt: -1 });
+};
+
 
 
 module.exports = { 
@@ -79,4 +96,6 @@ module.exports = {
     productSortedByPrice, 
     searchByName, 
     searchByCategory,
+    countByFilter,
+    findSellerProducts,
 };

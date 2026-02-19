@@ -30,12 +30,15 @@ export default function Login() {
       // Store user info for UI convenience (components may use this)
       localStorage.setItem("user", JSON.stringify(response.user));
       await refreshAuth();
-      // Redirect to area according to role
-      const role = response.user?.role || "client";
-      if (role === "admin") {
+      // Redirect according to role format coming from backend (array or string)
+      const roles = Array.isArray(response.user?.role)
+        ? response.user.role
+        : [response.user?.role || "client"];
+
+      if (roles.includes("admin")) {
         navigate("/admin/");
-            } else {
-        navigate("/client/");
+      } else {
+        navigate("/");
       }
     } catch (err) {
       setError(err?.message || "Erreur lors de la connexion");
