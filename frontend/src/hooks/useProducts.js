@@ -15,11 +15,9 @@ export default function useProducts(productId = null) {
       try {
         if (productId) {
           const data = await publicApi.getProductDetails(productId);
-          console.log(data);
           setProduct(data);
         } else {
           const data = await publicApi.getProducts();
-          console.log(data);
           setProducts(data);
         }
       } catch (err) {
