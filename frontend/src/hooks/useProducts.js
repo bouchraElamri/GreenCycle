@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import publicApi from "../api/publicApi";
 
-export default function useHomeService(productId = null) {
+export default function useProducts(productId = null) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [products, setProducts] = useState([]);
@@ -15,11 +15,9 @@ export default function useHomeService(productId = null) {
       try {
         if (productId) {
           const data = await publicApi.getProductDetails(productId);
-          console.log(data);
           setProduct(data);
         } else {
           const data = await publicApi.getProducts();
-          console.log(data);
           setProducts(data);
         }
       } catch (err) {
