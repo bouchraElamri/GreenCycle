@@ -26,6 +26,10 @@ export default function Navbar() {
   const gotosignup = () => navigate(`/register`);
   const switchtoseller = () => navigate("/seller");
 
+  const goToLogin = () => navigate(`/login`);
+  const gotosignup = () => navigate(`/register`);
+  const switchtoseller = () => navigate("/seller");
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const value = searchTerm.trim();
