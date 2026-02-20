@@ -6,7 +6,7 @@ export default function MainLayout({ children }) {
   return (
     <>
       <Navbar />
-      <main className=" px-6">{children}           
+      <main >{children}           
       </main>
       <Footer />
     </>
