@@ -1,10 +1,14 @@
 import React from 'react'
-import MainLayout from '../../components/layouts/MainLayout'
+import Navbar from '../../components/layouts/Navbar';
+import Footer from '../../components/layouts/Footer';
+
 const HomePage = () => {
   return (
-    <MainLayout>
-      <div>HomePage</div>
-    </MainLayout>
+    <div className='min-h-screen flex flex-col'>
+      <Navbar />
+      homepage
+      <Footer />
+    </div>
   )
 }
 

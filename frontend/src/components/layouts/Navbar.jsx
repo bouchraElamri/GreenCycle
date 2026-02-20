@@ -12,13 +12,6 @@ export default function Navbar() {
   const location = useLocation();
   const { isAuthenticated, logout, role } = useContext(AuthContext);
 
-  const roles = Array.isArray(role) ? role : role ? [role] : [];
-  const normalizedRoles = roles.map((r) => String(r).toLowerCase());
-  const isAdminUser =
-    normalizedRoles.includes("admin") ||
-    normalizedRoles.includes("administrator");
-  const isAdminRoute = location.pathname.startsWith("/admin");
-
   const drawerRef = useRef(null);
   const sidebarRef = useRef(null);
 
@@ -28,12 +21,10 @@ export default function Navbar() {
 
   // ✅ NEW: 0..1 progressive haze opacity
   const [fadeProgress, setFadeProgress] = useState(0);
-  const progressiveHazeMask = {
-    WebkitMaskImage:
-      "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.75) 45%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%)",
-    maskImage:
-      "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.75) 45%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%)",
-  };
+
+  const goToLogin = () => navigate(`/login`);
+  const gotosignup = () => navigate(`/register`);
+  const switchtoseller = () => navigate("/seller");
 
   const goToLogin = () => navigate(`/login`);
   const gotosignup = () => navigate(`/register`);
@@ -139,8 +130,16 @@ export default function Navbar() {
     };
   }, [location.pathname]);
 
+  // If user is administrator, open sidebar/drawer by default
+  useEffect(() => {
+    if (role === "adminr") {
+      setSidebarOpen(true);
+      setDrawerOpen(true);
+    }
+  }, [role]);
+
   // If current user is administrator, render a simplified navbar
-  if (isAdminUser || isAdminRoute) {
+  if (role === "admin") {
     return (
       <header className="fixed top-6 left-0 w-full z-50">
         {/* Progressive top haze BEHIND navbar */}
@@ -148,10 +147,7 @@ export default function Navbar() {
           className="pointer-events-none fixed top-0 left-0 w-full z-0"
           style={{ opacity: fadeProgress }}
         >
-          <div
-            className="h-20 md:h-24 bg-white backdrop-blur-xl"
-            style={progressiveHazeMask}
-          />
+          <div className="h-40 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.95)_20%,rgba(255,255,255,0.85)_45%,rgba(255,255,255,0.6)_70%,rgba(255,255,255,0.25)_85%,rgba(255,255,255,0)_100%)] backdrop-blur-md" />
         </div>
 
         <div className="relative z-50 flex flex-col mx-6 lg:mx-10 xl:mx-24 2xl:mx-40">
@@ -164,7 +160,7 @@ export default function Navbar() {
                       shadow
                       lg:h-16"
           >
-            <Link className="ml-6 shrink-0 lg:ml-6" to="/admin">
+            <Link className="ml-6 shrink-0 lg:ml-6" to="/">
               <img
                 src={logo}
                 alt="Logo"
@@ -173,42 +169,10 @@ export default function Navbar() {
             </Link>
 
             <div className="flex items-center gap-4 mr-6">
-              <span className="text-white-intense font-nexa font-bold hidden sm:inline">
-                Administrator
-              </span>
-              <button
-                type="button"
-                onClick={() => setDrawerOpen((prev) => !prev)}
-                className="w-10 h-10 rounded-full overflow-hidden border-2 border-white-light"
-              >
-                <img
-                  src={pdpph}
-                  alt="Admin"
-                  className="w-full h-full object-cover"
-                />
-              </button>
+              <span className="text-white-intense font-nexa font-bold hidden sm:inline">Administrator</span>
+              <img src={pdpph} alt="Admin" className="w-10 h-10 rounded-full object-cover" />
             </div>
           </nav>
-
-          <div
-            ref={drawerRef}
-            className={`hidden lg:block absolute right-0 top-full mt-5 transition-all duration-200 ease-out ${
-              isAuthenticated && drawerOpen
-                ? "opacity-100 translate-y-0 pointer-events-auto"
-                : "opacity-0 -translate-y-2 pointer-events-none"
-            }`}
-          >
-            <div className="bg-white-broken w-64 shadow-[0_0_30px_rgba(0,0,0,0.1)] rounded-3xl bg-white/95 backdrop-blur">
-              <div className="flex flex-col items-center py-2">
-                <button
-                  onClick={handleLogout}
-                  className="w-full px-6 py-3 text-left font-nexa text-xl text-green-dark hover:font-bold transition"
-                >
-                  Log Out
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </header>
     );
@@ -221,14 +185,11 @@ export default function Navbar() {
         className="pointer-events-none fixed top-0 left-0 w-full z-0"
         style={{ opacity: fadeProgress }}
       >
-        <div
-          className="h-20 md:h-24 bg-white backdrop-blur-xl"
-          style={progressiveHazeMask}
-        />
+        <div className="h-40 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.95)_20%,rgba(255,255,255,0.85)_45%,rgba(255,255,255,0.6)_70%,rgba(255,255,255,0.25)_85%,rgba(255,255,255,0)_100%)] backdrop-blur-md" />
       </div>
 
       {/* Navbar content ABOVE haze */}
-      <div className="relative z-50 flex flex-col mx-6 md:mx-24">
+      <div className="relative z-50 flex flex-col mx-6 lg:mx-10 xl:mx-24 2xl:mx-40">
         <nav
           className="flex h-12
                     justify-between 
@@ -236,20 +197,20 @@ export default function Navbar() {
                     bg-gradient-to-r from-green-tolerated to-green-dark
                     rounded-full 
                     shadow
-                    md:h-16"
+                    lg:h-16"
         >
           {/* logo */}
-          <Link className="ml-6 shrink-0 md:ml-6" to="/">
+          <Link className="ml-6 shrink-0 lg:ml-6" to="/">
             <img
               src={logo}
               alt="Logo"
-              className="w-[140px] md:w-[170px] xl:w-[170px] h-auto"
+              className="w-[140px] lg:w-[170px] xl:w-[170px] h-auto"
             />
           </Link>
 
           {/* navigation : for Desktop */}
-          <div className="hidden md:flex md:items-center md:flex-1 md:justify-end">
-            <ul className="flex items-center md:gap-6 xl:gap-12 mr-0">
+          <div className="hidden lg:flex lg:items-center lg:flex-1 lg:justify-end">
+            <ul className="flex items-center lg:gap-6 xl:gap-12 mr-0">
               <li>
                 <Link
                   to="/product_list"
@@ -262,7 +223,7 @@ export default function Navbar() {
               <li>
                 <form
                   onSubmit={handleSearchSubmit}
-                  className="flex h-10 bg-white-intense rounded-full overflow-hidden md:w-64 xl:w-96"
+                  className="flex h-10 bg-white-intense rounded-full overflow-hidden lg:w-64 xl:w-96"
                 >
                   <input
                     type="text"
@@ -329,13 +290,13 @@ export default function Navbar() {
           {/* navigation : for Mobile */}
           {!isAuthenticated ? (
             <>
-              <div className="flex items-center md:hidden">
+              <div className="flex items-center lg:hidden">
                 <button
                   type="button"
                   onClick={() => {
                     setSidebarOpen(true);
                   }}
-                  className="flex items-center mr-6 overflow-hidden border-white-light md:hidden"
+                  className="flex items-center mr-6 overflow-hidden border-white-light lg:hidden"
                 >
                   <RiMenuSearchFill size={30} color="white" />
                 </button>
@@ -343,13 +304,13 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <div className="flex items-center md:hidden">
+              <div className="flex items-center lg:hidden">
                 <button
                   type="button"
                   onClick={() => {
                     setSidebarOpen(!sidebarOpen);
                   }}
-                  className="flex items-center mr-1 w-10 h-10 rounded-full overflow-hidden border-2 border-white-light md:hidden"
+                  className="flex items-center mr-1 w-10 h-10 rounded-full overflow-hidden border-2 border-white-light lg:hidden"
                 >
                   <img
                     src={profile}
@@ -365,7 +326,7 @@ export default function Navbar() {
         {/* Right sidebar drawer (desktop only) */}
         <div
           ref={drawerRef}
-          className={`hidden md:block absolute right-0 top-full mt-5 transition-all duration-200 ease-out
+          className={`hidden lg:block absolute right-0 top-full mt-5 transition-all duration-200 ease-out
             ${
               isAuthenticated && drawerOpen
                 ? "opacity-100 translate-y-0 pointer-events-auto"
@@ -420,7 +381,7 @@ export default function Navbar() {
         {/* Right sidebar drawer (mobile only) */}
         <div
           ref={sidebarRef}
-          className={`md:hidden absolute left-0 top-full w-full mt-5 transition-all duration-200 ease-out
+          className={`lg:hidden absolute left-0 top-full w-full mt-5 transition-all duration-200 ease-out
             ${
               sidebarOpen
                 ? "opacity-100 translate-y-0 pointer-events-auto"
@@ -454,7 +415,7 @@ export default function Navbar() {
               <div className="py-6">
                 <form
                   onSubmit={handleSearchSubmit}
-                  className="flex h-10 bg-white-intense rounded-full overflow-hidden md:w-64 xl:w-96"
+                  className="flex h-10 bg-white-intense rounded-full overflow-hidden lg:w-64 xl:w-96"
                 >
                   <input
                     type="text"
