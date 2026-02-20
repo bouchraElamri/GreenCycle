@@ -1,3 +1,7 @@
+
+
+
+
 import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -70,26 +74,26 @@ export default function SignUp() {
       }}
     >
       <main
-        className="min-h-screen w-full px-4 sm:px-6 lg:px-10 py-10 flex items-center justify-center"
+        className="min-h-screen w-full px-4 sm:px-6 lg:px-10  flex items-center justify-center"
         style={{
           background:
             "linear-gradient(90deg,rgba(33, 80, 37, 1) 0%, rgba(196, 230, 201, 0.75) 100%)",
         }}
       >
-        <div className="w-full px-6 py-5 lg:px-10 lg:py-10 max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
+        <div className="w-full px-6 py-5 lg:px-10  max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
           <div className="w-full lg:w-1/2">
-            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-nexa text-center font-bold text-white mb-4">
+            <h1 className=" text-white text-xl sm:text-2xl lg:text-4xl font-nexa text-center font-bold mb-2" style={{ color: "white" , letterSpacing:"1px", wordSpacing:"4px"}}>
               Welcome to
             </h1>
 
             <img
               src={logo}
               alt="GreenCycle Logo"
-              className="h-auto mx-auto w-48 sm:w-56 lg:w-72"
+              className="h-auto mx-auto w-40 sm:w-48 lg:w-52"
             />
 
             <div
-              className="mt-6 shadow-md overflow-hidden mx-auto w-full max-w-xl"
+              className="mt-3 shadow-md overflow-hidden mx-auto w-full max-w-xl"
               style={{
                 borderRadius: "40px",
                 backgroundImage: `url(${formimg})`,
@@ -98,7 +102,7 @@ export default function SignUp() {
               }}
             >
               <form
-                className="py-8 px-5 sm:px-10"
+                className="py-5 px-3 sm:px-10"
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.75)" }}
                 onSubmit={handleSubmit}
               >
@@ -115,7 +119,7 @@ export default function SignUp() {
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-6">
-                  <div className="mt-4 md:mt-6">
+                  <div className="mt-2 md:mt-3">
                     <label
                       htmlFor="first-name"
                       className="font-nexa text-gray-600 text-sm md:text-base"
@@ -134,7 +138,7 @@ export default function SignUp() {
                     />
                   </div>
 
-                  <div className="mt-4 md:mt-6">
+                  <div className="mt-2 md:mt-3">
                     <label
                       htmlFor="last-name"
                       className="font-nexa text-gray-600 text-sm md:text-base"
@@ -154,7 +158,7 @@ export default function SignUp() {
                   </div>
                 </div>
 
-                <div className="mt-4 md:mt-6">
+                <div className="mt-2 md:mt-3">
                   <label
                     htmlFor="phone-number"
                     className="font-nexa text-sm md:text-base text-gray-600"
@@ -173,7 +177,7 @@ export default function SignUp() {
                   />
                 </div>
 
-                <div className="mt-4 md:mt-6">
+                <div className="mt-2 md:mt-3">
                   <label htmlFor="email" className="font-nexa text-sm md:text-base text-gray-600">
                     Email
                   </label>
@@ -190,7 +194,7 @@ export default function SignUp() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-6">
-                  <div className="mt-4 md:mt-6">
+                  <div className="mt-2 md:mt-3">
                     <label
                       htmlFor="password"
                       className="font-nexa text-sm md:text-base text-gray-600"
@@ -209,7 +213,7 @@ export default function SignUp() {
                     />
                   </div>
 
-                  <div className="mt-4 md:mt-6">
+                  <div className="mt-2 md:mt-3">
                     <label
                       htmlFor="confirm-password"
                       className="font-nexa text-sm md:text-base text-gray-600"
@@ -229,11 +233,11 @@ export default function SignUp() {
                   </div>
                 </div>
 
-                <div className="mt-4 md:mt-6 flex flex-col items-center justify-center">
+                <div className="mt-2 md:mt-3 flex flex-col items-center justify-center">
                   <button
                     type="submit"
                     disabled={loading}
-                    style={{ backgroundColor: "#598E5C" }}
+                    style={{ backgroundColor: "#598E5C", color: "white", border: "1px solid #598E5C" }}
                     className="w-full sm:w-56 font-nexa text-white font-bold mb-2 py-2 px-4 rounded-full hover:bg-green-600 hover:opacity-80 transition duration-300 disabled:opacity-60"
                   >
                     {loading ? "Creating..." : "Create account"}
@@ -241,7 +245,7 @@ export default function SignUp() {
 
                   <Link
                     to="/login"
-                    style={{ backgroundColor: "white", color: "#598E5C" }}
+                    style={{ backgroundColor: "white", color: "#598E5C", border: "1px solid #598E5C" }}
                     className="block font-nexa text-center w-full sm:w-56 font-bold py-2 px-4 rounded-full hover:opacity-80 transition duration-300"
                   >
                     Sign In
@@ -258,7 +262,7 @@ export default function SignUp() {
             <img
               src={hook}
               alt="Hook Poster"
-              className="w-full h-[740px] object-cover"
+              className="w-full h-[570px] object-cover"
             />
           </div>
         </div>
