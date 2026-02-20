@@ -4,12 +4,13 @@ import { useContext, useEffect, useState, useRef } from "react";
 import logo from "../../assets/Logo-white 2.png";
 import searchicon from "../../assets/zoom.png";
 import profile from "../../assets/profile.jpg";
+import pdpph from "../../assets/pdpph.png";
 import { RiMenuSearchFill } from "react-icons/ri";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, logout } = useContext(AuthContext);
+  const { isAuthenticated, logout, role } = useContext(AuthContext);
 
   const drawerRef = useRef(null);
   const sidebarRef = useRef(null);
@@ -124,6 +125,54 @@ export default function Navbar() {
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [location.pathname]);
+
+  // If user is administrator, open sidebar/drawer by default
+  useEffect(() => {
+    if (role === "adminr") {
+      setSidebarOpen(true);
+      setDrawerOpen(true);
+    }
+  }, [role]);
+
+  // If current user is administrator, render a simplified navbar
+  if (role === "admin") {
+    return (
+      <header className="fixed top-6 left-0 w-full z-50">
+        {/* Progressive top haze BEHIND navbar */}
+        <div
+          className="pointer-events-none fixed top-0 left-0 w-full z-0"
+          style={{ opacity: fadeProgress }}
+        >
+          <div className="h-40 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.95)_20%,rgba(255,255,255,0.85)_45%,rgba(255,255,255,0.6)_70%,rgba(255,255,255,0.25)_85%,rgba(255,255,255,0)_100%)] backdrop-blur-md" />
+        </div>
+
+        <div className="relative z-50 flex flex-col mx-6 lg:mx-10 xl:mx-24 2xl:mx-40">
+          <nav
+            className="flex h-12
+                      justify-between 
+                      items-center 
+                      bg-gradient-to-r from-green-tolerated to-green-dark
+                      rounded-full 
+                      shadow
+                      lg:h-16"
+          >
+            <Link className="ml-6 shrink-0 lg:ml-6" to="/">
+              <img
+                src={logo}
+                alt="Logo"
+                className="w-[140px] lg:w-[170px] xl:w-[170px] h-auto"
+              />
+            </Link>
+
+            <div className="flex items-center gap-4 mr-6">
+              <span className="text-white-intense font-nexa font-bold hidden sm:inline">Administrator</span>
+              <img src={pdpph} alt="Admin" className="w-10 h-10 rounded-full object-cover" />
+            </div>
+          </nav>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="fixed top-6 left-0 w-full z-50">
@@ -282,32 +331,45 @@ export default function Navbar() {
         >
           <div className="bg-white-broken w-72 shadow-[0_0_30px_rgba(0,0,0,0.1)] rounded-3xl bg-white/95 backdrop-blur">
             <div className="flex flex-col items-center py-2">
-              <Link
-                to="/cart"
-                onClick={() => setDrawerOpen(false)}
-                className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
-              >
-                Cart
-              </Link>
+              {role === "administrator" ? (
+                <>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-6 py-3 text-left font-nexa text-xl text-green-dark hover:font-bold transition"
+                  >
+                    Log Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/cart"
+                    onClick={() => setDrawerOpen(false)}
+                    className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Cart
+                  </Link>
 
-              <div className="w-[85%] h-px bg-black/10" />
+                  <div className="w-[85%] h-px bg-black/10" />
 
-              <Link
-                to="/profile"
-                onClick={() => setDrawerOpen(false)}
-                className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
-              >
-                Profile
-              </Link>
+                  <Link
+                    to="/profile"
+                    onClick={() => setDrawerOpen(false)}
+                    className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Profile
+                  </Link>
 
-              <div className="w-[85%] h-[0.5px] bg-black/10" />
+                  <div className="w-[85%] h-[0.5px] bg-black/10" />
 
-              <button
-                onClick={handleLogout}
-                className="w-full px-6 py-3 text-left font-nexa text-xl text-green-dark hover:font-bold transition"
-              >
-                Log Out
-              </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-6 py-3 text-left font-nexa text-xl text-green-dark hover:font-bold transition"
+                  >
+                    Log Out
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -395,6 +457,15 @@ export default function Navbar() {
                   >
                     Sign Up
                   </Link>
+                </>
+              ) : role === "administrator" ? (
+                <>
+                  <button
+                    onClick={handleLogout}
+                    className="px-6 py-3 text-left font-nexa text-xl text-green-dark hover:font-bold transition"
+                  >
+                    Log Out
+                  </button>
                 </>
               ) : (
                 <>
