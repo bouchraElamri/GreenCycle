@@ -1,4 +1,5 @@
 import useUsers from "../../../hooks/useUsers";
+import Pagination from "../../../components/common/Pagination";
 
 const formatDate = (value) => {
   if (!value) return "-";
@@ -19,7 +20,6 @@ export default function UserList() {
     q,
     setQ,
     setPage,
-    setLimit,
     loading,
     error,
   } = useUsers();
@@ -39,16 +39,6 @@ export default function UserList() {
           placeholder="Search by name, email, phone..."
           className="h-11 w-full max-w-md rounded-full border border-white-broken bg-white-intense px-4 text-gray outline-none focus:border-green-tolerated"
         />
-
-        <select
-          value={pagination.limit}
-          onChange={(e) => setLimit(e.target.value)}
-          className="h-11 rounded-full border border-white-broken bg-white-intense px-4 text-gray outline-none focus:border-green-tolerated"
-        >
-          <option value={5}>5 / page</option>
-          <option value={10}>10 / page</option>
-          <option value={20}>20 / page</option>
-        </select>
       </div>
 
       {loading && <p className="p-4 text-gray">Loading users...</p>}
@@ -91,30 +81,14 @@ export default function UserList() {
             </table>
           </div>
 
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <p className="text-sm text-gray">
-              Page {pagination.page} / {Math.max(pagination.totalPages || 1, 1)} - Total {pagination.total || 0}
-            </p>
+          {Math.max(pagination.totalPages || 0, 0) > 1 && (
+            <Pagination
+              currentPage={pagination.page}
+              setCurrentPage={setPage}
+              totalPages={pagination.totalPages}
+            />
+          )}
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setPage(Math.max(1, pagination.page - 1))}
-                disabled={pagination.page <= 1}
-                className="rounded-full border border-green-tolerated px-4 py-2 text-sm font-bold text-green-dark disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => setPage(Math.min(pagination.totalPages || 1, pagination.page + 1))}
-                disabled={pagination.page >= (pagination.totalPages || 1)}
-                className="rounded-full border border-green-tolerated px-4 py-2 text-sm font-bold text-green-dark disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Next
-              </button>
-            </div>
-          </div>
         </>
       )}
     </section>

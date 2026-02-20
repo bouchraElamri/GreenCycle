@@ -43,7 +43,12 @@ export default function useUsers(initialPage = 1, initialLimit = 10) {
   }, [pagination.page, pagination.limit, q]);
 
   const setPage = (nextPage) => {
-    setPagination((prev) => ({ ...prev, page: nextPage }));
+    setPagination((prev) => {
+      const resolvedPage =
+        typeof nextPage === "function" ? nextPage(prev.page) : nextPage;
+      const safePage = Math.max(Number(resolvedPage) || 1, 1);
+      return { ...prev, page: safePage };
+    });
   };
 
   const setLimit = (nextLimit) => {

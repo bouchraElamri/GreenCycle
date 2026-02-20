@@ -13,9 +13,28 @@ export default function useAdminProducts() {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("Missing auth token");
 
-      const allProducts = await adminApi.getProductsForReview(token);
+      const [allProducts, categories] = await Promise.all([
+        adminApi.getProductsForReview(token),
+        adminApi.getCategories(),
+      ]);
+
+      const categoryMap = new Map(
+        (Array.isArray(categories) ? categories : []).map((category) => [
+          String(category._id),
+          category.name,
+        ])
+      );
+
       const pendingProducts = Array.isArray(allProducts)
-        ? allProducts.filter((product) => !product.isApproved)
+        ? allProducts
+            .filter((product) => !product.isApproved)
+            .map((product) => ({
+              ...product,
+              categoryName:
+                categoryMap.get(String(product.category)) ||
+                product.category?.name ||
+                "-",
+            }))
         : [];
 
       setProducts(pendingProducts);

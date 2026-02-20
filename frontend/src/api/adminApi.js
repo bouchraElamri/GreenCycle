@@ -60,6 +60,13 @@ const adminApi = {
       })
     ),
 
+  getCategories: async () =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/categories`, {
+        method: "GET",
+      })
+    ),
+
   setProductApproval: async (token, productId, isApproved) =>
     handleResponse(
       await fetch(`${API_BASE_URL}/admin/products/approve/${productId}`, {

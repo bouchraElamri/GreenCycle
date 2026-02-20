@@ -58,15 +58,15 @@ export default function ProductList() {
 
       {!loading && !error && (
         <div className="overflow-x-auto rounded-2xl border border-white-broken bg-white-intense">
-          <table className="w-full min-w-[900px] text-left">
+          <table className="w-full min-w-[700px] table-fixed text-left">
             <thead className="bg-green-light/35 text-gray">
               <tr>
-                <th className="w-[210px] px-4 py-3 text-sm font-bold">Product ID</th>
-                <th className="px-4 py-3 text-sm font-bold">Name</th>
-                <th className="px-4 py-3 text-sm font-bold">Date</th>
-                <th className="px-4 py-3 text-sm font-bold">Price</th>
-                <th className="w-[190px] px-4 py-3 text-sm font-bold">Major Category</th>
-                <th className="px-4 py-3 text-sm font-bold">Actions</th>
+                <th className="w-[20%] border-r border-white-broken px-3 py-3 text-sm font-bold">Product ID</th>
+                <th className="w-[13%] border-r border-white-broken px-3 py-3 text-sm font-bold">Name</th>
+                <th className="w-[14%] border-r border-white-broken px-3 py-3 text-sm font-bold">Date</th>
+                <th className="w-[9%] border-r border-white-broken px-3 py-3 text-sm font-bold">Price</th>
+                <th className="w-[18%] border-r border-white-broken px-3 py-3 text-sm font-bold">Category</th>
+                <th className="w-[26%] px-3 py-3 text-sm font-bold text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -79,7 +79,7 @@ export default function ProductList() {
               ) : (
                 products.map((product) => (
                   <tr key={product._id} className="border-t border-white-broken/80">
-                    <td className="px-4 py-3 text-gray">
+                    <td className="border-r border-white-broken/80 px-3 py-3 text-gray">
                       <button
                         type="button"
                         onClick={() =>
@@ -87,7 +87,7 @@ export default function ProductList() {
                             prev === product._id ? null : product._id
                           )
                         }
-                        className={`max-w-[190px] text-left text-gray transition hover:text-green-dark ${
+                        className={`max-w-[170px] text-left text-gray transition hover:text-green-dark ${
                           expandedProductId === product._id ? "break-all" : "truncate"
                         }`}
                         title="Click to show/hide full ID"
@@ -95,10 +95,10 @@ export default function ProductList() {
                         {product._id}
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-gray">{product.name || "-"}</td>
-                    <td className="px-4 py-3 text-gray">{formatDate(product.createdAt)}</td>
-                    <td className="px-4 py-3 text-gray">{product.price ?? "-"}</td>
-                    <td className="px-4 py-3 text-gray">
+                    <td className="border-r border-white-broken/80 px-3 py-3 text-gray">{product.name || "-"}</td>
+                    <td className="border-r border-white-broken/80 px-3 py-3 text-gray">{formatDate(product.createdAt)}</td>
+                    <td className="border-r border-white-broken/80 px-3 py-3 text-gray">{product.price ?? "-"}</td>
+                    <td className="border-r border-white-broken/80 px-3 py-3 text-gray">
                       <button
                         type="button"
                         onClick={() =>
@@ -111,13 +111,10 @@ export default function ProductList() {
                         }`}
                         title="Click to show/hide full category"
                       >
-                        {product.category?.name ||
-                          (typeof product.category === "string"
-                            ? product.category
-                            : "-")}
+                        {product.categoryName || "-"}
                       </button>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3">
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -131,7 +128,7 @@ export default function ProductList() {
                           type="button"
                           onClick={() => openRejectModal(product._id)}
                           disabled={submittingId === product._id}
-                          className="rounded-full bg-red px-4 py-2 text-sm font-bold text-white-intense transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="rounded-full bg-red px-7 py-2 text-sm font-bold text-white-intense transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           Reject
                         </button>
