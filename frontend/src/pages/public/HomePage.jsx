@@ -1,14 +1,14 @@
 import React from 'react'
-import Navbar from '../../components/layouts/Navbar';
-import Footer from '../../components/layouts/Footer';
+import MainLayout from '../../components/layouts/MainLayout'
+import Hero from '../../components/LandingPage/hero'
 
 const HomePage = () => {
   return (
-    <div className='min-h-screen flex flex-col'>
-      <Navbar />
-      homepage
-      <Footer />
-    </div>
+    <>
+    <MainLayout>
+    <Hero/>
+    </MainLayout>
+    </>
   )
 }
 
