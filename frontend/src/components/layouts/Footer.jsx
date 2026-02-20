@@ -25,19 +25,19 @@ export default function Footer() {
 
         {/* Right: Social icons */}
         <div className="flex items-center gap-3">
-          <a href="#" className="w-9 h-9 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-green-dark transition">
+          <a href="facebook.com" className="w-9 h-9 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-green-dark transition">
             <FaFacebookF size={16} />
           </a>
 
-          <a href="#" className="w-9 h-9 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-green-dark transition">
+          <a href="intagram.com" className="w-9 h-9 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-green-dark transition">
             <FaInstagram size={16} />
           </a>
 
-          <a href="#" className="w-9 h-9 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-green-dark transition">
+          <a href="twitter.com" className="w-9 h-9 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-green-dark transition">
             <FaXTwitter size={16} />
           </a>
 
-          <a href="#" className="w-9 h-9 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-green-dark transition">
+          <a href="linkedin.com" className="w-9 h-9 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-green-dark transition">
             <FaLinkedinIn size={16} />
           </a>
         </div>
