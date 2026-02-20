@@ -3,6 +3,7 @@ const router = express.Router();
 const categoryController = require("../controllers/category.controller");
 const adminController = require("../controllers/admin.controller");
 const authController = require("../controllers/auth.controller"); 
+const sellerController = require("../controllers/seller.controller");
 const validate = require("../middlewares/validate.middleware");
 const {
   createCategorySchema,
@@ -44,5 +45,7 @@ router.get("/orders", GetAdminOrders);
 router.get("/orders/delivered", GetAdminDeliveredOrders);
 router.get("/orders/confirmed", GetAdminConfirmedOrders);
 router.get("/orders/:id", GetAdminOrderDetails);
+
+router.get("/sellers", sellerController.getAllSellersForAdmin);
 
 module.exports = router;
