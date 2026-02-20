@@ -14,7 +14,9 @@ export default function Navbar() {
 
   const roles = Array.isArray(role) ? role : role ? [role] : [];
   const normalizedRoles = roles.map((r) => String(r).toLowerCase());
-  const isAdminUser = normalizedRoles.includes("admin") || normalizedRoles.includes("administrator");
+  const isAdminUser =
+    normalizedRoles.includes("admin") ||
+    normalizedRoles.includes("administrator");
   const isAdminRoute = location.pathname.startsWith("/admin");
 
   const drawerRef = useRef(null);
@@ -23,7 +25,6 @@ export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
 
   // ✅ NEW: 0..1 progressive haze opacity
   const [fadeProgress, setFadeProgress] = useState(0);
@@ -138,7 +139,6 @@ export default function Navbar() {
     };
   }, [location.pathname]);
 
-
   // If current user is administrator, render a simplified navbar
   if (isAdminUser || isAdminRoute) {
     return (
@@ -148,7 +148,10 @@ export default function Navbar() {
           className="pointer-events-none fixed top-0 left-0 w-full z-0"
           style={{ opacity: fadeProgress }}
         >
-          <div className="h-40 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.95)_20%,rgba(255,255,255,0.85)_45%,rgba(255,255,255,0.6)_70%,rgba(255,255,255,0.25)_85%,rgba(255,255,255,0)_100%)] backdrop-blur-md" />
+          <div
+            className="h-20 md:h-24 bg-white backdrop-blur-xl"
+            style={progressiveHazeMask}
+          />
         </div>
 
         <div className="relative z-50 flex flex-col mx-6 lg:mx-10 xl:mx-24 2xl:mx-40">
@@ -170,13 +173,19 @@ export default function Navbar() {
             </Link>
 
             <div className="flex items-center gap-4 mr-6">
-              <span className="text-white-intense font-nexa font-bold hidden sm:inline">Administrator</span>
+              <span className="text-white-intense font-nexa font-bold hidden sm:inline">
+                Administrator
+              </span>
               <button
                 type="button"
                 onClick={() => setDrawerOpen((prev) => !prev)}
                 className="w-10 h-10 rounded-full overflow-hidden border-2 border-white-light"
               >
-                <img src={pdpph} alt="Admin" className="w-full h-full object-cover" />
+                <img
+                  src={pdpph}
+                  alt="Admin"
+                  className="w-full h-full object-cover"
+                />
               </button>
             </div>
           </nav>
