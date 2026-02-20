@@ -78,6 +78,34 @@ const adminApi = {
         body: JSON.stringify({ isApproved }),
       })
     ),
+
+  getOrders: async (token, status = "all") => {
+    const endpoint =
+      status === "confirmed"
+        ? "/admin/orders/confirmed"
+        : status === "delivered"
+        ? "/admin/orders/delivered"
+        : "/admin/orders";
+
+    return handleResponse(
+      await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    );
+  },
+
+  getOrderDetails: async (token, orderId) =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/admin/orders/${orderId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ),
 };
 
 export default adminApi;

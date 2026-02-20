@@ -5,12 +5,8 @@ import AdminLayout from "../components/layouts/AdminLayout";
 import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
 import UserList from "../pages/admin/users/UserList";
 import ProductList from "../pages/admin/products/ProductList";
-
-const Placeholder = ({ title }) => (
-  <div className="rounded-2xl border border-dashed border-green-light p-6 text-gray bg-white-intense">
-    {title} page coming soon.
-  </div>
-);
+import OrderList from "../pages/admin/orders/OrderList";
+import OrderDetails from "../pages/admin/orders/OrderDetails";
 
 export default function AdminRoutes() {
   const { isAuthenticated, loading, user } = useContext(AuthContext);
@@ -29,7 +25,8 @@ export default function AdminRoutes() {
         <Route index element={<AdminDashboard />} />
         <Route path="users" element={<UserList />} />
         <Route path="products" element={<ProductList />} />
-        <Route path="orders" element={<Placeholder title="Orders" />} />
+        <Route path="orders" element={<OrderList />} />
+        <Route path="orders/:id" element={<OrderDetails />} />
       </Route>
     </Routes>
   );
