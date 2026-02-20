@@ -104,7 +104,7 @@ const publicApi = {
     const res = await fetch(`${API_BASE_URL}/getProducts${query}`);
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error(errorData.message || "Error while fetching products");
+      throw new Error(errorData.message || "Error fetching products");
     }
     return res.json();
   },
@@ -116,8 +116,19 @@ const publicApi = {
       throw new Error(errorData.message || "Product not found");
     }
     return res.json();
-  }
+  },
+  // getProductsByCategory: async (categoryId) => {
 
+  // };
+  
+  getCategories: async () => {
+    const res = await fetch(`${API_BASE_URL}/categories`);
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error fetching categories");
+    }
+    return res.json();
+  },
 };
 
 export default publicApi;

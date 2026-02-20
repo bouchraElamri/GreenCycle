@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/public/HomePage";
 import ProductList from "../pages/public/products/ProductList";
+import ProductDetail from "../pages/public/products/ProductDetail";
 import ForgotPasswordPage from "../pages/public/auth/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/public/auth/ResetPasswordPage";
 import ActivateAccountPage from "../pages/public/auth/ActivateAccountPage";
@@ -19,6 +20,7 @@ export default function PublicRoutes() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/product_list" element={<ProductList />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
         </Routes>
     );
 }
