@@ -5,9 +5,7 @@ import Hero from '../../components/LandingPage/hero';
 const HomePage = () => {
   return (
     <div className='min-h-screen flex flex-col'>
-      <Navbar />
-      <Hero/>
-      <Footer />
+      homepage
     </div>
   )
 }
