@@ -12,6 +12,7 @@ const { getClientOrdersParamsSchema } = require("../validators/order.validator")
 const uploadProfile = require("../middlewares/uploadProfile.middleware");
 const authController = require("../controllers/auth.controller");
 const { requestEmailChangeSchema, confirmEmailChangeSchema, changePasswordSchema, emailSchema, resetPasswordSchema } = require("../validators/auth.validator");
+const ratingController = require("../controllers/rating.controller");
 
 router.use(authenticate);
 
@@ -29,6 +30,8 @@ router.post('/switch-to-seller', validateSwitchToSeller, sellerController.switch
 router.post("/orders/", validate(createOrderSchema), PostOrder);
 
 router.get("/orders/:clientId", validate(getClientOrdersParamsSchema, "params"), GetClientOrders);
+router.post("/products/:id/reviews", ratingController.addProductReview);
+router.delete("/products/:id/reviews", ratingController.removeProductReview);
 // Change email routes
 router.post("/email-change/request", validate(requestEmailChangeSchema), authController.requestEmailChange);
 router.post("/email-change/confirm", validate(confirmEmailChangeSchema), authController.confirmEmailChange);
