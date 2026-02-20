@@ -32,7 +32,7 @@ router.get("/activate/:token", authController.activateAccount);
 router.get("/verify-token", authenticate, authController.verifyToken);
 router.get("/me", authenticate, authController.getCurrentUser);
 router.get("/sellers", authenticate, isClientOrSeller, sellerController.getVisibleSellers);
-router.get("/sellers/:sellerId", authenticate, isClientOrSeller, sellerController.getSellerProfileById);
+router.get("/sellers/:sellerId", sellerController.getSellerProfileById);
 router.get(
   "/sellers/:sellerId/products",
   authenticate,
