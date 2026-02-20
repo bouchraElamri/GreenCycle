@@ -41,7 +41,7 @@ export default function AdminDashboard() {
         {cards.map((card) => (
           <div
             key={card.label}
-            className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-r from-green-dark to-green-tolerated p-[2px] md:h-[180px]"
+            className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-r from-green-dark to-green-tolerated p-[1.5px] md:h-[180px]"
           >
             <div className="relative h-full overflow-hidden rounded-[22px] bg-green-light/35 p-6">
               {card.bgImage && (

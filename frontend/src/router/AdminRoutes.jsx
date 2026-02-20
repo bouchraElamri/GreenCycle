@@ -3,6 +3,8 @@ import { useContext } from "react";
 import AuthContext from "../contexts/AuthContext";
 import AdminLayout from "../components/layouts/AdminLayout";
 import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
+import UserList from "../pages/admin/users/UserList";
+import ProductList from "../pages/admin/products/ProductList";
 
 const Placeholder = ({ title }) => (
   <div className="rounded-2xl border border-dashed border-green-light p-6 text-gray bg-white-intense">
@@ -25,8 +27,8 @@ export default function AdminRoutes() {
     <Routes>
       <Route element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
-        <Route path="users" element={<Placeholder title="Users" />} />
-        <Route path="products" element={<Placeholder title="Products" />} />
+        <Route path="users" element={<UserList />} />
+        <Route path="products" element={<ProductList />} />
         <Route path="orders" element={<Placeholder title="Orders" />} />
       </Route>
     </Routes>

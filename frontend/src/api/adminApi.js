@@ -15,6 +15,17 @@ const handleResponse = async (response) => {
   return data;
 };
 
+const buildQuery = (params = {}) => {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      query.append(key, String(value));
+    }
+  });
+  const qs = query.toString();
+  return qs ? `?${qs}` : "";
+};
+
 const adminApi = {
   getDashboard: async (token) =>
     handleResponse(
@@ -23,6 +34,41 @@ const adminApi = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      })
+    ),
+
+  getUsers: async (token, { page = 1, limit = 10, q = "" } = {}) =>
+    handleResponse(
+      await fetch(
+        `${API_BASE_URL}/admin/users${buildQuery({ page, limit, q })}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+    ),
+
+  getProductsForReview: async (token) =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/admin/getProducts`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ),
+
+  setProductApproval: async (token, productId, isApproved) =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/admin/products/approve/${productId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isApproved }),
       })
     ),
 };
