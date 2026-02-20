@@ -11,7 +11,7 @@ const { GetClientOrders } = require("../controllers/order.controller");
 const { getClientOrdersParamsSchema } = require("../validators/order.validator");
 const uploadProfile = require("../middlewares/uploadProfile.middleware");
 const authController = require("../controllers/auth.controller");
-const { requestEmailChangeSchema, confirmEmailChangeSchema, changePasswordSchema } = require("../validators/auth.validator");
+const { requestEmailChangeSchema, confirmEmailChangeSchema, changePasswordSchema, emailSchema, resetPasswordSchema } = require("../validators/auth.validator");
 
 router.use(authenticate);
 
@@ -33,8 +33,13 @@ router.get("/orders/:clientId", validate(getClientOrdersParamsSchema, "params"),
 router.post("/email-change/request", validate(requestEmailChangeSchema), authController.requestEmailChange);
 router.post("/email-change/confirm", validate(confirmEmailChangeSchema), authController.confirmEmailChange);
 
-// Change
+// Change password
 router.post("/change-password", validate(changePasswordSchema), authController.changePassword);
 
+// Forgot Password
+router.post("/forgot-password", validate(emailSchema), authController.forgotPassword);
+
+// Reset Password
+router.post("/reset-password/:token", validate(resetPasswordSchema), authController.resetPassword);
 
 module.exports = router;
