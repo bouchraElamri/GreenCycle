@@ -48,6 +48,29 @@ const findBySellerUser = (sellerUserId) => {
     .lean();
 };
 
+const findPendingByClient = (clientId) => {
+  return Order.find({ clientId, status: "pending" }).sort({ createdAt: 1 }).lean();
+};
+
+const findByClientAndStatus = (clientId, status) => {
+  return Order.find({ clientId, status })
+    .sort({ createdAt: -1 })
+    .populate("items.product", "name price images")
+    .lean();
+};
+
+const findPendingByIdAndClient = (orderId, clientId) => {
+  return Order.findOne({ _id: orderId, clientId, status: "pending" }).lean();
+};
+
+const deleteById = (orderId) => {
+  return Order.findByIdAndDelete(orderId);
+};
+
+const deleteManyByIds = (ids) => {
+  return Order.deleteMany({ _id: { $in: ids } });
+};
+
 module.exports = {
   create,
   findAll,
@@ -56,4 +79,9 @@ module.exports = {
   findByIdAndUser,
   findBySellerUser,
   getClientId,
+  findPendingByClient,
+  findByClientAndStatus,
+  findPendingByIdAndClient,
+  deleteById,
+  deleteManyByIds,
 };

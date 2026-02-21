@@ -1,24 +1,66 @@
 const orderService = require("../services/order.service");
-const { authenticate } = require("../middlewares/auth.middleware");
 
 
-const PostOrder = async (req, res, next) => {
+const AddToCart = async (req, res, next) => {
   try {
-
     const clientId = req.user.id;
-    // For testing without auth middleware
-    const { items, deliveryAddress } = req.body;
+    const { product, quantity } = req.body;
 
-    // Call service layer
-    const createdOrder = await orderService.createOrder({
+    const createdOrder = await orderService.addToCart({
       userId: clientId,
-      items,
-      deliveryAddress,
+      productId: product,
+      quantity,
     });
 
-    // Return created order
     return res.status(201).json({ order: createdOrder });
+  } catch (error) {
+    next(error);
+  }
+};
 
+const ConfirmPendingOrders = async (req, res, next) => {
+  try {
+    const result = await orderService.confirmPendingOrders({
+      userId: req.user.id,
+      deliveryAddress: req.body.deliveryAddress,
+      bankAccount: req.body.bankAccount,
+    });
+
+    return res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const GetPendingOrders = async (req, res, next) => {
+  try {
+    const orders = await orderService.getPendingOrders({
+      userId: req.user.id,
+    });
+    return res.status(200).json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const GetConfirmedOrders = async (req, res, next) => {
+  try {
+    const orders = await orderService.getConfirmedOrders({
+      userId: req.user.id,
+    });
+    return res.status(200).json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const DeletePendingOrder = async (req, res, next) => {
+  try {
+    const result = await orderService.deletePendingOrder({
+      userId: req.user.id,
+      orderId: req.params.orderId,
+    });
+    return res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -26,7 +68,6 @@ const PostOrder = async (req, res, next) => {
 
 const GetClientOrders = async (req, res, next) => {
   try {
-    const { clientId } = req.params; // validated by Joi
     const orders = await orderService.getClientOrders({
       authUserId: req.user.id,
       clientId: req.params.clientId,
@@ -50,4 +91,12 @@ const GetSellerOrders = async (req, res, next) => {
   }
 };
 
-module.exports = { PostOrder, GetClientOrders, GetSellerOrders };
+module.exports = {
+  AddToCart,
+  ConfirmPendingOrders,
+  GetPendingOrders,
+  GetConfirmedOrders,
+  DeletePendingOrder,
+  GetClientOrders,
+  GetSellerOrders,
+};
