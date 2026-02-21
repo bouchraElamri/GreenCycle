@@ -93,8 +93,8 @@ const uploadProfilePicture = async (req, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
-    // store the path (or filename) in the user record
-    const filePath = req.file.path;
+    // Store a web path (not local filesystem path) to avoid OS-specific separators issues.
+    const filePath = `/uploads/profiles/${req.file.filename}`;
     const updated = await userRepo.updateUser(req.user.id, { profileImage: filePath });
 
     res.json({ message: "Profile image updated", user: updated });
@@ -136,6 +136,32 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+const updateProfile = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+    const { firstName, lastName, phone } = req.body;
+    const updated = await userRepo.updateUser(userId, { firstName, lastName, phone });
+    res.json({
+      message: "Profile updated successfully.",
+      user: {
+        id: updated._id,
+        firstName: updated.firstName,
+        lastName: updated.lastName,
+        email: updated.email,
+        phone: updated.phone,
+        profileImage: updated.profileImage,
+        role: updated.role,
+      },
+    });
+  } catch (err) {
+    if (err?.code === 11000) {
+      return res.status(409).json({ error: "This phone number is already in use" });
+    }
+    if (typeof next === "function") return next(err);
+    res.status(err.statusCode || 500).json({ error: err.message || "Server error" });
+  }
+};
+
 module.exports = {
   register,
   requestEmailChange,
@@ -149,4 +175,5 @@ module.exports = {
   uploadProfilePicture,
   getAllUsers,
   changePassword,
+  updateProfile,
 };
