@@ -128,7 +128,25 @@ const publicApi = {
       throw new Error(errorData.message || "Error fetching categories");
     }
     return res.json();
+  },  
+  getSeller: async (sellerId) => {
+    const res = await fetch(`${API_BASE_URL}/sellers/${sellerId}`);
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error fetching seller");
+    }
+    const payload = await res.json();
+    return payload?.data ?? payload;
+  },
+  getProductByCategory: async (category) => {
+    const res = await fetch(`${API_BASE_URL}/searchByCategory?categoryName=${encodeURIComponent(category || "")}`);
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error fetching related products");
+    }
+    return res.json();
   },
 };
+
 
 export default publicApi;

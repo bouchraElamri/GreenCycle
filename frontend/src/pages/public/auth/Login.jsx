@@ -5,7 +5,7 @@ import hook from "../../../assets/Hook _poster.png";
 import formimg from "../../../assets/Photobg.png";
 import publicApi from "../../../api/publicApi";
 import { useContext, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import AuthContext from "../../../contexts/AuthContext";
 
 export default function Login() {
@@ -14,6 +14,7 @@ export default function Login() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const {  refreshAuth } = useContext(AuthContext);
 
 
@@ -34,11 +35,12 @@ export default function Login() {
       const roles = Array.isArray(response.user?.role)
         ? response.user.role
         : [response.user?.role || "client"];
+      const redirectTo = location.state?.from || "/";
 
       if (roles.includes("admin")) {
         navigate("/admin/");
       } else {
-        navigate("/");
+        navigate(redirectTo, { replace: true });
       }
     } catch (err) {
       setError(err?.message || "Erreur lors de la connexion");
