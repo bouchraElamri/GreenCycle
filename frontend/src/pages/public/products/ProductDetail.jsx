@@ -6,6 +6,7 @@ import Pagination from '../../../components/common/Pagination';
 import Tabs from '../../../components/common/Tabs';
 import useProducts from '../../../hooks/useProducts';
 import useUsers from '../../../hooks/useUsers';
+import useCartActions from '../../../hooks/useCartActions';
 import { useParams } from 'react-router-dom';
 import RatingStars from '../../../components/common/RatingStars';
 
@@ -14,6 +15,7 @@ const ProductDetail = () => {
     const { id } = useParams();
     const { product } = useProducts(id);
     const { productsRelated } = useProducts(null, product?.category?.name);
+    const { addProductToCart, adding } = useCartActions();
 
     const { seller } = useUsers(product?.seller);
 
@@ -61,6 +63,14 @@ const ProductDetail = () => {
             const next = [...prev];
             [next[0], next[clickedIndex]] = [next[clickedIndex], next[0]];
             return next;
+        });
+    };
+
+    const handleAddToCart = async () => {
+        if (!product?._id) return;
+        await addProductToCart({
+            productId: product._id,
+            quantity: Math.max(1, quantity),
         });
     };
 
@@ -128,22 +138,28 @@ const ProductDetail = () => {
                                         style={{ background: "linear-gradient(to right, #5F9A62, #1E5A2A)" }}
                                     />
                                 </div>
-                                <Button className='bg-green-medium text-white-intense font-nexa px-5 py-3 rounded'>Add to Cart</Button>
+                                <Button
+                                    onClick={handleAddToCart}
+                                    disabled={adding}
+                                    className='bg-green-medium text-white-intense font-nexa px-5 py-3 rounded disabled:opacity-60'
+                                >
+                                    {adding ? "Adding..." : "Add to Cart"}
+                                </Button>
                             </div>
                         </div>
                     </div>
                 </section>
                 <section className=' rounded-3xl mt-4 border border-green-dark h-64 max-h-64 overflow-hidden'
-                              style={{ background: "linear-gradient(to bottom, #C4E6C9, #FFFFFF)" }}
->
-                   <Tabs
-  activeTab={activeTab}
-  setActiveTab={setActiveTab}
-  tabs={[
-    { label: "Details", value: "details" },
-    { label: "Reviews", value: "reviews" },
-  ]}
-/>
+                    style={{ background: "linear-gradient(to bottom, #C4E6C9, #FFFFFF)" }}
+                >
+                    <Tabs
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        tabs={[
+                            { label: "Details", value: "details" },
+                            { label: "Reviews", value: "reviews" },
+                        ]}
+                    />
                     <div className=' p-4'>
                         {activeTab === "details" ? (
                             <div className="text-green-dark overflow-y-auto h-48">
@@ -188,8 +204,8 @@ const ProductDetail = () => {
                         {currentProducts.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                                 {currentProducts.map((relatedProduct) => (
-                                        <ProductCard key={relatedProduct._id} product={relatedProduct} />
-                                    ))}
+                                    <ProductCard key={relatedProduct._id} product={relatedProduct} />
+                                ))}
                             </div>
                         ) : (
                             <p className="text-gray-700">No related products found.</p>
