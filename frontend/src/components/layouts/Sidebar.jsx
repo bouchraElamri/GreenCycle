@@ -61,7 +61,7 @@ function getMenuByRole(role) {
   };
 }
 
-export default function DashboardSidebar({ role, onLogout }) {
+export default function Sidebar({ role, onLogout }) {
   const menu = getMenuByRole(role);
 
   return (

@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import AuthContext from "../../contexts/AuthContext";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import DashboardSidebar from "./DashboardSidebar";
+import Sidebar from "./Sidebar";
 
 export default function SellerLayout() {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export default function SellerLayout() {
       <div className="pt-28 pb-12">
         <div className="mx-6 md:mx-24">
           <div className="flex items-start gap-6 lg:gap-8">
-            <DashboardSidebar role={role} onLogout={handleLogout} />
+            <Sidebar role={role} onLogout={handleLogout} />
 
             <main className="min-w-0 flex-1 pb-16">
               <Outlet />
