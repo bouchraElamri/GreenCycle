@@ -1,0 +1,140 @@
+import React, { useEffect, useRef } from "react";
+import CategoriesCard from "../common/CategoriesCard";
+import imgPets from "../../assets/Pets&Accessories.png";
+import imgFashion from "../../assets/Fashion&Accessories.png";
+import imgOutdoor from "../../assets/Outdoor&Mobility.png";
+import imgKids from "../../assets/Kids&Toys.png";
+import imgHouse from "../../assets/House&Deco.png";
+import imgTech from "../../assets/Techitems.png";
+import imgWellness from "../../assets/Wellness&Lifestyle.png";
+import imgArt from "../../assets/Art&handmake.png";
+
+const Categories = () => {
+  const mobileScrollerRef = useRef(null);
+  const isInteractingRef = useRef(false);
+
+  const cards = [
+    { title: "Pet Accessories", image: imgPets },
+    { title: "Fashion &\nAccessories", image: imgFashion },
+    { title: "Outdoor &\nMobility", image: imgOutdoor },
+    { title: "Kids & Toys", image: imgKids },
+    { title: "House &\nDeco", image: imgHouse },
+    { title: "Tech Items", image: imgTech },
+    { title: "Wellness &\nLifestyle", image: imgWellness },
+    { title: "Art &\nHandmade", image: imgArt },
+  ];
+  const columns = [
+    cards.filter((_, index) => index % 4 === 0),
+    cards.filter((_, index) => index % 4 === 1),
+    cards.filter((_, index) => index % 4 === 2),
+    cards.filter((_, index) => index % 4 === 3),
+  ];
+
+  useEffect(() => {
+    const scroller = mobileScrollerRef.current;
+    if (!scroller) return;
+
+    let rafId = null;
+    let lastTs = 0;
+    const pxPerSecond = 24;
+
+    const tick = (ts) => {
+      if (!lastTs) lastTs = ts;
+      const dt = (ts - lastTs) / 1000;
+      lastTs = ts;
+
+      if (!isInteractingRef.current) {
+        scroller.scrollLeft += pxPerSecond * dt;
+        const half = scroller.scrollWidth / 2;
+        if (half > 0 && scroller.scrollLeft >= half) {
+          scroller.scrollLeft -= half;
+        }
+      }
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const startInteract = () => {
+      isInteractingRef.current = true;
+    };
+    const stopInteract = () => {
+      isInteractingRef.current = false;
+    };
+
+    scroller.addEventListener("pointerdown", startInteract);
+    window.addEventListener("pointerup", stopInteract);
+    scroller.addEventListener("touchstart", startInteract, { passive: true });
+    scroller.addEventListener("touchend", stopInteract, { passive: true });
+    scroller.addEventListener("mouseenter", startInteract);
+    scroller.addEventListener("mouseleave", stopInteract);
+
+    rafId = requestAnimationFrame(tick);
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      scroller.removeEventListener("pointerdown", startInteract);
+      window.removeEventListener("pointerup", stopInteract);
+      scroller.removeEventListener("touchstart", startInteract);
+      scroller.removeEventListener("touchend", stopInteract);
+      scroller.removeEventListener("mouseenter", startInteract);
+      scroller.removeEventListener("mouseleave", stopInteract);
+    };
+  }, []);
+
+  return (
+    <section className="relative z-20 w-full overflow-hidden bg-white-intense mt-24 md:mt-32 py-10 md:py-14">
+      <div className="w-full md:hidden">
+        <div className="px-4">
+          <div
+            ref={mobileScrollerRef}
+            className="flex gap-3 overflow-x-auto pb-2 touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {[...cards, ...cards].map((card, index) => (
+              <CategoriesCard
+                key={`mobile-${card.title}-${index}`}
+                title={card.title}
+                image={card.image}
+                className="min-w-[210px] w-[210px] h-64 flex-shrink-0"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden w-full md:block">
+        <div className="relative isolate">
+          <div className="pointer-events-none absolute left-1/2 -top-8 -z-10 h-28 w-[90%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.24)_0%,rgba(0,0,0,0.12)_42%,rgba(0,0,0,0)_78%)] blur-md" />
+          <div className="pointer-events-none absolute left-1/2 -bottom-8 -z-10 h-28 w-[90%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.24)_0%,rgba(0,0,0,0.12)_42%,rgba(0,0,0,0)_78%)] blur-md" />
+          <div className="pointer-events-none absolute inset-x-0 -top-16 z-20 h-20 bg-white-intense" />
+          <div className="pointer-events-none absolute inset-x-0 -bottom-16 z-20 h-20 bg-white-intense" />
+
+          <div className="mx-6 md:mx-24 xl:mx-38 relative z-10 grid grid-cols-2 gap-x-1 md:grid-cols-4 md:gap-x-1">
+            {columns.map((columnCards, columnIndex) => (
+              <div
+                key={`column-${columnIndex}`}
+                className="categories-column h-[540px] overflow-hidden"
+              >
+                <div
+                  className={`categories-track ${
+                    columnIndex % 2 ? "categories-track-reverse" : ""
+                  }`}
+                >
+                  {[...columnCards, ...columnCards].map((card, itemIndex) => (
+                    <CategoriesCard
+                      key={`${card.title}-${itemIndex}`}
+                      title={card.title}
+                      image={card.image}
+                      className="mx-auto w-[68%] h-64 md:w-[70%] md:h-80 mb-3 md:mb-4"
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Categories;
