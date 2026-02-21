@@ -137,7 +137,15 @@ const publicApi = {
     }
     const payload = await res.json();
     return payload?.data ?? payload;
-  }
+  },
+  getProductByCategory: async (category) => {
+    const res = await fetch(`${API_BASE_URL}/searchByCategory?categoryName=${encodeURIComponent(category || "")}`);
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error fetching related products");
+    }
+    return res.json();
+  },
 };
 
 

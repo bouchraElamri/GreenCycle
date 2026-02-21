@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import publicApi from "../api/publicApi";
 
-export default function useProducts(productId = null) {
+export default function useProducts(productId = null, category = null) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState(null);
+  const [productsRelated, setProductsRelated] = useState([]);
 
   useEffect(() => {
     setLoading(true);
@@ -16,7 +17,12 @@ export default function useProducts(productId = null) {
         if (productId) {
           const data = await publicApi.getProductDetails(productId);
           setProduct(data);
-        } else {
+        } 
+        else if (category) {
+          const data = await publicApi.getProductByCategory(category);
+          setProductsRelated(data);
+        }
+        else {
           const data = await publicApi.getProducts();
           setProducts(data);
         }
@@ -26,9 +32,9 @@ export default function useProducts(productId = null) {
         setLoading(false);
       }
     };
-
     fetchData();
-  }, [productId]);
+  }, [productId, category]);
+   
 
-  return { products, product, loading, error };
+  return { products, product, loading, error, productsRelated };
 }
