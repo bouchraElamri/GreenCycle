@@ -17,7 +17,10 @@ export default function Navbar() {
   const isAdminUser =
     normalizedRoles.includes("admin") ||
     normalizedRoles.includes("administrator");
+  const isSellerUser = normalizedRoles.includes("seller");
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const isSellerRoute = location.pathname.startsWith("/seller");
+  const isSellerView = isSellerUser && isSellerRoute;
 
   const drawerRef = useRef(null);
   const sidebarRef = useRef(null);
@@ -38,6 +41,7 @@ export default function Navbar() {
   const goToLogin = () => navigate(`/login`);
   const gotosignup = () => navigate(`/register`);
   const switchtoseller = () => navigate("/seller");
+  const switchtobuyer = () => navigate("/");
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -193,7 +197,10 @@ export default function Navbar() {
                     md:h-16"
         >
           {/* logo */}
-          <Link className="ml-6 shrink-0 md:ml-6" to="/">
+          <Link
+            className="ml-6 shrink-0 md:ml-6"
+            to={isSellerView ? "/seller" : "/"}
+          >
             <img
               src={logo}
               alt="Logo"
@@ -204,14 +211,16 @@ export default function Navbar() {
           {/* navigation : for Desktop */}
           <div className="hidden md:flex md:items-center md:flex-1 md:justify-end">
             <ul className="flex items-center md:gap-6 xl:gap-12 mr-0">
-              <li>
-                <Link
-                  to="/product_list"
-                  className="inline-flex h-10 w-28 items-center justify-center rounded-full font-nexa text-base font-bold text-white-intense transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
-                >
-                  Products
-                </Link>
-              </li>
+              {!isSellerView && (
+                <li>
+                  <Link
+                    to="/product_list"
+                    className="inline-flex h-10 w-28 items-center justify-center rounded-full font-nexa text-base font-bold text-white-intense transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
+                  >
+                    Products
+                  </Link>
+                </li>
+              )}
 
               <li>
                 <form
@@ -252,14 +261,25 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <li>
-                    <button
-                      onClick={switchtoseller}
-                      className="inline-flex items-center justify-center h-10 text-white-intense text-lg font-nexa font-bold px-3 py-1 rounded-full transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
-                    >
-                      switch to seller
-                    </button>
-                  </li>
+                  {isSellerView ? (
+                    <li>
+                      <button
+                        onClick={switchtobuyer}
+                        className="inline-flex items-center justify-center h-10 text-white-intense text-lg font-nexa font-bold px-3 py-1 rounded-full transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
+                      >
+                        Switch To Buyer
+                      </button>
+                    </li>
+                  ) : (
+                    <li>
+                      <button
+                        onClick={switchtoseller}
+                        className="inline-flex items-center justify-center h-10 text-white-intense text-lg font-nexa font-bold px-3 py-1 rounded-full transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
+                      >
+                        Switch To Seller
+                      </button>
+                    </li>
+                  )}
                   <li>
                     <button
                       type="button"
@@ -328,7 +348,7 @@ export default function Navbar() {
         >
           <div className="bg-white-broken w-72 shadow-[0_0_30px_rgba(0,0,0,0.1)] rounded-3xl bg-white/95 backdrop-blur">
             <div className="flex flex-col items-center py-2">
-              {role === "administrator" ? (
+              {isAdminUser || isSellerView ? (
                 <>
                   <button
                     onClick={handleLogout}
@@ -423,17 +443,21 @@ export default function Navbar() {
                 </form>
               </div>
 
-              <div className="w-[85%] h-px bg-black/10" />
+              {!isSellerView && (
+                <>
+                  <div className="w-[85%] h-px bg-black/10" />
 
-              <Link
-                to="/product_list"
-                onClick={() => setSidebarOpen(false)}
-                className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
-              >
-                Products
-              </Link>
+                  <Link
+                    to="/product_list"
+                    onClick={() => setSidebarOpen(false)}
+                    className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Products
+                  </Link>
 
-              <div className="w-[85%] h-[0.5px] bg-black/10" />
+                  <div className="w-[85%] h-[0.5px] bg-black/10" />
+                </>
+              )}
 
               {!isAuthenticated ? (
                 <>
@@ -455,7 +479,7 @@ export default function Navbar() {
                     Sign Up
                   </Link>
                 </>
-              ) : role === "administrator" ? (
+              ) : isAdminUser || isSellerView ? (
                 <>
                   <button
                     onClick={handleLogout}
@@ -477,7 +501,7 @@ export default function Navbar() {
                   <div className="w-[85%] h-px bg-black/10" />
 
                   <Link
-                    to="/"
+                    to="/seller"
                     onClick={() => setSidebarOpen(false)}
                     className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
                   >
