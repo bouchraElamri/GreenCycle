@@ -1,14 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const { PostOrder } = require("../controllers/order.controller");
+const {
+  AddToCart,
+  ConfirmPendingOrders,
+  GetPendingOrders,
+  GetConfirmedOrders,
+  DeletePendingOrder,
+  GetClientOrders,
+} = require("../controllers/order.controller");
 const validate = require("../middlewares/validate.middleware"); // <- your existing generic middleware
-const { createOrderSchema } = require("../validators/order.validator");
+const {
+  addToCartSchema,
+  confirmPendingOrdersSchema,
+  getClientOrdersParamsSchema,
+  orderIdParamsSchema,
+} = require("../validators/order.validator");
 const { authenticate } = require("../middlewares/auth.middleware");
 const { validateSwitchToSeller } = require("../validators/seller.validator");
 const sellerController = require("../controllers/seller.controller");
 const { getOrdersQuerySchema } = require("../validators/order.validator");
-const { GetClientOrders } = require("../controllers/order.controller");
-const { getClientOrdersParamsSchema } = require("../validators/order.validator");
 const uploadProfile = require("../middlewares/uploadProfile.middleware");
 const authController = require("../controllers/auth.controller");
 const { requestEmailChangeSchema, confirmEmailChangeSchema, changePasswordSchema, emailSchema, resetPasswordSchema } = require("../validators/auth.validator");
@@ -26,8 +36,21 @@ router.post('/profile/picture', uploadProfile.single('image'), authController.up
 // Switch to seller
 router.post('/switch-to-seller', validateSwitchToSeller, sellerController.switchToSeller);
 
-// For testing without auth middleware
-router.post("/orders/", validate(createOrderSchema), PostOrder);
+router.post("/add-to-cart", validate(addToCartSchema), AddToCart);
+
+router.post(
+  "/orders/confirm",
+  validate(confirmPendingOrdersSchema),
+  ConfirmPendingOrders
+);
+
+router.get("/orders/pending", GetPendingOrders);
+router.get("/orders/confirmed", GetConfirmedOrders);
+router.delete(
+  "/orders/pending/:orderId",
+  validate(orderIdParamsSchema, "params"),
+  DeletePendingOrder
+);
 
 router.get("/orders/:clientId", validate(getClientOrdersParamsSchema, "params"), GetClientOrders);
 router.post("/products/:id/reviews", ratingController.addProductReview);

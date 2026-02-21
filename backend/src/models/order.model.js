@@ -39,6 +39,13 @@ const orderSchema = new mongoose.Schema(
       country: String,
     },
 
+    bankAccount: {
+      holderName: String,
+      cardNumber: String,
+      expirationDate: String,
+      cvv: String,
+    },
+
     totalPrice: {
       type: Number,
       required: true,
@@ -46,15 +53,16 @@ const orderSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["confirmed", "delivered"],
-      default: "confirmed",
+      enum: ["pending","confirmed", "delivered"],
+      default: "pending",
     },
   },
   { timestamps: true }
 );
 
 orderSchema.pre("save", async function () {
-  if (!this.isNew) {
+  // Reserve stock only when a confirmed order is created.
+  if (!this.isNew || this.status !== "confirmed") {
     return;
   }
 
