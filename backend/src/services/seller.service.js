@@ -7,6 +7,19 @@ class SellerService {
   formatPublicSellerProfile(seller) {
     return {
       _id: seller._id,
+      fullName: seller.userId
+        ? `${seller.userId.firstName || ""} ${seller.userId.lastName || ""}`.trim()
+        : "",
+      email: seller.userId?.email,
+      description: seller.description,
+      profileUrl: seller.profileUrl,
+      rating: seller.rating,
+    };
+  }
+
+  formatAdminSellerProfile(seller) {
+    return {
+      _id: seller._id,
       userId: seller.userId?._id || seller.userId,
       fullName: seller.userId
         ? `${seller.userId.firstName || ""} ${seller.userId.lastName || ""}`.trim()
@@ -14,6 +27,7 @@ class SellerService {
       firstName: seller.userId?.firstName,
       lastName: seller.userId?.lastName,
       email: seller.userId?.email,
+      phone: seller.userId?.phone,
       description: seller.description,
       profileUrl: seller.profileUrl,
       bannerUrl: seller.bannerUrl,
@@ -21,6 +35,7 @@ class SellerService {
       isVerified: seller.isVerified,
       rating: seller.rating,
       totalSales: seller.totalSales,
+      bankAccount: seller.bankAccount,
       createdAt: seller.createdAt,
       updatedAt: seller.updatedAt,
     };
@@ -109,6 +124,11 @@ class SellerService {
     return sellers.map((seller) => this.formatPublicSellerProfile(seller));
   }
 
+  async getAllSellersForAdmin() {
+    const sellers = await sellerRepo.findAllWithUser();
+    return sellers.map((seller) => this.formatAdminSellerProfile(seller));
+  }
+
   async getSellerPublicProfile(sellerId) {
     if (!mongoose.Types.ObjectId.isValid(sellerId)) {
       const error = new Error("Invalid seller id");
@@ -124,6 +144,28 @@ class SellerService {
     }
 
     return this.formatPublicSellerProfile(seller);
+  }
+
+  async getSellerProfileByRole(sellerId, requesterRoles = []) {
+    if (!mongoose.Types.ObjectId.isValid(sellerId)) {
+      const error = new Error("Invalid seller id");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const seller = await sellerRepo.findByIdWithUser(sellerId);
+    if (!seller) {
+      const error = new Error("Seller profile not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const roles = Array.isArray(requesterRoles) ? requesterRoles : [];
+    const isAdmin = roles.includes("admin");
+
+    return isAdmin
+      ? this.formatAdminSellerProfile(seller)
+      : this.formatPublicSellerProfile(seller);
   }
 
   async getSellerPublicProducts(sellerId, type = "remaining") {

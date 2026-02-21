@@ -90,54 +90,8 @@ export default function Navbar() {
 
   // ✅ NEW: progressive haze while scrolling past hero (landing page only)
   useEffect(() => {
-    const isLanding = location.pathname === "/";
-
-    // Other pages: haze always visible
-    if (!isLanding) {
-      setFadeProgress(1);
-      return;
-    }
-
-    let rafId = null;
-
-    const update = () => {
-      const hero = document.getElementById("hero");
-      if (!hero) {
-        setFadeProgress(0);
-        return;
-      }
-
-      const rect = hero.getBoundingClientRect();
-      const heroHeight = rect.height || 1;
-
-      // How far hero moved up (0 when top aligned, increases as you scroll down)
-      const scrolledPast = Math.max(0, -rect.top);
-
-      // Fade becomes fully visible after you scroll this distance
-      const fadeDistance = heroHeight * 0.6; // tweak: 0.4 faster, 0.8 slower
-
-      const p = Math.min(1, scrolledPast / fadeDistance);
-      setFadeProgress(p);
-    };
-
-    const onScroll = () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        rafId = null;
-        update();
-      });
-    };
-
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [location.pathname]);
+    setFadeProgress(1);
+  }, []);
 
   // If current user is administrator, render a simplified navbar
   if (isAdminUser || isAdminRoute) {
