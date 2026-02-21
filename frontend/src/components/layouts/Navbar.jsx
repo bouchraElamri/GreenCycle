@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import AuthContext from "../../contexts/AuthContext";
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useMemo, useState, useRef } from "react";
 import logo from "../../assets/Logo-white 2.png";
 import searchicon from "../../assets/zoom.png";
 import profile from "../../assets/profile.jpg";
@@ -10,13 +10,14 @@ import { RiMenuSearchFill } from "react-icons/ri";
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, logout, role } = useContext(AuthContext);
+  const { isAuthenticated, logout, role, user } = useContext(AuthContext);
 
   const roles = Array.isArray(role) ? role : role ? [role] : [];
   const normalizedRoles = roles.map((r) => String(r).toLowerCase());
   const isAdminUser =
     normalizedRoles.includes("admin") ||
     normalizedRoles.includes("administrator");
+  const isSellerUser = normalizedRoles.includes("seller");
   const isAdminRoute = location.pathname.startsWith("/admin");
 
   const drawerRef = useRef(null);
@@ -38,6 +39,33 @@ export default function Navbar() {
   const goToLogin = () => navigate(`/login`);
   const gotosignup = () => navigate(`/register`);
   const switchtoseller = () => navigate("/seller");
+
+  const apiOrigin = useMemo(() => {
+    return (
+      process.env.REACT_APP_API_URL || "http://localhost:5000/api"
+    ).replace(/\/api\/?$/, "");
+  }, []);
+
+  const profileImageSrc = useMemo(() => {
+    const rawPath = user?.profileImage;
+    if (!rawPath) return "";
+
+    const normalized = String(rawPath).replace(/\\/g, "/");
+    if (normalized.startsWith("http")) return normalized;
+
+    const uploadsIndex = normalized.indexOf("/uploads/");
+    if (uploadsIndex >= 0) {
+      return `${apiOrigin}${normalized.slice(uploadsIndex)}`;
+    }
+
+    if (normalized.startsWith("uploads/")) {
+      return `${apiOrigin}/${normalized}`;
+    }
+
+    return `${apiOrigin}${
+      normalized.startsWith("/") ? normalized : `/${normalized}`
+    }`;
+  }, [apiOrigin, user?.profileImage]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -136,7 +164,7 @@ export default function Navbar() {
                 className="w-10 h-10 rounded-full overflow-hidden border-2 border-white-light"
               >
                 <img
-                  src={pdpph}
+                  src={profileImageSrc || pdpph}
                   alt="Admin"
                   className="w-full h-full object-cover"
                 />
@@ -252,14 +280,16 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <li>
-                    <button
-                      onClick={switchtoseller}
-                      className="inline-flex items-center justify-center h-10 text-white-intense text-lg font-nexa font-bold px-3 py-1 rounded-full transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
-                    >
-                      switch to seller
-                    </button>
-                  </li>
+                  {!isSellerUser && (
+                    <li>
+                      <button
+                        onClick={switchtoseller}
+                        className="inline-flex items-center justify-center h-10 text-white-intense text-lg font-nexa font-bold px-3 py-1 rounded-full transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
+                      >
+                        switch to seller
+                      </button>
+                    </li>
+                  )}
                   <li>
                     <button
                       type="button"
@@ -269,7 +299,7 @@ export default function Navbar() {
                       className="flex item-center mr-3 w-12 h-12 rounded-full overflow-hidden border-2 border-white-light"
                     >
                       <img
-                        src={profile}
+                        src={profileImageSrc || profile}
                         alt="Profile"
                         className="w-full h-full object-cover"
                       />
@@ -306,7 +336,7 @@ export default function Navbar() {
                   className="flex items-center mr-1 w-10 h-10 rounded-full overflow-hidden border-2 border-white-light md:hidden"
                 >
                   <img
-                    src={profile}
+                    src={profileImageSrc || profile}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
@@ -328,8 +358,38 @@ export default function Navbar() {
         >
           <div className="bg-white-broken w-72 shadow-[0_0_30px_rgba(0,0,0,0.1)] rounded-3xl bg-white/95 backdrop-blur">
             <div className="flex flex-col items-center py-2">
-              {role === "administrator" ? (
+              {isSellerUser ? (
                 <>
+                  <Link
+                    to="/seller"
+                    onClick={() => setDrawerOpen(false)}
+                    className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <div className="w-[85%] h-px bg-black/10" />
+
+                  <Link
+                    to="/seller/profile"
+                    onClick={() => setDrawerOpen(false)}
+                    className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Profile
+                  </Link>
+
+                  <div className="w-[85%] h-px bg-black/10" />
+
+                  <Link
+                    to="/cart"
+                    onClick={() => setDrawerOpen(false)}
+                    className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Cart
+                  </Link>
+
+                  <div className="w-[85%] h-px bg-black/10" />
+
                   <button
                     onClick={handleLogout}
                     className="w-full px-6 py-3 text-left font-nexa text-xl text-green-dark hover:font-bold transition"
@@ -348,6 +408,16 @@ export default function Navbar() {
                   </Link>
 
                   <div className="w-[85%] h-px bg-black/10" />
+
+                  <Link
+                    to="/seller"
+                    onClick={() => setDrawerOpen(false)}
+                    className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                  >
+                    Switch To Seller
+                  </Link>
+
+                  <div className="w-[85%] h-[0.5px] bg-black/10" />
 
                   <Link
                     to="/profile"
@@ -466,6 +536,20 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
+                  {isSellerUser && (
+                    <>
+                      <Link
+                        to="/seller"
+                        onClick={() => setSidebarOpen(false)}
+                        className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                      >
+                        Dashboard
+                      </Link>
+
+                      <div className="w-[85%] h-px bg-black/10" />
+                    </>
+                  )}
+
                   <Link
                     to="/cart"
                     onClick={() => setSidebarOpen(false)}
@@ -476,18 +560,22 @@ export default function Navbar() {
 
                   <div className="w-[85%] h-px bg-black/10" />
 
-                  <Link
-                    to="/"
-                    onClick={() => setSidebarOpen(false)}
-                    className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
-                  >
-                    Switch To Seller
-                  </Link>
+                  {!isSellerUser && (
+                    <>
+                      <Link
+                        to="/seller"
+                        onClick={() => setSidebarOpen(false)}
+                        className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
+                      >
+                        Switch To Seller
+                      </Link>
 
-                  <div className="w-[85%] h-px bg-black/10" />
+                      <div className="w-[85%] h-px bg-black/10" />
+                    </>
+                  )}
 
                   <Link
-                    to="/profile"
+                    to={isSellerUser ? "/seller/profile" : "/profile"}
                     onClick={() => setSidebarOpen(false)}
                     className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
                   >
