@@ -16,7 +16,7 @@ async function handleResponse(response) {
   return data;
 }
 
-const publicApi = {
+const publicApi = { 
   // Login
   login: async ({ email, password }) => {
     return handleResponse(
@@ -51,7 +51,7 @@ const publicApi = {
   // Forgot password
   forgotPassword: async (email) => {
     return handleResponse(
-      await fetch(`${API_BASE_URL}/forgot-password`, {
+      await fetch(`${API_BASE_URL}/client/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -62,7 +62,7 @@ const publicApi = {
   // Reset password
   resetPassword: async (token, password,passwordConfirmation) => {
     return handleResponse(
-      await fetch(`${API_BASE_URL}/reset-password/${token}`, {
+      await fetch(`${API_BASE_URL}/client/reset-password/${token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password,passwordConfirmation }),
