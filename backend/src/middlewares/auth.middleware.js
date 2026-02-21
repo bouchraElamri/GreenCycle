@@ -13,7 +13,15 @@ const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await userRepo.findById(decoded.id);
     if (!user) return res.status(401).json({ message: "User not found" });
-    req.user = { id: user._id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role };
+    req.user = {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      profileImage: user.profileImage,
+      role: user.role,
+    };
     next();
   } catch (err) {
     res.status(401).json({ message: "Invalid token" });
@@ -37,6 +45,8 @@ const optionalAuthenticate = async (req, res, next) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        phone: user.phone,
+        profileImage: user.profileImage,
         role: user.role,
       };
     }

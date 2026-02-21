@@ -21,7 +21,7 @@ const sellerController = require("../controllers/seller.controller");
 const { getOrdersQuerySchema } = require("../validators/order.validator");
 const uploadProfile = require("../middlewares/uploadProfile.middleware");
 const authController = require("../controllers/auth.controller");
-const { requestEmailChangeSchema, confirmEmailChangeSchema, changePasswordSchema, emailSchema, resetPasswordSchema } = require("../validators/auth.validator");
+const { requestEmailChangeSchema, confirmEmailChangeSchema, changePasswordSchema, emailSchema, resetPasswordSchema, updateProfileSchema } = require("../validators/auth.validator");
 const ratingController = require("../controllers/rating.controller");
 
 router.use(authenticate);
@@ -32,6 +32,7 @@ router.get('/', (req, res) => res.json({ message: 'Client API root' }));
 
 // Upload or change profile picture
 router.post('/profile/picture', uploadProfile.single('image'), authController.uploadProfilePicture);
+router.patch("/profile", validate(updateProfileSchema), authController.updateProfile);
 
 // Switch to seller
 router.post('/switch-to-seller', validateSwitchToSeller, sellerController.switchToSeller);
