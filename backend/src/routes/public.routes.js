@@ -24,6 +24,7 @@ router.get('/categories/:id', categoryController.getCategoryById);
 router.post("/register", validate(registerSchema), authController.register);
 router.post("/login", validate(loginSchema), authController.login);
 router.post("/forgot-password", validate(emailSchema), authController.forgotPassword);
+router.get("/activate/:token", authController.activateAccount);
 
 
 // Protected
