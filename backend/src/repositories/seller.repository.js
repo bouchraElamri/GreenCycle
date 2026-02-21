@@ -17,7 +17,13 @@ const findByUserIdWithUser = async (userId) => {
 };
 
 const findByIdWithUser = async (id) => {
-  return Seller.findById(id).populate("userId", "firstName lastName email");
+  return Seller.findById(id).populate("userId", "firstName lastName email phone");
+};
+
+const findAllWithUser = async () => {
+  return Seller.find()
+    .populate("userId", "firstName lastName email")
+    .sort({ createdAt: -1 });
 };
 
 module.exports = {
@@ -25,4 +31,5 @@ module.exports = {
   findByUserId,
   findByUserIdWithUser,
   findByIdWithUser,
+  findAllWithUser,
 };

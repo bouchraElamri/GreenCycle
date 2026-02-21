@@ -1,6 +1,7 @@
 const productServ = require("../services/product.service");
 const sellerRepo = require("../repositories/seller.repository");
 const sellerModule = require("../models/seller.model");
+const userModel = require("../models/user.model");
 
 const getProducts = async (req, res, next)=>{
     try{
@@ -50,7 +51,11 @@ const deleteProduct = async (req, res, next) => {
     // Authorization: ensure the requester owns the product
     const product = await productServ.getProductById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
-
+    const adminUser = await userModel.findById(req.user.id);
+    if (adminUser && adminUser.role == 'admin') {
+      await productServ.deleteProduct(req.params.id);
+      return res.status(204).send();
+    }
     const sellerProfile = await sellerRepo.findByUserId(req.user.id);
     if (!sellerProfile) return res.status(403).json({ message: "User is not a seller" });
 
@@ -94,8 +99,30 @@ const updateProduct = async (req, res, next) => {
         return res.status(403).json({ message: "Not authorized to edit this product" });
       }
 
+      // Prevent sellers from changing approval status. Only admins may approve products.
+      if (Object.prototype.hasOwnProperty.call(data, 'isApproved')) {
+        return res.status(403).json({ message: 'Only admins can change product approval status' });
+      }
+
       const product = await productServ.updateProduct(req.params.id, data);
       res.status(200).json(product);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Admin-only: approve or unapprove a product
+const approveProduct = async (req, res, next) => {
+  try {
+    const { isApproved } = req.body;
+
+    if (typeof isApproved !== 'boolean') {
+      return res.status(400).json({ message: 'isApproved must be a boolean' });
+    }
+
+    const product = await productServ.updateProduct(req.params.id, { isApproved });
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.status(200).json(product);
   } catch (error) {
     next(error);
   }
@@ -150,6 +177,7 @@ module.exports = {
   createProduct, 
   findProductById, 
   updateProduct , 
+  approveProduct,
   filterByPrice , 
   deleteProduct , 
   getNewstProducts , 

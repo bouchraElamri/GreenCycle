@@ -18,12 +18,20 @@ const {
 const { authenticate } = require("../middlewares/auth.middleware");
 const { validateSwitchToSeller } = require("../validators/seller.validator");
 const sellerController = require("../controllers/seller.controller");
+const { getOrdersQuerySchema } = require("../validators/order.validator");
+const uploadProfile = require("../middlewares/uploadProfile.middleware");
+const authController = require("../controllers/auth.controller");
+const { requestEmailChangeSchema, confirmEmailChangeSchema, changePasswordSchema, emailSchema, resetPasswordSchema } = require("../validators/auth.validator");
+const ratingController = require("../controllers/rating.controller");
 
 router.use(authenticate);
 
 // Client routes placeholder
 
 router.get('/', (req, res) => res.json({ message: 'Client API root' }));
+
+// Upload or change profile picture
+router.post('/profile/picture', uploadProfile.single('image'), authController.uploadProfilePicture);
 
 // Switch to seller
 router.post('/switch-to-seller', validateSwitchToSeller, sellerController.switchToSeller);
@@ -45,6 +53,19 @@ router.delete(
 );
 
 router.get("/orders/:clientId", validate(getClientOrdersParamsSchema, "params"), GetClientOrders);
+router.post("/products/:id/reviews", ratingController.addProductReview);
+router.delete("/products/:id/reviews", ratingController.removeProductReview);
+// Change email routes
+router.post("/email-change/request", validate(requestEmailChangeSchema), authController.requestEmailChange);
+router.post("/email-change/confirm", validate(confirmEmailChangeSchema), authController.confirmEmailChange);
 
+// Change password
+router.post("/change-password", validate(changePasswordSchema), authController.changePassword);
+
+// Forgot Password
+router.post("/forgot-password", validate(emailSchema), authController.forgotPassword);
+
+// Reset Password
+router.post("/reset-password/:token", validate(resetPasswordSchema), authController.resetPassword);
 
 module.exports = router;

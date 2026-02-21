@@ -1,5 +1,7 @@
 const orderRepo = require('../repositories/order.repository');
 const Product = require("../models/product.model");
+const mongoose = require("mongoose");
+// order.service.js
 const Client = require("../models/client.model");
 const Seller = require("../models/seller.model");
 
@@ -214,6 +216,52 @@ const getSellerOrders = async ({ authUserId, sellerId }) => {
     .filter(Boolean);
 };
 
+const mapAdminOrderSummary = (order) => ({
+  orderId: order._id,
+  totalPrice: order.totalPrice,
+  clientId: order.clientId,
+  date: order.createdAt,
+  status: order.status,
+});
+
+const getAdminOrders = async ({ status } = {}) => {
+  const orders = await orderRepo.findAdminOrders({ status });
+  return orders.map(mapAdminOrderSummary);
+};
+
+const getAdminOrderDetailsById = async (orderId) => {
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
+    const err = new Error("Invalid order id");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const order = await orderRepo.findAdminOrderDetailsById(orderId);
+  if (!order) {
+    const err = new Error("Order not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  return {
+    orderId: order._id,
+    clientId: order.clientId?._id || order.clientId,
+    clientUserId: order.clientId?.userId || null,
+    totalPrice: order.totalPrice,
+    status: order.status,
+    date: order.createdAt,
+    items: (order.items || []).map((item) => ({
+      productId: item.product?._id || item.product,
+      sellerId: item.seller?._id || item.seller,
+      sellerUserId: item.seller?.userId || null,
+      name: item.product?.name || item.name,
+      price: item.price ?? item.product?.price,
+      photos: item.product?.images || [],
+      quantity: item.quantity,
+    })),
+  };
+};
+
 if (!getClientOrders || !getSellerOrders) {
   throw new Error("Required order service functions are missing");
 }
@@ -226,4 +274,8 @@ module.exports = {
   deletePendingOrder,
   getClientOrders,
   getSellerOrders,
+  getClientOrders,
+  getSellerOrders,
+  getAdminOrders,
+  getAdminOrderDetailsById,
 };

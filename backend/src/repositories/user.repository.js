@@ -28,6 +28,39 @@ const findOne = async (filter) => {
   return await User.findOne(filter);
 };
 
+const buildUsersSearchFilter = (q) => {
+  if (!q || !q.trim()) return {};
+  const regex = new RegExp(q.trim(), "i");
+  return {
+    $or: [
+      { firstName: regex },
+      { lastName: regex },
+      { email: regex },
+      { phone: regex },
+    ],
+  };
+};
+
+const findAllUsers = async ({ page = 1, limit = 10, q = "" } = {}) => {
+  const safePage = Math.max(Number(page) || 1, 1);
+  const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 100);
+  const skip = (safePage - 1) * safeLimit;
+
+  const filter = buildUsersSearchFilter(q);
+
+  return User.find(filter)
+    .select("-password -resetPasswordToken -resetPasswordExpires -activationToken")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(safeLimit);
+};
+
+const countUsers = async ({ q = "" } = {}) => {
+  const filter = buildUsersSearchFilter(q);
+  return User.countDocuments(filter);
+};
+
+
 module.exports = {
   createUser,
   findByEmail,
@@ -35,4 +68,6 @@ module.exports = {
   findByResetToken,
   updateUser,
   findOne,
+  findAllUsers,
+  countUsers,
 };

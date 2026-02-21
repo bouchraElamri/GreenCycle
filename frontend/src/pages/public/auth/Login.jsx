@@ -30,12 +30,15 @@ export default function Login() {
       // Store user info for UI convenience (components may use this)
       localStorage.setItem("user", JSON.stringify(response.user));
       await refreshAuth();
-      // Redirect to area according to role
-      const role = response.user?.role || "client";
-      if (role === "admin") {
+      // Redirect according to role format coming from backend (array or string)
+      const roles = Array.isArray(response.user?.role)
+        ? response.user.role
+        : [response.user?.role || "client"];
+
+      if (roles.includes("admin")) {
         navigate("/admin/");
-            } else {
-        navigate("/client/");
+      } else {
+        navigate("/");
       }
     } catch (err) {
       setError(err?.message || "Erreur lors de la connexion");
@@ -55,14 +58,14 @@ export default function Login() {
       }}
     >
       <main
-        className="min-h-screen w-full px-4 sm:px-6 lg:px-10 py-10 flex items-center justify-center"
+        className="min-h-screen w-full px-4 sm:px-6 lg:px-10  flex items-center justify-center"
         style={{
           background:
             "linear-gradient(90deg,rgba(33, 80, 37, 1) 0%, rgba(196, 230, 201, 0.75) 100%)",
         }}
       >
         {/* Same wrapper design */}
-        <div className="w-full px-6 py-5 lg:px-10 lg:py-10 max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
+        <div className="w-full px-6 py-5 lg:px-10  max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
           {/* Left side (title + form) */}
           <div className="w-full lg:w-1/2">
 
@@ -130,7 +133,7 @@ export default function Login() {
                   <button
                     type="submit"
                     disabled={loading}
-                    style={{ backgroundColor: "#598E5C" }}
+                    style={{ backgroundColor: "#598E5C" ,color: "white" ,border: "1px solid #598E5C" }}
                     className="w-full sm:w-56 font-nexa text-white font-bold mb-2 py-2 px-4 rounded-full hover:bg-green-600 hover:opacity-80 transition duration-300"
                   >
                      {loading ? "Connexion en cours..." : "Se connecter"}
@@ -138,7 +141,7 @@ export default function Login() {
 
                   <Link
                     to="/register"
-                    style={{ backgroundColor: "white", color: "#598E5C" }}
+                    style={{ backgroundColor: "white", color: "#598E5C", border: "1px solid #598E5C" }}
                     className="block font-nexa text-center w-full sm:w-56 font-bold py-2 px-4 rounded-full hover:opacity-80 transition duration-300"
                   >
                     Sign Up
@@ -156,7 +159,7 @@ export default function Login() {
             <img
               src={hook}
               alt="Hook Poster"
-              className="w-full h-[740px] object-cover"
+              className="w-full h-[550px] object-cover"
             />
           </div>
         </div>

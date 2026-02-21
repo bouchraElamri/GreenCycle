@@ -89,6 +89,65 @@ class SellerController {
       });
     }
   }
+
+  async getVisibleSellers(req, res, next) {
+    try {
+      const sellers = await sellerService.getVisibleSellers();
+      return res.status(200).json({
+        success: true,
+        data: sellers,
+      });
+    } catch (error) {
+      if (typeof next === "function") return next(error);
+      return res.status(500).json({ success: false, message: "Failed to retrieve sellers" });
+    }
+  }
+
+  async getAllSellersForAdmin(req, res, next) {
+    try {
+      const sellers = await sellerService.getAllSellersForAdmin();
+      return res.status(200).json({
+        success: true,
+        data: sellers,
+      });
+    } catch (error) {
+      if (typeof next === "function") return next(error);
+      return res.status(500).json({ success: false, message: "Failed to retrieve sellers" });
+    }
+  }
+
+  async getSellerProfileById(req, res, next) {
+    try {
+      const seller = await sellerService.getSellerProfileByRole(
+        req.params.sellerId,
+        req.user?.role || []
+      );
+      return res.status(200).json({
+        success: true,
+        data: seller,
+      });
+    } catch (error) {
+      if (typeof next === "function") return next(error);
+      return res.status(error.statusCode || 500).json({ success: false, message: error.message });
+    }
+  }
+
+  async getSellerProducts(req, res, next) {
+    try {
+      const products = await sellerService.getSellerPublicProducts(
+        req.params.sellerId,
+        req.query.type || "remaining"
+      );
+
+      return res.status(200).json({
+        success: true,
+        data: products,
+      });
+    } catch (error) {
+      if (typeof next === "function") return next(error);
+      return res.status(error.statusCode || 500).json({ success: false, message: error.message });
+    }
+  }
 }
 
 module.exports = new SellerController();

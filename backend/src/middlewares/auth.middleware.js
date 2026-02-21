@@ -20,6 +20,33 @@ const authenticate = async (req, res, next) => {
   }
 };
 
+const optionalAuthenticate = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return next();
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await userRepo.findById(decoded.id);
+    if (user) {
+      req.user = {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      };
+    }
+  } catch (err) {
+    // Ignore invalid token in optional mode and continue as visitor.
+  }
+
+  return next();
+};
+
 const isAdmin = (req, res, next) => {
   const roles = req.user?.role;
 
@@ -51,4 +78,23 @@ const isSeller = async (req, res, next) => {
   return res.status(403).json({ error: "Denied Access: sellers only" });
 };
 
-module.exports = { authenticate, isAdmin, isSeller };
+const isClientOrSeller = (req, res, next) => {
+  const roles = req.user?.role;
+
+  if (
+    Array.isArray(roles) &&
+    (roles.includes("client") || roles.includes("seller"))
+  ) {
+    return next();
+  }
+
+  return res.status(403).json({ error: "Denied Access: clients or sellers only" });
+};
+
+module.exports = {
+  authenticate,
+  optionalAuthenticate,
+  isAdmin,
+  isSeller,
+  isClientOrSeller,
+};

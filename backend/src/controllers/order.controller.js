@@ -91,12 +91,52 @@ const GetSellerOrders = async (req, res, next) => {
   }
 };
 
+const GetAdminOrders = async (req, res, next) => {
+  try {
+    const orders = await orderService.getAdminOrders();
+    return res.status(200).json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const GetAdminConfirmedOrders = async (req, res, next) => {
+  try {
+    const orders = await orderService.getAdminOrders({ status: "confirmed" });
+    return res.status(200).json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const GetAdminDeliveredOrders = async (req, res, next) => {
+  try {
+    const orders = await orderService.getAdminOrders({ status: "delivered" });
+    return res.status(200).json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const GetAdminOrderDetails = async (req, res, next) => {
+  try {
+    const order = await orderService.getAdminOrderDetailsById(req.params.id);
+    return res.status(200).json(order);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
+  GetClientOrders,
+  GetSellerOrders,
+  GetAdminOrders,
+  GetAdminConfirmedOrders,
+  GetAdminDeliveredOrders,
+  GetAdminOrderDetails,
   AddToCart,
   ConfirmPendingOrders,
   GetPendingOrders,
   GetConfirmedOrders,
   DeletePendingOrder,
-  GetClientOrders,
-  GetSellerOrders,
 };

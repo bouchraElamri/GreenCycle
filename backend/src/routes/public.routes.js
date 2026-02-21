@@ -4,7 +4,8 @@ const { getProducts, findProductById , filterByPrice , getNewstProducts ,
 const { isAvailable } = require('../middlewares/availableProduct.middleware');
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
-const { authenticate } = require("../middlewares/auth.middleware");
+const sellerController = require("../controllers/seller.controller");
+const { authenticate, optionalAuthenticate } = require("../middlewares/auth.middleware");
 const { registerSchema, loginSchema, emailSchema, resetPasswordSchema } = require("../validators/auth.validator");
 const validate = require("../middlewares/validate.middleware");
 const categoryController = require("../controllers/category.controller");
@@ -23,17 +24,17 @@ router.get('/categories/:id', categoryController.getCategoryById);
 router.post("/register", validate(registerSchema), authController.register);
 router.post("/login", validate(loginSchema), authController.login);
 router.post("/forgot-password", validate(emailSchema), authController.forgotPassword);
-router.post("/reset-password/:token", validate(resetPasswordSchema), authController.resetPassword);
 router.get("/activate/:token", authController.activateAccount);
 
 
 // Protected
 router.get("/verify-token", authenticate, authController.verifyToken);
 router.get("/me", authenticate, authController.getCurrentUser);
+router.get("/sellers/:sellerId", optionalAuthenticate, sellerController.getSellerProfileById);
+router.get(
+  "/sellers/:sellerId/products",
+  sellerController.getSellerProducts
+);
 
 
 module.exports = router;
-
-
-
-
