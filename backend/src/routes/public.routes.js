@@ -9,6 +9,8 @@ const { authenticate, optionalAuthenticate } = require("../middlewares/auth.midd
 const { registerSchema, loginSchema, emailSchema, resetPasswordSchema } = require("../validators/auth.validator");
 const validate = require("../middlewares/validate.middleware");
 const categoryController = require("../controllers/category.controller");
+const contactController = require("../controllers/contact.controller");
+const { contactSchema } = require("../validators/contact.validator");
 
 // Public routes placeholder
 router.get('/', (req, res) => res.json({ message: 'Public API root' }));
@@ -25,6 +27,7 @@ router.post("/register", validate(registerSchema), authController.register);
 router.post("/login", validate(loginSchema), authController.login);
 router.post("/forgot-password", validate(emailSchema), authController.forgotPassword);
 router.get("/activate/:token", authController.activateAccount);
+router.post("/contact", validate(contactSchema), contactController.sendContact);
 
 
 // Protected

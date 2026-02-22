@@ -42,3 +42,39 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   cursor: pointer;
 }
+
+.categories-track {
+  display: flex;
+  flex-direction: column;
+  animation: categories-scroll-up 18s linear infinite;
+  will-change: transform;
+}
+
+.categories-track-reverse {
+  animation-name: categories-scroll-down;
+}
+
+.categories-column:hover .categories-track,
+.categories-column:hover .categories-track-reverse {
+  animation-play-state: paused;
+}
+
+@keyframes categories-scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes categories-scroll-down {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
