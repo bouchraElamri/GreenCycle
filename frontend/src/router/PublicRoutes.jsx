@@ -21,6 +21,7 @@ export default function PublicRoutes() {
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/product_list" element={<ProductList />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            
         </Routes>
     );
 }
