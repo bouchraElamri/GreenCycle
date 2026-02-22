@@ -76,7 +76,7 @@ export default function OrderList() {
               <tr>
                 <th className="px-4 py-3 text-sm font-bold">Order ID</th>
                 <th className="px-4 py-3 text-sm font-bold">Price</th>
-                <th className="px-4 py-3 text-sm font-bold">Client ID</th>
+                <th className="px-4 py-3 text-sm font-bold">Client Name</th>
                 <th className="px-4 py-3 text-sm font-bold">Date</th>
                 <th className="px-4 py-3 text-sm font-bold">Status</th>
               </tr>
@@ -101,11 +101,7 @@ export default function OrderList() {
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-gray">{order.totalPrice ?? "-"}</td>
-                    <td className="px-4 py-3 text-gray">
-                      <span className="inline-block max-w-[220px] truncate" title={String(order.clientId || "-")}>
-                        {String(order.clientId || "-")}
-                      </span>
-                    </td>
+                    <td className="px-4 py-3 text-gray">{order.clientFullName || "-"}</td>
                     <td className="px-4 py-3 text-gray">{formatDate(order.date)}</td>
                     <td className="px-4 py-3 text-gray">{order.status || "-"}</td>
                   </tr>
