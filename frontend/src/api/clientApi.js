@@ -44,6 +44,22 @@ export const confirmEmailChange = async (confirmationCode) =>
     })
   );
 
+
+export const changeProfilePic = async (profilePic)=>
+  {
+    const formData = new FormData();
+    formData.append("image", profilePic);
+
+    return handleResponse(
+      await fetch(`${API_BASE_URL}/client/profile/picture`,{
+        method: "POST",
+        headers: authHeaders(),
+        body: formData
+
+      })
+    );
+  };
+
 export const updatePassword = async (oldPassword, newPassword, newPasswordConfirmation) =>
   handleResponse(
     await fetch(`${API_BASE_URL}/client/change-password`, {

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { requestEmailChange, confirmEmailChange, updatePassword } from '../api/clientApi'
+import { requestEmailChange, confirmEmailChange, updatePassword, changeProfilePic } from '../api/clientApi'
 
 const useProfileEdit = () => {
 
@@ -19,6 +19,9 @@ const useProfileEdit = () => {
   const [emailSuccess, setEmailSuccess]   = useState('')
   const [passwordError, setPasswordError]     = useState('')
   const [passwordSuccess, setPasswordSuccess] = useState('')
+  const [profilePicError, setProfilePicError] = useState('')
+  const [profilePicSuccess, setProfilePicSuccess] = useState('')
+  const [profilePicLoading, setProfilePicLoading] = useState(false)
 
   // ─── HANDLERS ─────────────────────────────────────────
 
@@ -72,6 +75,26 @@ const useProfileEdit = () => {
     }
   }
 
+  const handleChangeProfilePic = async (file) => {
+    setProfilePicError('')
+    setProfilePicSuccess('')
+
+    if (!file) {
+      setProfilePicError('Please select an image.')
+      return
+    }
+
+    setProfilePicLoading(true)
+    try {
+      await changeProfilePic(file)
+      setProfilePicSuccess('Profile picture updated successfully!')
+    } catch (err) {
+      setProfilePicError(err.message)
+    } finally {
+      setProfilePicLoading(false)
+    }
+  }
+
   return {
     // Email
     newEmail, setNewEmail,
@@ -85,10 +108,12 @@ const useProfileEdit = () => {
     loading,
     emailError, emailSuccess,
     passwordError, passwordSuccess,
+    profilePicError, profilePicSuccess, profilePicLoading,
     // Handlers
     handleSendCode,
     handleConfirmEmail,
     handleUpdatePassword,
+    handleChangeProfilePic,
   }
 }
 
