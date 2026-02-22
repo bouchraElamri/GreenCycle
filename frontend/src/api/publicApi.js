@@ -109,6 +109,21 @@ const publicApi = {
     return res.json();
   },
 
+  getNewestProducts: async (limit = 12) => {
+    const res = await fetch(`${API_BASE_URL}/getProducts`);
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error fetching products");
+    }
+
+    const products = await res.json();
+    const safeLimit = Number.isFinite(limit) ? Math.max(1, Number(limit)) : 12;
+
+    return (Array.isArray(products) ? products : [])
+      .sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0))
+      .slice(0, safeLimit);
+  },
+
   getProductDetails: async (id) => {
     const res = await fetch(`${API_BASE_URL}/getProductById/${id}`);
     if (!res.ok) {
@@ -128,6 +143,16 @@ const publicApi = {
       throw new Error(errorData.message || "Error fetching categories");
     }
     return res.json();
+  },
+
+  sendContactMessage: async ({ name, email, phone, message }) => {
+    return handleResponse(
+      await fetch(`${API_BASE_URL}/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, phone, message }),
+      })
+    );
   },
 };
 

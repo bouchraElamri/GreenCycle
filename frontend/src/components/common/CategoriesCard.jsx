@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const CategoriesCard = ({ title, image, className = "" }) => {
+const CategoriesCard = ({ title, image, className = "", to = "/product_list" }) => {
   return (
-    <Link to="/product_list" className="group block">
+    <Link to={to} className="group block">
       <article
         className={`relative overflow-hidden rounded-[40px] shadow-sm ${className}`}
       >
