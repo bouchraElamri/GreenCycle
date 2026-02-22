@@ -3,66 +3,161 @@ const Product = require("../models/product.model");
 const mongoose = require("mongoose");
 // order.service.js
 const Client = require("../models/client.model");
-const Order = require("../models/order.model");
 const Seller = require("../models/seller.model");
 
-const createOrder = async ({ userId, items, deliveryAddress }) => {
+const addToCart = async ({ userId, productId, quantity }) => {
+  const client = await Client.findOne({ userId });
+  if (!client) {
+    const err = new Error("Client profile not found");
+    err.statusCode = 404;
+    throw err;
+  }
 
-    const client = await Client.findOne({ userId });
+  const product = await Product.findById(productId);
+  if (!product) {
+    const err = new Error("Product not found");
+    err.statusCode = 404;
+    throw err;
+  }
 
-    if (!client) {
-      const err = new Error("Client profile not found");
-      err.statusCode = 404;
-      throw err;
-    }
+  if (!quantity || quantity < 1 || quantity > product.quantity) {
+    const err = new Error("Invalid quantity for product: " + product.name);
+    err.statusCode = 400;
+    throw err;
+  }
 
-    if(!Array.isArray(items) || items.length === 0){
-        const error = new Error("Invalid items");
-        error.statusCode = 400;
-        throw error;
-    }
+  const created = await orderRepo.create({
+    clientId: client._id,
+    items: [
+      {
+        product: product._id,
+        seller: product.seller,
+        name: product.name,
+        price: product.price,
+        quantity,
+      },
+    ],
+    totalPrice: product.price * quantity,
+    status: "pending",
+  });
 
-    let totalPrice = 0;
-    const orderItems = [];
+  return created;
+};
 
+const confirmPendingOrders = async ({ userId, deliveryAddress, bankAccount }) => {
+  const client = await Client.findOne({ userId });
+  if (!client) {
+    const err = new Error("Client profile not found");
+    err.statusCode = 404;
+    throw err;
+  }
 
-    for (const item of items) {
+  const pendingOrders = await orderRepo.findPendingByClient(client._id);
+  if (!pendingOrders.length) {
+    const err = new Error("No pending orders to confirm");
+    err.statusCode = 400;
+    throw err;
+  }
 
-        // Fetch real product from DB
-        const product = await Product.findById(item.product);
-
-        if (!product) {
-            const err = new Error("Product not found");
-            err.statusCode = 404;
-            throw err;
-        }
-        if (!item.quantity || item.quantity < 1 || item.quantity > product.quantity) {
-            const err = new Error("Invalid quantity for product: " + product.name);
-            err.statusCode = 400;
-            throw err;
-        }
-
-        const subtotal = product.price * item.quantity;
-        totalPrice += subtotal;
-
-        orderItems.push({
-            product: product._id,
-            seller: product.seller,
-            name: product.name,
-            price: product.price,
-            quantity: item.quantity,
+  const mergedByProduct = new Map();
+  for (const order of pendingOrders) {
+    for (const item of order.items || []) {
+      const key = String(item.product);
+      const current = mergedByProduct.get(key);
+      if (current) {
+        current.quantity += item.quantity;
+      } else {
+        mergedByProduct.set(key, {
+          product: item.product,
+          seller: item.seller,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
         });
+      }
     }
+  }
 
-    const created = await orderRepo.create({
-        clientId: client._id, // this is what Order model expects
-        items: orderItems,
-        deliveryAddress,
-        totalPrice,
-        status: "confirmed",
-    });
+  const items = Array.from(mergedByProduct.values());
+  const totalPrice = items.reduce(
+    (sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0),
+    0
+  );
 
-    return created;
+  const confirmedOrder = await orderRepo.create({
+    clientId: client._id,
+    items,
+    deliveryAddress,
+    bankAccount,
+    totalPrice,
+    status: "confirmed",
+  });
+
+  await orderRepo.deleteManyByIds(pendingOrders.map((order) => order._id));
+
+  return {
+    order: confirmedOrder,
+    mergedOrdersCount: pendingOrders.length,
+  };
+};
+
+const getPendingOrders = async ({ userId }) => {
+  const client = await Client.findOne({ userId });
+  if (!client) {
+    const err = new Error("Client profile not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const orders = await orderRepo.findByClientAndStatus(client._id, "pending");
+  return orders.map((order) => {
+    const firstItem = (order.items || [])[0] || {};
+    const product = firstItem.product || {};
+
+    return {
+      orderId: order._id,
+      status: order.status,
+      quantity: firstItem.quantity || 0,
+      product: {
+        id: product._id || firstItem.product,
+        name: firstItem.name || product.name,
+        price: firstItem.price || product.price,
+        image: Array.isArray(product.images) ? product.images[0] : undefined,
+      },
+      totalPrice: order.totalPrice,
+      createdAt: order.createdAt,
+    };
+  });
+};
+
+const getConfirmedOrders = async ({ userId }) => {
+  const client = await Client.findOne({ userId });
+  if (!client) {
+    const err = new Error("Client profile not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  return orderRepo.findByClientAndStatus(client._id, "confirmed");
+};
+
+const deletePendingOrder = async ({ userId, orderId }) => {
+  const client = await Client.findOne({ userId });
+  if (!client) {
+    const err = new Error("Client profile not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const pendingOrder = await orderRepo.findPendingByIdAndClient(orderId, client._id);
+  if (!pendingOrder) {
+    const err = new Error("Pending order not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  await orderRepo.deleteById(orderId);
+  return { message: "Pending order deleted successfully" };
 };
 
 const getClientOrders = async ({ authUserId, clientId }) => {
@@ -172,7 +267,13 @@ if (!getClientOrders || !getSellerOrders) {
 }
 
 module.exports = {
-  createOrder,
+  addToCart,
+  confirmPendingOrders,
+  getPendingOrders,
+  getConfirmedOrders,
+  deletePendingOrder,
+  getClientOrders,
+  getSellerOrders,
   getClientOrders,
   getSellerOrders,
   getAdminOrders,

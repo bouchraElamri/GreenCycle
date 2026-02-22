@@ -30,7 +30,7 @@ function ProductFiltring({
         : 100;
 
     return (
-        <section className="relative w-full rounded-3xl overflow-visible md:w-80 md:overflow-hidden md:h-5/6">
+        <section className="relative w-full rounded-3xl overflow-visible md:w-80 md:overflow-hidden md:min-h-[640px] md:h-auto md:self-start pt-7">
             <img
                 src={"/assets/images/product_filtring.png"}
                 alt="background"
@@ -40,7 +40,7 @@ function ProductFiltring({
             <div className="absolute inset-0 bg-white-intense/85 pointer-events-none" />
 
             <div className="relative h-full flex flex-col items-center
-           justify-center text-black text-center py-6 px-4 md:py-10 md:px-6">
+           justify-center text-black text-center py-6 px-4 md:pt-10 md:pb-6 md:px-6">
                 <h1 className="text-2xl font-nexa font-semibold ">Craft your path</h1>
                 <p className="text-sm mt-1 font-nexa ">Curated Sustainable Selection</p>
 
