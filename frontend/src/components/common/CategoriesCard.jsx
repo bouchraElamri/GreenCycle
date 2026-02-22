@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 
 const CategoriesCard = ({ title, image, className = "" }) => {
   return (
-    <Link to="/product_list" className="block">
+    <Link to="/product_list" className="group block">
       <article
         className={`relative overflow-hidden rounded-[40px] shadow-sm ${className}`}
       >
         <img
           src={image}
           alt={title}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           loading="lazy"
         />
 

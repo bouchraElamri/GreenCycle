@@ -8,6 +8,8 @@ import imgHouse from "../../assets/House&Deco.png";
 import imgTech from "../../assets/Techitems.png";
 import imgWellness from "../../assets/Wellness&Lifestyle.png";
 import imgArt from "../../assets/Art&handmake.png";
+import Symbol1 from "../../assets/Symbol1.png";
+import Symbol2 from "../../assets/Symbol2.png";
 
 const Categories = () => {
   const mobileScrollerRef = useRef(null);
@@ -82,7 +84,14 @@ const Categories = () => {
   }, []);
 
   return (
-    <section className="relative z-20 w-full overflow-hidden bg-white-intense mt-24 md:mt-32 py-10 md:py-14">
+    <section className="relative rounded-[4rem] z-20 w-full overflow-hidden bg-white-intense py-10 md:py-3">
+      <div className="w-full md:h-[12rem] bg-white-intense">
+            <div className="flex justify-center items-center gap-3 md:gap-5 w-full h-full text-[2rem] md:text-[3rem] text-green-medium font-nexa font-bold">
+                <img src={Symbol1} alt="Left symbol" className="mb-[4rem] md:mb-0 w-8 h-8 md:w-12 md:h-12 object-contain" />
+                <h1 className="mb-[4rem] md:mb-0">Choose Your Path</h1>
+                <img src={Symbol2} alt="Right symbol" className="mb-[4rem] md:mb-0 w-8 h-8 md:w-12 md:h-12 object-contain" />
+            </div>
+          </div>
       <div className="w-full md:hidden">
         <div className="px-4">
           <div
