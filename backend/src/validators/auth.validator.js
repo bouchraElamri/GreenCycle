@@ -65,6 +65,14 @@ const changePasswordSchema = Joi.object({
   }),
 });
 
+const updateProfileSchema = Joi.object({
+  firstName: Joi.string().min(2).max(50).required(),
+  lastName: Joi.string().min(2).max(50).required(),
+  phone: Joi.string().pattern(/^[\d\s-]{9,15}$/).required().messages({
+    "any.required": "Le numéro de téléphone est obligatoire",
+  }),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
@@ -73,5 +81,6 @@ module.exports = {
   requestEmailChangeSchema,
   confirmEmailChangeSchema,
   changePasswordSchema,
+  updateProfileSchema,
 };
 

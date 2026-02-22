@@ -17,7 +17,7 @@ const findByUserIdWithUser = async (userId) => {
 };
 
 const findByIdWithUser = async (id) => {
-  return Seller.findById(id).populate("userId", "firstName lastName email");
+  return Seller.findById(id).populate("userId", "firstName lastName email phone");
 };
 
 const findAllWithUser = async () => {

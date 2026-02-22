@@ -43,13 +43,13 @@ export default function ResetPasswordPage() {
       }}
     >
       <main
-        className="min-h-screen w-full px-4 sm:px-6 lg:px-10 py-10 flex items-center justify-center"
+        className="min-h-screen w-full px-4 sm:px-6 lg:px-10  flex items-center justify-center"
         style={{
           background:
             "linear-gradient(90deg,rgba(33, 80, 37, 1) 0%, rgba(196, 230, 201, 0.75) 100%)",
         }}
       >
-        <div className="w-full px-6 py-5 lg:px-10 lg:py-10 max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
+        <div className="w-full px-6 py-5 lg:px-10 max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
           {/* Left */}
           <div className="w-full lg:w-1/2">
             <img
@@ -112,7 +112,7 @@ export default function ResetPasswordPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    style={{ backgroundColor: "#598E5C" }}
+                    style={{ backgroundColor: "#598E5C", color: "white", border: "1px solid #598E5C" }}
                     className="w-full sm:w-56 font-nexa text-white font-bold mb-2 py-2 px-4 rounded-full hover:bg-green-600 hover:opacity-80 transition duration-300 disabled:opacity-60"
                   >
                     {loading ? "Réinitialisation..." : "Réinitialiser"}
@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
 
                   <Link
                     to="/login"
-                    style={{ backgroundColor: "white", color: "#598E5C" }}
+                    style={{ backgroundColor: "white", color: "#598E5C", border: "1px solid #598E5C" }}
                     className="block font-nexa text-center w-full sm:w-56 font-bold py-2 px-4 rounded-full hover:opacity-80 transition duration-300"
                   >
                     Back to Login
@@ -138,7 +138,7 @@ export default function ResetPasswordPage() {
             <img
               src={hook}
               alt="Hook Poster"
-              className="w-full h-[740px] object-cover"
+              className="w-full h-[550px] object-cover"
             />
           </div>
         </div>

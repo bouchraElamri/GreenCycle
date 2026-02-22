@@ -5,12 +5,14 @@ const upload = require("../middlewares/upload.middleware");
 const validate = require("../middlewares/validate.middleware");
 const { productSchema } = require("../validators/product.validator");
 const { createProduct, updateProduct, deleteProduct } = require("../controllers/product.controller");
+const sellerController = require("../controllers/seller.controller");
 
 const { authenticate } = require('../middlewares/auth.middleware');
 const router = express.Router();
 // Seller routes placeholder
 router.use(authenticate); // protège toutes les routes du vendeur
 router.get('/', (req, res) => res.json({ message: 'Seller API root' }));
+router.get('/profile', sellerController.getProfile);
 router.post('/addProduct',upload.array('images', 5), validate(productSchema ) ,createProduct );
 
 // Reject attempts to set `isApproved` from seller endpoints (multer has populated req.body at this point)
