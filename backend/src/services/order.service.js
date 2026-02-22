@@ -216,10 +216,13 @@ const getSellerOrders = async ({ authUserId, sellerId }) => {
     .filter(Boolean);
 };
 
+const getFullName = (user = {}) =>
+  `${user?.firstName || ""} ${user?.lastName || ""}`.trim();
+
 const mapAdminOrderSummary = (order) => ({
   orderId: order._id,
   totalPrice: order.totalPrice,
-  clientId: order.clientId,
+  clientFullName: getFullName(order.clientId?.userId) || "-",
   date: order.createdAt,
   status: order.status,
 });
@@ -245,15 +248,14 @@ const getAdminOrderDetailsById = async (orderId) => {
 
   return {
     orderId: order._id,
-    clientId: order.clientId?._id || order.clientId,
-    clientUserId: order.clientId?.userId || null,
+    clientFullName: getFullName(order.clientId?.userId) || "-",
     totalPrice: order.totalPrice,
     status: order.status,
     date: order.createdAt,
     items: (order.items || []).map((item) => ({
       productId: item.product?._id || item.product,
-      sellerId: item.seller?._id || item.seller,
-      sellerUserId: item.seller?.userId || null,
+      sellerName: getFullName(item.seller?.userId) || "-",
+      sellerProfileUrl: item.seller?.profileUrl || null,
       name: item.product?.name || item.name,
       price: item.price ?? item.product?.price,
       photos: item.product?.images || [],
