@@ -9,7 +9,7 @@ const useProfileEdit = () => {
   const [codeSent, setCodeSent]   = useState(false)
 
   // ─── PASSWORD STATE ────────────────────────────────────
-  const [oldPassword, setOldPassword]                   = useState('')
+  const [oldPassword, setOldPassword]    = useState('')
   const [newPassword, setNewPassword]                   = useState('')
   const [newPasswordConfirmation, setNewPasswordConfirmation] = useState('')
 
