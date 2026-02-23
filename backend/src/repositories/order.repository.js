@@ -76,7 +76,17 @@ const findAdminOrders = async ({ status } = {}) => {
     filter.status = status;
   }
 
-  return Order.find(filter).sort({ createdAt: -1 }).lean();
+  return Order.find(filter)
+    .sort({ createdAt: -1 })
+    .populate({
+      path: "clientId",
+      select: "userId",
+      populate: {
+        path: "userId",
+        select: "firstName lastName",
+      },
+    })
+    .lean();
 };
 
 const findAdminOrderDetailsById = async (orderId) => {
@@ -84,6 +94,10 @@ const findAdminOrderDetailsById = async (orderId) => {
     .populate({
       path: "clientId",
       select: "userId",
+      populate: {
+        path: "userId",
+        select: "firstName lastName",
+      },
     })
     .populate({
       path: "items.product",
@@ -91,7 +105,11 @@ const findAdminOrderDetailsById = async (orderId) => {
     })
     .populate({
       path: "items.seller",
-      select: "userId",
+      select: "userId profileUrl",
+      populate: {
+        path: "userId",
+        select: "firstName lastName",
+      },
     })
     .lean();
 };

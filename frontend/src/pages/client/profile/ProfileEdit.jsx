@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Navbar from '../../../components/layouts/Navbar'
 import useProfileEdit from '../../../hooks/useProfileEdit'
 import Button from '../../../components/ui/Button'
+import { NavLink } from 'react-router-dom'
 
 export default function ProfileEdit() {
   const [selectedProfileImage, setSelectedProfileImage] = useState(null)
@@ -21,7 +22,13 @@ export default function ProfileEdit() {
     handleConfirmEmail,
     handleUpdatePassword,
     handleChangeProfilePic,
-  } = useProfileEdit()
+  } = useProfileEdit();
+  const navClassName = ({ isActive }) =>
+    `block w-full rounded-full px-6 py-3 text-lg font-bold shadow-md transition-all duration-200 ${
+      isActive
+        ? "bg-gradient-to-r from-green-dark to-green-tolerated text-white-intense shadow-inner"
+        : "bg-gradient-to-r from-green-light to-white-intense text-green-dark hover:bg-gradient-to-r hover:from-green-dark hover:to-green-tolerated hover:text-white-intense"
+    }`;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -32,12 +39,8 @@ export default function ProfileEdit() {
 
           <aside className='md:w-64 ms-8'>
             <div className='flex flex-col gap-4 bg-gray-100'>
-              <Button className='w-full text-center text-white-intense bg-green-600 rounded-full px-2 py-2 font-medium'>
-                Edit Info
-              </Button>
-              <Button className='w-full text-center bg-green-600 text-white-intense rounded-full px-2 py-2 font-medium'>
-                My Orders
-              </Button>
+              <NavLink to="/client/edit-profile" className={navClassName}>Edit Info</NavLink>
+              <NavLink to="/client/orders" className={navClassName}>My Orders</NavLink>
             </div>
           </aside>
 
