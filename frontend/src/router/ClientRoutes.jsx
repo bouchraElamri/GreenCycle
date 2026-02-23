@@ -4,7 +4,7 @@ import {Navigate, Route, Routes} from "react-router-dom";
 import ProfileEdit from "../pages/client/profile/ProfileEdit"
 
 export default function ClientRoutes(){
-    const {isAuthenticated, role, loading} = useContext(AuthContext);
+    const {isAuthenticated, loading} = useContext(AuthContext);
     
     if (loading){
         return <div className="min-h-screen p-8 font-nexa text-green-dark">Loading...</div>;
@@ -15,7 +15,10 @@ export default function ClientRoutes(){
 
     return (
         <Routes>
-            <Route path="edit-profile" index element={<ProfileEdit/>}/>
+            <Route index element={<Navigate to="edit-profile" replace />} />
+            <Route path="/edit-profile" element={<ProfileEdit/>}/>
+            <Route path="/orders" element={<ProfileEdit/>}/>
+            <Route path="*" element={<Navigate to="edit-profile" replace />} />
         </Routes>
     );
     
