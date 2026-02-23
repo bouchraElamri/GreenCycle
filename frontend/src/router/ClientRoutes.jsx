@@ -1,7 +1,8 @@
-import { useContext } from "react";
+﻿import { useContext } from "react";
 import AuthContext from "../contexts/AuthContext";
 import {Navigate, Route, Routes} from "react-router-dom";
-import ProfileEdit from "../pages/client/profile/ProfileEdit"
+import ProfileEdit from "../pages/client/profile/ProfileEdit";
+import OrderList from "../pages/client/orders/OrderList";
 
 export default function ClientRoutes(){
     const {isAuthenticated, loading} = useContext(AuthContext);
@@ -15,10 +16,10 @@ export default function ClientRoutes(){
 
     return (
         <Routes>
-            <Route index element={<Navigate to="edit-profile" replace />} />
-            <Route path="/edit-profile" element={<ProfileEdit/>}/>
-            <Route path="/orders" element={<ProfileEdit/>}/>
-            <Route path="*" element={<Navigate to="edit-profile" replace />} />
+            <Route index element={<Navigate to="Profile" replace />} />
+            <Route path="/Profile" element={<ProfileEdit/>}/>
+            <Route path="/orders" element={<OrderList/>}/>
+            <Route path="*" element={<Navigate to="Profile" replace />} />
         </Routes>
     );
     
