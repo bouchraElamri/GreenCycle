@@ -7,7 +7,7 @@ import Tabs from '../../../components/common/Tabs';
 import useProducts from '../../../hooks/useProducts';
 import useUsers from '../../../hooks/useUsers';
 import useCartActions from '../../../hooks/useCartActions';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import RatingStars from '../../../components/common/RatingStars';
 
 const apiOrigin = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api$/, "");
@@ -16,6 +16,7 @@ const ProductDetail = () => {
     const { product } = useProducts(id);
     const { productsRelated } = useProducts(null, product?.category?.name);
     const { addProductToCart, adding } = useCartActions();
+    const navigate = useNavigate();
 
     const { seller } = useUsers(product?.seller);
 
@@ -106,7 +107,9 @@ const ProductDetail = () => {
                                     seller?.profileUrl ? (seller.profileUrl.startsWith("http")
                                         ? seller.profileUrl
                                         : `${apiOrigin}${seller.profileUrl}`) : "/assets/images/placeholder_user.png"
-                                } alt={seller?.fullName} className='w-full h-full object-cover rounded-full' />
+                                } alt={seller?.fullName} className='w-full h-full object-cover rounded-full cursor-pointer'
+                                onClick={()=>navigate("/profile/" + seller?._id)}
+                                 />
                             </div>
                             <div className='ml-4 flex flex-row justify-center'>
                                 <div className='flex flex-col justify-center'>
