@@ -1,0 +1,33 @@
+import { Navigate, Route, Routes } from "react-router-dom";
+import { useContext } from "react";
+import AuthContext from "../contexts/AuthContext";
+import AdminLayout from "../components/layouts/AdminLayout";
+import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
+import UserList from "../pages/admin/users/UserList";
+import ProductList from "../pages/admin/products/ProductList";
+import OrderList from "../pages/admin/orders/OrderList";
+import OrderDetails from "../pages/admin/orders/OrderDetails";
+
+export default function AdminRoutes() {
+  const { isAuthenticated, loading, user } = useContext(AuthContext);
+
+  if (loading) return <p className="p-6">Loading...</p>;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  const roles = user?.role || [];
+  if (!Array.isArray(roles) || !roles.includes("admin")) {
+    return <Navigate to="/" replace />;
+  }
+
+  return (
+    <Routes>
+      <Route element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="users" element={<UserList />} />
+        <Route path="products" element={<ProductList />} />
+        <Route path="orders" element={<OrderList />} />
+        <Route path="orders/:id" element={<OrderDetails />} />
+      </Route>
+    </Routes>
+  );
+}
