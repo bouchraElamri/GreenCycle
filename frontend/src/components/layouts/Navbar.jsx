@@ -42,6 +42,13 @@ export default function Navbar() {
   const gotosignup = () => navigate(`/register`);
   const switchtoseller = () => navigate("/seller");
   const switchtobuyer = () => navigate("/");
+  const usesRoleSidebar = isAdminRoute || isSellerView;
+
+  const toggleRoleSidebar = () => {
+    setDrawerOpen(false);
+    setSidebarOpen(false);
+    window.dispatchEvent(new CustomEvent("toggle-role-sidebar"));
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -130,14 +137,14 @@ export default function Navbar() {
               />
             </Link>
 
-            <div className="flex items-center gap-4 mr-6">
+            <div className="flex items-center gap-4 mr-1 md:mr-3">
               <span className="text-white-intense font-nexa font-bold hidden sm:inline">
                 Administrator
               </span>
               <button
                 type="button"
-                onClick={() => setDrawerOpen((prev) => !prev)}
-                className="w-10 h-10 rounded-full overflow-hidden border-2 border-white-light"
+                onClick={toggleRoleSidebar}
+                className="flex items-center w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-white-light"
               >
                 <img
                   src={pdpph}
@@ -284,6 +291,10 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={() => {
+                        if (usesRoleSidebar) {
+                          toggleRoleSidebar();
+                          return;
+                        }
                         setDrawerOpen(!drawerOpen);
                       }}
                       className="flex item-center mr-3 w-12 h-12 rounded-full overflow-hidden border-2 border-white-light"
@@ -321,6 +332,10 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => {
+                    if (usesRoleSidebar) {
+                      toggleRoleSidebar();
+                      return;
+                    }
                     setSidebarOpen(!sidebarOpen);
                   }}
                   className="flex items-center mr-1 w-10 h-10 rounded-full overflow-hidden border-2 border-white-light md:hidden"
