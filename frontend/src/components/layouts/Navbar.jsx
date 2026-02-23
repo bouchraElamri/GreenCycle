@@ -29,7 +29,7 @@ export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // ✅ NEW: 0..1 progressive haze opacity
+  // 0..1 progressive haze opacity
   const [fadeProgress, setFadeProgress] = useState(0);
   const progressiveHazeMask = {
     WebkitMaskImage:
@@ -42,6 +42,13 @@ export default function Navbar() {
   const gotosignup = () => navigate(`/register`);
   const switchtoseller = () => navigate("/seller");
   const switchtobuyer = () => navigate("/");
+  const usesRoleSidebar = isAdminRoute || isSellerView;
+
+  const toggleRoleSidebar = () => {
+    setDrawerOpen(false);
+    setSidebarOpen(false);
+    window.dispatchEvent(new CustomEvent("toggle-role-sidebar"));
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -92,7 +99,7 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutsidebox);
   }, [sidebarOpen]);
 
-  // ✅ NEW: progressive haze while scrolling past hero (landing page only)
+  // progressive haze while scrolling past hero (landing page only)
   useEffect(() => {
     setFadeProgress(1);
   }, []);
@@ -130,14 +137,14 @@ export default function Navbar() {
               />
             </Link>
 
-            <div className="flex items-center gap-4 mr-6">
+            <div className="flex items-center gap-4 mr-1 md:mr-3">
               <span className="text-white-intense font-nexa font-bold hidden sm:inline">
                 Administrator
               </span>
               <button
                 type="button"
-                onClick={() => setDrawerOpen((prev) => !prev)}
-                className="w-10 h-10 rounded-full overflow-hidden border-2 border-white-light"
+                onClick={toggleRoleSidebar}
+                className="flex items-center w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-white-light"
               >
                 <img
                   src={pdpph}
@@ -174,7 +181,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-6 left-0 w-full z-50">
-      {/* ✅ Progressive top haze BEHIND navbar */}
+      {/* Progressive top haze BEHIND navbar */}
       <div
         className="pointer-events-none fixed top-0 left-0 w-full z-0"
         style={{ opacity: fadeProgress }}
@@ -284,6 +291,10 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={() => {
+                        if (usesRoleSidebar) {
+                          toggleRoleSidebar();
+                          return;
+                        }
                         setDrawerOpen(!drawerOpen);
                       }}
                       className="flex item-center mr-3 w-12 h-12 rounded-full overflow-hidden border-2 border-white-light"
@@ -321,6 +332,10 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => {
+                    if (usesRoleSidebar) {
+                      toggleRoleSidebar();
+                      return;
+                    }
                     setSidebarOpen(!sidebarOpen);
                   }}
                   className="flex items-center mr-1 w-10 h-10 rounded-full overflow-hidden border-2 border-white-light md:hidden"
