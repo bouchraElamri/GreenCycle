@@ -29,7 +29,7 @@ export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // ✅ NEW: 0..1 progressive haze opacity
+  // 0..1 progressive haze opacity
   const [fadeProgress, setFadeProgress] = useState(0);
   const progressiveHazeMask = {
     WebkitMaskImage:
@@ -99,7 +99,7 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutsidebox);
   }, [sidebarOpen]);
 
-  // ✅ NEW: progressive haze while scrolling past hero (landing page only)
+  // progressive haze while scrolling past hero (landing page only)
   useEffect(() => {
     setFadeProgress(1);
   }, []);
@@ -181,7 +181,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-6 left-0 w-full z-50">
-      {/* ✅ Progressive top haze BEHIND navbar */}
+      {/* Progressive top haze BEHIND navbar */}
       <div
         className="pointer-events-none fixed top-0 left-0 w-full z-0"
         style={{ opacity: fadeProgress }}
