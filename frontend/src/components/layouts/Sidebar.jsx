@@ -54,7 +54,7 @@ function getMenuByRole(role) {
     homeLink: "/client/profile/edit",
     subtitle: "GreenCycle client space",
     items: [
-      { to: "/client/profile/edit", label: "Settings", icon: <FiSettings /> },
+      { to: "/client/profile", label: "Edit Profile", icon: <FiSettings /> },
       { to: "/client/orders", label: "My Orders", icon: <FiPackage /> },
     ],
   };
