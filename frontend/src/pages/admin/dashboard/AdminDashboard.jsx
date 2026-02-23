@@ -36,14 +36,14 @@ export default function AdminDashboard() {
 
   return (
     <section className="w-full font-nexa">
-      <h1 className="mb-8 text-5xl font-black text-gray">Dashboard</h1>
-      <div className="grid max-w-[950px] grid-cols-1 gap-6 md:grid-cols-2">
+      <h1 className="mb-6 text-4xl font-black text-gray sm:mb-8 sm:text-5xl">Dashboard</h1>
+      <div className="grid max-w-[950px] grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
         {cards.map((card) => (
           <div
             key={card.label}
-            className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-r from-green-dark to-green-tolerated p-[1.5px] md:h-[180px]"
+            className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-r from-green-dark to-green-tolerated p-[1.5px] min-h-[170px] sm:min-h-[180px]"
           >
-            <div className="relative h-full overflow-hidden rounded-[22px] bg-green-light/35 p-6">
+            <div className="relative h-full overflow-hidden rounded-[22px] bg-green-light/35 p-5 sm:p-6">
               {card.bgImage && (
                 <>
                   <img
@@ -56,8 +56,8 @@ export default function AdminDashboard() {
                 </>
               )}
               <div className="relative z-10">
-                <p className="text-5xl font-black text-gray">{card.value ?? 0}</p>
-                <p className="mt-2 text-3xl text-gray">{card.label}</p>
+                <p className="text-4xl font-black text-gray sm:text-5xl">{card.value ?? 0}</p>
+                <p className="mt-2 text-2xl text-gray sm:text-3xl">{card.label}</p>
               </div>
             </div>
           </div>

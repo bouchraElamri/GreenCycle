@@ -59,11 +59,22 @@ export default function useAdminProducts() {
     setProducts((prev) => prev.filter((product) => product._id !== productId));
   };
 
+  const rejectProduct = async (productId) => {
+    const token = localStorage.getItem("authToken");
+    if (!token) throw new Error("Missing auth token");
+
+    await adminApi.deleteProduct(token, productId);
+
+    // Remove rejected product from pending list after deletion.
+    setProducts((prev) => prev.filter((product) => product._id !== productId));
+  };
+
   return {
     products,
     loading,
     error,
     reload: loadProducts,
     updateApproval,
+    rejectProduct,
   };
 }

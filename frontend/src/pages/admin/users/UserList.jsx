@@ -26,7 +26,7 @@ export default function UserList() {
 
   return (
     <section className="w-full font-nexa">
-      <h1 className="mb-6 text-5xl font-black text-gray">Users</h1>
+      <h1 className="mb-5 text-4xl font-black text-gray sm:mb-6 sm:text-5xl">Users</h1>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <input
@@ -37,7 +37,7 @@ export default function UserList() {
             setPage(1);
           }}
           placeholder="Search by name, email, phone..."
-          className="h-11 w-full max-w-md rounded-full border border-white-broken bg-white-intense px-4 text-gray outline-none focus:border-green-tolerated"
+          className="h-11 w-full rounded-full border border-white-broken bg-white-intense px-4 text-gray outline-none focus:border-green-tolerated sm:max-w-md"
         />
       </div>
 
@@ -47,7 +47,7 @@ export default function UserList() {
       {!loading && !error && (
         <>
           <div className="overflow-x-auto rounded-2xl border border-white-broken bg-white-intense">
-            <table className="w-full min-w-[760px] text-left">
+            <table className="w-full min-w-[700px] text-left sm:min-w-[760px]">
               <thead className="bg-green-light/35 text-gray">
                 <tr>
                   <th className="px-4 py-3 text-sm font-bold">Full Name</th>

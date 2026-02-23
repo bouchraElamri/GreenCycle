@@ -1,38 +1,41 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import AuthContext from "../../contexts/AuthContext";
 import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
 
 export default function AdminLayout() {
-  const navClassName = ({ isActive }) =>
-    `block w-full rounded-full px-6 py-3 text-lg font-bold shadow-md transition-all duration-200 ${
-      isActive
-        ? "bg-gradient-to-r from-green-dark to-green-tolerated text-white-intense shadow-inner"
-        : "bg-gradient-to-r from-green-light to-white-intense text-green-dark hover:bg-gradient-to-r hover:from-green-dark hover:to-green-tolerated hover:text-white-intense"
-    }`;
+  const navigate = useNavigate();
+  const { logout, role } = useContext(AuthContext);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  async function handleLogout() {
+    setMobileSidebarOpen(false);
+    await logout();
+    navigate("/login");
+  }
+
+  useEffect(() => {
+    const toggleSidebar = () => setMobileSidebarOpen((prev) => !prev);
+    window.addEventListener("toggle-role-sidebar", toggleSidebar);
+    return () => window.removeEventListener("toggle-role-sidebar", toggleSidebar);
+  }, []);
 
   return (
     <>
       <Navbar />
 
       <div className="min-h-screen bg-white-intense font-nexa">
-        <main className="mx-6 pb-8 pt-32 lg:mx-10 xl:mx-24 2xl:mx-40">
-          <div className="grid grid-cols-1 items-start gap-y-8 sm:grid-cols-[290px_1px_1fr] sm:gap-x-8 ">
-            <aside className="space-y-3 sm:pt-1">
-              <NavLink to="/admin" end className={navClassName}>
-                Dashboard
-              </NavLink>
-              <NavLink to="/admin/users" className={navClassName}>
-                Users
-              </NavLink>
-              <NavLink to="/admin/products" className={navClassName}>
-                Products
-              </NavLink>
-              <NavLink to="/admin/orders" className={navClassName}>
-                Orders
-              </NavLink>
-            </aside>
-            <div className="hidden h-[500px] bg-white-broken sm:block" />
+        <main className="mx-4 pb-8 pt-24 sm:mx-6 sm:pt-28 lg:mx-10 xl:mx-24 2xl:mx-40">
+          <div className="grid grid-cols-1 items-start gap-y-6 lg:grid-cols-[288px_1px_1fr] lg:gap-x-8">
+            <Sidebar
+              role={role || "admin"}
+              onLogout={handleLogout}
+              mobileOpen={mobileSidebarOpen}
+              onCloseMobile={() => setMobileSidebarOpen(false)}
+            />
+            <div className="hidden h-[500px] bg-white-broken lg:block" />
             <Outlet />
-          
           </div>
         </main>
       </div>

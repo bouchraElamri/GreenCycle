@@ -69,14 +69,14 @@ export default function OrderDetails() {
         </Link>
       </div>
 
-      <h1 className="mb-4 text-4xl font-black text-gray">Order Details</h1>
+      <h1 className="mb-4 text-3xl font-black text-gray sm:text-4xl">Order Details</h1>
 
       {loading && <p className="p-4 text-gray">Loading order details...</p>}
       {error && !loading && <p className="p-4 text-red">{error}</p>}
 
       {!loading && !error && order && (
         <>
-          <div className="mb-5 rounded-2xl border border-white-broken bg-white-intense p-5">
+          <div className="mb-5 rounded-2xl border border-white-broken bg-white-intense p-4 sm:p-5">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <p className="text-gray"><strong>Order ID:</strong> {order.orderId}</p>
               <p className="text-gray"><strong>Status:</strong> {order.status || "-"}</p>
@@ -87,7 +87,7 @@ export default function OrderDetails() {
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-white-broken bg-white-intense">
-            <table className="w-full min-w-[900px] text-left">
+            <table className="w-full min-w-[820px] text-left sm:min-w-[900px]">
               <thead className="bg-green-light/35 text-gray">
                 <tr>
                   <th className="px-4 py-3 text-sm font-bold">Seller Name</th>
@@ -175,9 +175,9 @@ export default function OrderDetails() {
                 className="relative max-h-[90vh] w-full max-w-3xl rounded-2xl bg-white p-3"
                 onClick={(event) => event.stopPropagation()}
               >
-                <div className="mb-2 flex items-center justify-between">
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                   {previewImages.length > 1 && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <button
                         type="button"
                         onClick={() =>

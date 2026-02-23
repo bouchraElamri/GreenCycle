@@ -9,7 +9,7 @@ const formatDate = (value) => {
 };
 
 export default function ProductList() {
-  const { products, loading, error, updateApproval } = useAdminProducts();
+  const { products, loading, error, updateApproval, rejectProduct } = useAdminProducts();
   const [submittingId, setSubmittingId] = useState(null);
   const [confirmRejectId, setConfirmRejectId] = useState(null);
   const [expandedProductId, setExpandedProductId] = useState(null);
@@ -42,7 +42,7 @@ export default function ProductList() {
 
     try {
       setSubmittingId(confirmRejectId);
-      await updateApproval(confirmRejectId, false);
+      await rejectProduct(confirmRejectId);
       setConfirmRejectId(null);
     } finally {
       setSubmittingId(null);
@@ -51,14 +51,14 @@ export default function ProductList() {
 
   return (
     <section className="w-full font-nexa">
-      <h1 className="mb-6 text-5xl font-black text-gray">Products</h1>
+      <h1 className="mb-5 text-4xl font-black text-gray sm:mb-6 sm:text-5xl">Products</h1>
 
       {loading && <p className="p-4 text-gray">Loading products...</p>}
       {error && !loading && <p className="p-4 text-red">{error}</p>}
 
       {!loading && !error && (
         <div className="overflow-x-auto rounded-2xl border border-white-broken bg-white-intense">
-          <table className="w-full min-w-[700px] table-fixed text-left">
+          <table className="w-full min-w-[860px] table-fixed text-left">
             <thead className="bg-green-light/35 text-gray">
               <tr>
                 <th className="w-[20%] border-r border-white-broken px-3 py-3 text-sm font-bold">Product ID</th>
@@ -115,7 +115,7 @@ export default function ProductList() {
                       </button>
                     </td>
                     <td className="px-3 py-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           onClick={() => handleApprove(product._id)}

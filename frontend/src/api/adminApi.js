@@ -79,6 +79,16 @@ const adminApi = {
       })
     ),
 
+  deleteProduct: async (token, productId) =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/admin/products/${productId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ),
+
   getOrders: async (token, status = "all") => {
     const endpoint =
       status === "confirmed"

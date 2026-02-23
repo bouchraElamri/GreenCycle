@@ -44,7 +44,7 @@ export default function OrderList() {
 
   return (
     <section className="w-full font-nexa">
-      <h1 className="mb-6 text-5xl font-black text-gray">Orders</h1>
+      <h1 className="mb-5 text-4xl font-black text-gray sm:mb-6 sm:text-5xl">Orders</h1>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <button type="button" className={filterBtnClass("all")} onClick={() => setStatusFilter("all")}>
@@ -71,7 +71,7 @@ export default function OrderList() {
 
       {!loading && !error && (
         <div className="overflow-x-auto rounded-2xl border border-white-broken bg-white-intense">
-          <table className="w-full min-w-[780px] text-left">
+          <table className="w-full min-w-[760px] text-left sm:min-w-[780px]">
             <thead className="bg-green-light/35 text-gray">
               <tr>
                 <th className="px-4 py-3 text-sm font-bold">Order ID</th>
