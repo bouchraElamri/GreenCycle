@@ -4,7 +4,6 @@ import {
   FiCalendar,
   FiEye,
   FiPackage,
-  FiPlus,
   FiRefreshCcw,
   FiSearch,
   FiTrash2,
@@ -52,7 +51,8 @@ function getStatusBadgeClass(status) {
   if (normalized === "confirmed") return "bg-blue-100 text-blue-700";
   if (normalized === "shipped") return "bg-indigo-100 text-indigo-700";
   if (normalized === "delivered") return "bg-green-100 text-green-700";
-  if (normalized === "canceled" || normalized === "cancelled") return "bg-red-100 text-red-700";
+  if (normalized === "canceled" || normalized === "cancelled")
+    return "bg-red-100 text-red-700";
   return "bg-gray-100 text-gray-700";
 }
 
@@ -89,7 +89,11 @@ function normalizeOrders(input) {
 
       const itemsFromOrder = Array.isArray(order?.items)
         ? order.items.map((item) => ({
-            name: item?.name || item?.product?.name || item?.productName || "Product",
+            name:
+              item?.name ||
+              item?.product?.name ||
+              item?.productName ||
+              "Product",
             quantity: Number(item?.quantity || 0),
             price: Number(item?.price ?? item?.product?.price ?? 0),
           }))
@@ -108,8 +112,15 @@ function normalizeOrders(input) {
       const items = itemsFromOrder.length ? itemsFromOrder : itemFromPendingShape;
       const totalPrice =
         Number(order?.totalPrice) ||
-        items.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0);
-      const totalQuantity = items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+        items.reduce(
+          (sum, item) =>
+            sum + Number(item.price || 0) * Number(item.quantity || 0),
+          0
+        );
+      const totalQuantity = items.reduce(
+        (sum, item) => sum + Number(item.quantity || 0),
+        0
+      );
 
       return {
         id: String(orderId),
@@ -168,12 +179,16 @@ export default function OrderList() {
       const clientId = extractClientId(user);
       if (!clientId) {
         setOrders([]);
-        setError("Client profile ID is not available in your session. Please sign out and sign in again.");
+        setError(
+          "Client profile ID is not available in your session. Please sign out and sign in again."
+        );
         return;
       }
 
       const result = normalizeOrders(await getClientOrders(clientId));
-      const unique = Array.from(new Map(result.map((order) => [order.id, order])).values());
+      const unique = Array.from(
+        new Map(result.map((order) => [order.id, order])).values()
+      );
       unique.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
       setOrders(unique);
     } catch (err) {
@@ -205,8 +220,11 @@ export default function OrderList() {
 
     return orders.filter((order) => {
       const statusMatch = status === "all" || order.status === status;
-      const dateMatch = !dateFilter || String(order.createdAt || "").slice(0, 10) === dateFilter;
-      const names = (order.items || []).map((item) => String(item.name || "").toLowerCase()).join(" ");
+      const dateMatch =
+        !dateFilter || String(order.createdAt || "").slice(0, 10) === dateFilter;
+      const names = (order.items || [])
+        .map((item) => String(item.name || "").toLowerCase())
+        .join(" ");
       const textMatch =
         !query ||
         order.id.toLowerCase().includes(query) ||
@@ -270,7 +288,7 @@ export default function OrderList() {
 
   return (
     <section className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border border-green-light/60 bg-white-intense p-4 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-gray-500">Total orders</p>
           <p className="mt-2 text-2xl font-bold text-green-dark">{summary.total}</p>
@@ -397,7 +415,7 @@ export default function OrderList() {
 
                       return (
                         <Fragment key={order.id}>
-                          <tr key={order.id} className="transition hover:bg-green-50/40">
+                          <tr className="transition hover:bg-green-50/40">
                             <td className="px-4 py-4 align-top">
                               <p className="font-semibold text-green-dark">
                                 {firstName}
@@ -449,7 +467,7 @@ export default function OrderList() {
                           </tr>
 
                           {expanded && (
-                            <tr key={`${order.id}-details`} className="bg-green-50/20">
+                            <tr className="bg-green-50/20">
                               <td colSpan={5} className="px-4 py-4">
                                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                                   <div className="rounded-xl border border-green-light/60 bg-white p-4">
