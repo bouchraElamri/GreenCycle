@@ -20,7 +20,7 @@ export default function SellerLayout() {
 
       <div className="pt-28 pb-12">
         <div className="mx-6 md:mx-24">
-          <div className="flex items-start gap-6 lg:gap-8">
+          <div className="md:flex items-start gap-6 lg:gap-8">
             <Sidebar role={role} onLogout={handleLogout} />
 
             <main className="min-w-0 flex-1 pb-16">
