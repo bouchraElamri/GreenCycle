@@ -7,7 +7,7 @@ const Tabs = ({ activeTab, setActiveTab, tabs }) => {
         <button
           key={tab.value}
           onClick={() => setActiveTab(tab.value)}
-          className={`w-1/2 py-3 rounded-full font-nexa font-bold border transition-all duration-200
+          className={`flex-1 py-3 rounded-full font-nexa font-bold border transition-all duration-200
             ${
               activeTab === tab.value
                 ? "bg-white-intense text-green-dark border-green-medium"
