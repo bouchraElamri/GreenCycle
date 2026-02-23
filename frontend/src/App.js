@@ -21,7 +21,6 @@ function App() {
             <Route path="/admin/*" element={<AdminRoutes />} />
             <Route path="/client/*" element={<ClientRoutes />} />
             <Route path="/seller/*" element={<SellerRoutes />} />
-            <Route path="/client/profile/edit" element={<ProfileEdit />} />
           </Routes>
         </CartProvider>
       </AuthProvider>
