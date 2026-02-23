@@ -7,6 +7,7 @@ import ResetPasswordPage from "../pages/public/auth/ResetPasswordPage";
 import ActivateAccountPage from "../pages/public/auth/ActivateAccountPage";
 import Login from "../pages/public/auth/Login";
 import SignUp from "../pages/public/auth/SignUp";
+import ProfilePage from "../pages/public/user/ProfilePage";
 
 
 
@@ -21,7 +22,7 @@ export default function PublicRoutes() {
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="/product_list" element={<ProductList />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-            
+            <Route path="/profile/:id" element={<ProfilePage />} />
         </Routes>
     );
 }

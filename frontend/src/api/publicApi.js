@@ -171,6 +171,14 @@ const publicApi = {
       })
     );
   },
+  getProductBySeller: async (id) => {
+    const res = await fetch(`${API_BASE_URL}/sellers/${id}/products`);
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error fetching products");
+    }
+    return res.json();
+  }
 };
 
 
