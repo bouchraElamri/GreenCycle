@@ -191,7 +191,7 @@ export default function ClientNav() {
           <div className="bg-white-broken w-72 shadow-[0_0_30px_rgba(0,0,0,0.1)] rounded-3xl bg-white/95 backdrop-blur">
             <div className="flex flex-col items-center py-2">
               <Link
-                to="/cart"
+                to="/client/cart"
                 onClick={() => setDrawerOpen(false)}
                 className="w-full px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
               >
@@ -281,7 +281,7 @@ export default function ClientNav() {
               <div className="w-[85%] h-px bg-black/10" />
 
               <Link
-                to="/cart"
+                to="/client/cart"
                 onClick={() => setSidebarOpen(false)}
                 className="px-6 py-3 font-nexa text-xl text-gray hover:font-bold transition"
               >
