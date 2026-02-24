@@ -2,7 +2,7 @@ import MainLayout from '../../../components/layouts/MainLayout';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useUsers from '../../../hooks/useUsers';
-import defaultAvatar from '../../../assets/profile.jpg';
+import defaultSellerAvatar from '../../../assets/profile-picture.png';
 import headerBackground from '../../../assets/Cover.png';
 import useProducts from '../../../hooks/useProducts';
 import ProductCard from '../../../components/common/ProductCard';
@@ -56,7 +56,8 @@ const ProfilePage = () => {
 
     const SellerName = `${seller?.fullName}`;
     const description = seller?.description || 'Here the user can implement a marketing text to attract his customer regarding his style or his product kind that he sells';
-    const profileImage = resolveImageUrl(seller?.user?.profileUrl) || defaultAvatar;
+    const sellerProfilePath = seller?.user?.profileImage || seller?.user?.profileUrl || seller?.profileUrl;
+    const profileImage = resolveImageUrl(sellerProfilePath) || defaultSellerAvatar;
 
     if (loading) {
         return (
