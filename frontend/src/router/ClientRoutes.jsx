@@ -3,6 +3,7 @@ import AuthContext from "../contexts/AuthContext";
 import {Navigate, Route, Routes} from "react-router-dom";
 import ProfileEdit from "../pages/client/profile/ProfileEdit"
 import CartPage from "../pages/client/cart/CartPage";
+import PuchasePage from "../pages/client/cart/PuchasePage";
 
 export default function ClientRoutes(){
     const {isAuthenticated, loading} = useContext(AuthContext);
@@ -19,8 +20,9 @@ export default function ClientRoutes(){
             <Route index element={<Navigate to="edit-profile" replace />} />
             <Route path="edit-profile" element={<ProfileEdit/>}/>
             <Route path="orders" element={<ProfileEdit/>}/>
-            <Route path="*" element={<Navigate to="edit-profile" replace />} />
             <Route path="cart" element={<CartPage/>}/>
+            <Route path="purchase" element={<PuchasePage/>}/>
+            <Route path="*" element={<Navigate to="edit-profile" replace />} />
         </Routes>
     );
     
