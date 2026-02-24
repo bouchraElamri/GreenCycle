@@ -78,3 +78,19 @@ export const addToCart = async ({ product, quantity }) =>
       body: JSON.stringify({ product, quantity }),
     })
   );
+
+export const getPendingOrders = async () =>
+  handleResponse(
+    await fetch(`${API_BASE_URL}/client/orders/pending`, {
+      method: "GET",
+      headers: authHeaders(),
+    })
+  );
+
+export const deletePendingOrder = async (orderId) =>
+  handleResponse(
+    await fetch(`${API_BASE_URL}/client/orders/pending/${orderId}`, {
+      method: "DELETE",
+      headers: authHeaders(),
+    })
+  );
