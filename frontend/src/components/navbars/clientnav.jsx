@@ -120,7 +120,7 @@ export default function ClientNav() {
               <li>
                 <Link
                   to="/product_list"
-                  className="inline-flex h-10 w-28 items-center justify-center rounded-full font-nexa text-base font-bold text-white-intense transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
+                  className="inline-flex h-10 w-28 items-center justify-center rounded-full font-nexa text-lg font-bold text-white-intense transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
                 >
                   Products
                 </Link>
