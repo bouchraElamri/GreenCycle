@@ -1,9 +1,9 @@
 import React from 'react'
 
-const title_table = () => {
+const TitleTable = () => {
   return (
     <div>title_table</div>
   )
 }
 
-export default title_table
+export default TitleTable
