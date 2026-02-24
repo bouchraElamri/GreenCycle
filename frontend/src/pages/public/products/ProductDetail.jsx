@@ -9,6 +9,7 @@ import useUsers from '../../../hooks/useUsers';
 import useCartActions from '../../../hooks/useCartActions';
 import { useNavigate, useParams } from 'react-router-dom';
 import RatingStars from '../../../components/common/RatingStars';
+import defaultSellerAvatar from "../../../assets/profile-picture.png";
 
 const apiOrigin = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api$/, "");
 const ProductDetail = () => {
@@ -54,6 +55,11 @@ const ProductDetail = () => {
 
     const resolveImageUrl = (path) => {
         if (!path) return "/assets/images/placeholder_product.png";
+        return path.startsWith("http") ? path : `${apiOrigin}${path}`;
+    };
+
+    const resolveSellerImageUrl = (path) => {
+        if (!path) return defaultSellerAvatar;
         return path.startsWith("http") ? path : `${apiOrigin}${path}`;
     };
 
@@ -103,11 +109,7 @@ const ProductDetail = () => {
                     <div className='w-full md:w-1/2'>
                         <div className=' flex '>
                             <div className='w-16 h-16 mt-4 md:mt-0 rounded-full bg-gray-200 overflow-hidden flex md:items-center md:justify-center'>
-                                <img src={
-                                    seller?.profileUrl ? (seller.profileUrl.startsWith("http")
-                                        ? seller.profileUrl
-                                        : `${apiOrigin}${seller.profileUrl}`) : "/assets/images/placeholder_user.png"
-                                } alt={seller?.fullName} className='w-full h-full object-cover rounded-full cursor-pointer'
+                                <img src={resolveSellerImageUrl(seller?.profileUrl || seller?.user?.profileImage || seller?.user?.profileUrl)} alt={seller?.fullName} className='w-full h-full object-cover rounded-full cursor-pointer'
                                 onClick={()=>navigate("/profile/" + seller?._id)}
                                  />
                             </div>

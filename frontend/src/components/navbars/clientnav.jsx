@@ -4,11 +4,11 @@ import { RiMenuSearchFill } from "react-icons/ri";
 import AuthContext from "../../contexts/AuthContext";
 import logo from "../../assets/Logo-white 2.png";
 import searchicon from "../../assets/zoom.png";
-import profile from "../../assets/profile.jpg";
+import defaultProfileImage from "../../assets/pdpph.png";
 
 export default function ClientNav() {
   const navigate = useNavigate();
-  const { logout } = useContext(AuthContext);
+  const { logout, user } = useContext(AuthContext);
 
   const drawerRef = useRef(null);
   const sidebarRef = useRef(null);
@@ -17,6 +17,7 @@ export default function ClientNav() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [fadeProgress, setFadeProgress] = useState(0);
+  const apiOrigin = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
 
   const progressiveHazeMask = {
     WebkitMaskImage:
@@ -76,6 +77,21 @@ export default function ClientNav() {
   useEffect(() => {
     setFadeProgress(1);
   }, []);
+
+  const resolveProfileImage = (rawPath) => {
+    if (!rawPath) return defaultProfileImage;
+
+    const normalized = String(rawPath).replace(/\\/g, "/");
+    if (normalized.startsWith("http")) return normalized;
+
+    const uploadsIndex = normalized.indexOf("/uploads/");
+    if (uploadsIndex >= 0) return `${apiOrigin}${normalized.slice(uploadsIndex)}`;
+    if (normalized.startsWith("uploads/")) return `${apiOrigin}/${normalized}`;
+
+    return `${apiOrigin}${normalized.startsWith("/") ? normalized : `/${normalized}`}`;
+  };
+
+  const profileImageSrc = resolveProfileImage(user?.profileImage);
 
   return (
     <header className="fixed top-6 left-0 w-full z-50">
@@ -144,7 +160,7 @@ export default function ClientNav() {
                   className="flex item-center mr-3 w-12 h-12 rounded-full overflow-hidden border-2 border-white-light"
                 >
                   <img
-                    src={profile}
+                    src={profileImageSrc}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
@@ -159,7 +175,7 @@ export default function ClientNav() {
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="flex items-center mr-1 w-10 h-10 rounded-full overflow-hidden border-2 border-white-light md:hidden"
             >
-              <img src={profile} alt="Profile" className="w-full h-full object-cover" />
+              <img src={profileImageSrc} alt="Profile" className="w-full h-full object-cover" />
             </button>
           </div>
         </nav>

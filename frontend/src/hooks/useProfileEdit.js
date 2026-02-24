@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { requestEmailChange, confirmEmailChange, updatePassword, changeProfilePic } from '../api/clientApi'
+import AuthContext from "../contexts/AuthContext";
 
 const useProfileEdit = () => {
+  const { refreshAuth } = useContext(AuthContext);
 
   // ─── EMAIL STATE ───────────────────────────────────────
   const [newEmail, setNewEmail]   = useState('')
@@ -87,6 +89,7 @@ const useProfileEdit = () => {
     setProfilePicLoading(true)
     try {
       await changeProfilePic(file)
+      await refreshAuth()
       setProfilePicSuccess('Profile picture updated successfully!')
     } catch (err) {
       setProfilePicError(err.message)

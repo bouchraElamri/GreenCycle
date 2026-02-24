@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import AuthContext from "../../contexts/AuthContext";
 import logo from "../../assets/Logo-white 2.png";
 import searchicon from "../../assets/zoom.png";
-import profile from "../../assets/profile.jpg";
+import defaultProfileImage from "../../assets/pdpph.png";
 
 export default function SellerNav() {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [fadeProgress, setFadeProgress] = useState(0);
+  const apiOrigin = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
 
   const progressiveHazeMask = {
     WebkitMaskImage:
@@ -20,6 +23,21 @@ export default function SellerNav() {
   useEffect(() => {
     setFadeProgress(1);
   }, []);
+
+  const resolveProfileImage = (rawPath) => {
+    if (!rawPath) return defaultProfileImage;
+
+    const normalized = String(rawPath).replace(/\\/g, "/");
+    if (normalized.startsWith("http")) return normalized;
+
+    const uploadsIndex = normalized.indexOf("/uploads/");
+    if (uploadsIndex >= 0) return `${apiOrigin}${normalized.slice(uploadsIndex)}`;
+    if (normalized.startsWith("uploads/")) return `${apiOrigin}/${normalized}`;
+
+    return `${apiOrigin}${normalized.startsWith("/") ? normalized : `/${normalized}`}`;
+  };
+
+  const profileImageSrc = resolveProfileImage(user?.profileImage);
 
   const toggleRoleSidebar = () => {
     window.dispatchEvent(new CustomEvent("toggle-role-sidebar"));
@@ -92,7 +110,7 @@ export default function SellerNav() {
                   className="flex item-center mr-3 w-12 h-12 rounded-full overflow-hidden border-2 border-white-light"
                 >
                   <img
-                    src={profile}
+                    src={profileImageSrc}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
@@ -107,7 +125,7 @@ export default function SellerNav() {
               onClick={toggleRoleSidebar}
               className="flex items-center mr-1 w-10 h-10 rounded-full overflow-hidden border-2 border-white-light md:hidden"
             >
-              <img src={profile} alt="Profile" className="w-full h-full object-cover" />
+              <img src={profileImageSrc} alt="Profile" className="w-full h-full object-cover" />
             </button>
           </div>
         </nav>
