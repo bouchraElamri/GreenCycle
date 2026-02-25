@@ -6,16 +6,14 @@ import {
   FiPackage,
   FiRefreshCcw,
   FiSearch,
-  FiTrash2,
 } from "react-icons/fi";
 import AuthContext from "../../../contexts/AuthContext";
-import { deletePendingOrder, getClientOrders } from "../../../api/clientApi";
+import { getClientOrders } from "../../../api/clientApi";
 
 const PAGE_SIZE = 8;
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All" },
-  { value: "pending", label: "Pending" },
   { value: "confirmed", label: "Confirmed" },
   { value: "shipped", label: "Shipped" },
   { value: "delivered", label: "Delivered" },
@@ -133,7 +131,7 @@ function normalizeOrders(input) {
         deliveryAddress: order?.deliveryAddress || null,
       };
     })
-    .filter((order) => order.id);
+    .filter((order) => order.id && order.status !== "pending");
 }
 
 function OrdersTableSkeleton() {
@@ -170,7 +168,6 @@ export default function OrderList() {
   const [dateFilter, setDateFilter] = useState("");
   const [page, setPage] = useState(1);
   const [expandedId, setExpandedId] = useState("");
-  const [cancelingId, setCancelingId] = useState("");
 
   async function loadOrders() {
     setError("");
@@ -253,7 +250,6 @@ export default function OrderList() {
   const summary = useMemo(
     () => ({
       total: orders.length,
-      pending: orders.filter((order) => order.status === "pending").length,
       confirmed: orders.filter((order) => order.status === "confirmed").length,
       delivered: orders.filter((order) => order.status === "delivered").length,
     }),
@@ -269,23 +265,6 @@ export default function OrderList() {
     }
   }
 
-  async function handleCancel(orderId) {
-    const shouldCancel = window.confirm("Cancel this pending order?");
-    if (!shouldCancel) return;
-
-    setCancelingId(orderId);
-    setError("");
-    try {
-      await deletePendingOrder(orderId);
-      setOrders((prev) => prev.filter((order) => order.id !== orderId));
-      if (expandedId === orderId) setExpandedId("");
-    } catch (err) {
-      setError(err?.message || "Failed to cancel order");
-    } finally {
-      setCancelingId("");
-    }
-  }
-
   return (
     <section className="space-y-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -294,16 +273,16 @@ export default function OrderList() {
           <p className="mt-2 text-2xl font-bold text-green-dark">{summary.total}</p>
         </div>
         <div className="rounded-2xl border border-green-light/60 bg-white-intense p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Pending</p>
-          <p className="mt-2 text-2xl font-bold text-amber-600">{summary.pending}</p>
-        </div>
-        <div className="rounded-2xl border border-green-light/60 bg-white-intense p-4 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-gray-500">Confirmed</p>
           <p className="mt-2 text-2xl font-bold text-blue-600">{summary.confirmed}</p>
         </div>
         <div className="rounded-2xl border border-green-light/60 bg-white-intense p-4 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-gray-500">Delivered</p>
           <p className="mt-2 text-2xl font-bold text-green-600">{summary.delivered}</p>
+        </div>
+        <div className="rounded-2xl border border-green-light/60 bg-white-intense p-4 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-gray-500">Statuses shown</p>
+          <p className="mt-2 text-sm font-semibold text-gray-700">Confirmed, Shipped, Delivered, Canceled</p>
         </div>
       </div>
 
@@ -451,17 +430,6 @@ export default function OrderList() {
                                   Details
                                 </button>
 
-                                {order.status === "pending" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleCancel(order.id)}
-                                    disabled={cancelingId === order.id}
-                                    className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
-                                  >
-                                    <FiTrash2 className="h-3.5 w-3.5" />
-                                    {cancelingId === order.id ? "Canceling..." : "Cancel"}
-                                  </button>
-                                )}
                               </div>
                             </td>
                           </tr>
