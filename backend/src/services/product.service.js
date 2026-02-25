@@ -47,22 +47,11 @@ const updateProduct = async (id, data) => {
   return productRepo.updateProduct(id, data);
 };
 
-const filterByPrice = async (minP, maxP) => productRepo.filterByPrice(minP, maxP);
-
-const getNewstProducts = async () => productRepo.getNewstProducts();
-
-const productSortedByPrice = async (order) => productRepo.productSortedByPrice(order);
-
-const searchByCategory = async (categoryName) => productRepo.searchByCategory(categoryName);
 
 module.exports = { 
   getAllProducts, 
   getProductById, 
   createProduct, 
   updateProduct, 
-  filterByPrice , 
   deleteProduct , 
-  getNewstProducts , 
-  productSortedByPrice, 
-  searchByCategory,
 };

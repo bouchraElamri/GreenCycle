@@ -23,10 +23,10 @@ const forbidIsApprovedField = (req, res, next) => {
 	next();
 };
 
-router.put('/editProduct/:id', upload.array('images', 5), forbidIsApprovedField, validate(updateProductSchema), updateProduct );
+router.patch('/editProduct/:id', upload.array('images', 5), forbidIsApprovedField, validate(updateProductSchema), updateProduct );
 router.delete('/deleteProduct/:id' ,deleteProduct );
 
-router.get("/orders/:sellerId", GetSellerOrders); // use req.user.id inside controller/service
+router.get("/orders/:sellerId", GetSellerOrders);
 
 
 module.exports = router;

@@ -217,50 +217,7 @@ const approveProduct = async (req, res, next) => {
     next(error);
   }
 };
-const filterByPrice = async (req , res , next ) => {
-  try{
-    const {minP , maxP}= req.body;
-    const products = await productServ.filterByPrice(minP , maxP);
-    res.status(200).json(products);
-  }
-  catch (error){
-    next(error);
-  }
-};
 
-const getNewstProducts = async (req, res, next) => {
-  try{
-    const products = await productServ.getNewstProducts();
-    res.status(200).json(products);
-  }
-  catch (error){
-    next(error);
-  }
-}
-
-const productSortedByPrice = async (req, res, next)=> {
-  try{
-    const products = await productServ.productSortedByPrice(req.body.order);
-    res.status(200).json(products);
-  }
-  catch(error){
-    next(error);
-  }
-};
-
-const searchByCategory = async (req, res, next) => {
-  try {
-    if(req.body){
-      const products = await productServ.searchByCategory(req.body.categoryName);
-      return res.status(200).json(products);
-    }
-    const products = await productServ.searchByCategory(req.query.categoryName);
-    res.status(200).json(products);
-  }
-  catch(error){
-    next(error);
-  }
-};
 
 module.exports = {
   getProducts, 
@@ -268,9 +225,5 @@ module.exports = {
   findProductById, 
   updateProduct , 
   approveProduct,
-  filterByPrice , 
-  deleteProduct , 
-  getNewstProducts , 
-  productSortedByPrice, 
-  searchByCategory,
+  deleteProduct ,  
 };
