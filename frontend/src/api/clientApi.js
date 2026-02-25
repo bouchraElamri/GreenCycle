@@ -79,9 +79,26 @@ export const addToCart = async ({ product, quantity }) =>
     })
   );
 
+  export const confirmPendingOrders = async ({ deliveryAddress, bankAccount }) =>
+  handleResponse(
+    await fetch(`${API_BASE_URL}/client/orders/confirm`, {
+      method: "POST",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ deliveryAddress, bankAccount }),
+    })
+  );
+
 export const getPendingOrders = async () =>
   handleResponse(
     await fetch(`${API_BASE_URL}/client/orders/pending`, {
+      method: "GET",
+      headers: authHeaders(),
+    })
+  );
+
+export const getConfirmedOrders = async () =>
+  handleResponse(
+    await fetch(`${API_BASE_URL}/client/orders/confirmed`, {
       method: "GET",
       headers: authHeaders(),
     })
@@ -95,11 +112,11 @@ export const deletePendingOrder = async (orderId) =>
     })
   );
 
-export const confirmPendingOrders = async ({ deliveryAddress, bankAccount }) =>
+export const getClientOrders = async (clientId) =>
   handleResponse(
-    await fetch(`${API_BASE_URL}/client/orders/confirm`, {
-      method: "POST",
-      headers: authHeaders({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ deliveryAddress, bankAccount }),
+    await fetch(`${API_BASE_URL}/client/orders/${clientId}`, {
+      method: "GET",
+      headers: authHeaders(),
     })
   );
+

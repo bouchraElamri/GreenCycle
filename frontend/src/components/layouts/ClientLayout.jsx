@@ -1,0 +1,36 @@
+﻿import { useContext } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import AuthContext from "../../contexts/AuthContext";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+import Sidebar from "./Sidebar";
+
+export default function ClientLayout() {
+  const navigate = useNavigate();
+  const { logout, role } = useContext(AuthContext);
+
+  async function handleLogout() {
+    await logout();
+    navigate("/login");
+  }
+
+  return (
+    <div className="min-h-screen font-sans bg-gradient-to-br from-green-light/60 via-white-intense to-white-intense text-gray-700">
+      <Navbar />
+
+      <div className="pt-28 pb-12">
+        <div className="mx-6 md:mx-24">
+          <div className="md:flex items-start gap-6 lg:gap-8">
+            <Sidebar role={role} onLogout={handleLogout} />
+
+            <main className="min-w-0 flex-1 pb-16">
+              <Outlet />
+            </main>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}
