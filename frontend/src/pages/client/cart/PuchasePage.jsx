@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import MainLayout from "../../../components/layouts/MainLayout";
 import { confirmPendingOrders, getPendingOrders } from "../../../api/clientApi";
 
@@ -44,6 +46,7 @@ const MOROCCAN_CITIES = [
 ];
 
 export default function PuchasePage() {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,7 +61,6 @@ export default function PuchasePage() {
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
-  const [submitSuccess, setSubmitSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -148,7 +150,6 @@ export default function PuchasePage() {
     const errors = validateFields(formData);
     setFieldErrors(errors);
     setSubmitError("");
-    setSubmitSuccess("");
     if (Object.keys(errors).length > 0) return;
 
     try {
@@ -170,7 +171,7 @@ export default function PuchasePage() {
         },
       });
 
-      setSubmitSuccess("Order confirmed successfully. Confirmation emails were sent.");
+      toast.success("Order confirmed successfully");
       setItems([]);
       setFormData({
         address: "",
@@ -181,6 +182,7 @@ export default function PuchasePage() {
         expirationDate: "",
         cvv: "",
       });
+      navigate("/", { replace: true });
     } catch (err) {
       setSubmitError(err?.message || "Failed to confirm order");
     } finally {
@@ -190,7 +192,7 @@ export default function PuchasePage() {
 
   return (
     <MainLayout>
-      <section className="relative overflow-hidden bg-gradient-to-b from-white-intense via-white-broken to-white-intense mt-20 md:mt-24 pb-2 md:pb-4">
+      <section className="relative overflow-hidden bg-gradient-to-b from-white-intense via-white-broken to-white-intense mt-20 md:mt-28 pb-2 md:pb-4">
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12">
           <div className="flex w-full justify-center">
             <div className="relative w-full max-w-5xl overflow-hidden rounded-[2.25rem] border border-white-broken bg-white/80 px-5 py-5 shadow-[0_20px_44px_rgba(0,0,0,0.14)] backdrop-blur md:px-8 md:py-6">
@@ -262,8 +264,8 @@ export default function PuchasePage() {
                     </div>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,0.55fr)]">
-                    <div>
+                  <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,0.55fr)] md:items-end">
+                    <div className="md:col-span-2">
                       <label className="mb-2 block text-sm font-medium text-green-dark/70">Card holder name</label>
                       <input
                         type="text"
@@ -329,9 +331,6 @@ export default function PuchasePage() {
                   </div>
                   {submitError ? (
                     <p className="text-xs text-red-600">{submitError}</p>
-                  ) : null}
-                  {submitSuccess ? (
-                    <p className="text-xs text-green-dark">{submitSuccess}</p>
                   ) : null}
                 </form>
               </div>
