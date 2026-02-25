@@ -34,7 +34,14 @@ export default function OrderList() {
         }
 
         const data = await sellerApi.getSellerOrders(sellerId);
-        if (mounted) setOrders(Array.isArray(data) ? data : []);
+        const safeOrders = Array.isArray(data) ? data : [];
+        if (mounted) {
+          setOrders(
+            safeOrders.filter(
+              (order) => String(order?.status || "").toLowerCase() !== "pending"
+            )
+          );
+        }
       } catch (err) {
         if (mounted) setError(err?.message || "Failed to load orders");
       } finally {
