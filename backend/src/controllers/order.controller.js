@@ -1,6 +1,5 @@
 const orderService = require("../services/order.service");
 
-
 const AddToCart = async (req, res, next) => {
   try {
     const clientId = req.user.id;
@@ -61,6 +60,19 @@ const DeletePendingOrder = async (req, res, next) => {
       orderId: req.params.orderId,
     });
     return res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const UpdatePendingOrderQuantity = async (req, res, next) => {
+  try {
+    const order = await orderService.updatePendingOrderQuantity({
+      userId: req.user.id,
+      orderId: req.params.orderId,
+      quantity: req.body.quantity,
+    });
+    return res.status(200).json(order);
   } catch (error) {
     next(error);
   }
@@ -139,4 +151,5 @@ module.exports = {
   GetPendingOrders,
   GetConfirmedOrders,
   DeletePendingOrder,
+  UpdatePendingOrderQuantity,
 };

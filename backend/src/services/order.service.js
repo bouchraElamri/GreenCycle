@@ -5,6 +5,36 @@ const mongoose = require("mongoose");
 const Client = require("../models/client.model");
 const Seller = require("../models/seller.model");
 
+const resolveAvailableQuantity = (product, fallbackQuantity = 1) => {
+  const stock = Number(product?.quantity);
+  if (Number.isFinite(stock) && stock > 0) {
+    return stock;
+  }
+
+  const fallback = Number(fallbackQuantity);
+  return Number.isFinite(fallback) && fallback > 0 ? fallback : 1;
+};
+
+const mapPendingOrderForCart = (order) => {
+  const firstItem = (order.items || [])[0] || {};
+  const product = firstItem.product || {};
+
+  return {
+    orderId: order._id,
+    status: order.status,
+    quantity: firstItem.quantity || 0,
+    product: {
+      id: product._id || firstItem.product,
+      name: firstItem.name || product.name,
+      price: firstItem.price || product.price,
+      image: Array.isArray(product.images) ? product.images[0] : undefined,
+      availableQuantity: resolveAvailableQuantity(product, firstItem.quantity),
+    },
+    totalPrice: order.totalPrice,
+    createdAt: order.createdAt,
+  };
+};
+
 const addToCart = async ({ userId, productId, quantity }) => {
   const client = await Client.findOne({ userId });
   if (!client) {
@@ -110,24 +140,7 @@ const getPendingOrders = async ({ userId }) => {
   }
 
   const orders = await orderRepo.findByClientAndStatus(client._id, "pending");
-  return orders.map((order) => {
-    const firstItem = (order.items || [])[0] || {};
-    const product = firstItem.product || {};
-
-    return {
-      orderId: order._id,
-      status: order.status,
-      quantity: firstItem.quantity || 0,
-      product: {
-        id: product._id || firstItem.product,
-        name: firstItem.name || product.name,
-        price: firstItem.price || product.price,
-        image: Array.isArray(product.images) ? product.images[0] : undefined,
-      },
-      totalPrice: order.totalPrice,
-      createdAt: order.createdAt,
-    };
-  });
+  return orders.map(mapPendingOrderForCart);
 };
 
 const getConfirmedOrders = async ({ userId }) => {
@@ -158,6 +171,61 @@ const deletePendingOrder = async ({ userId, orderId }) => {
 
   await orderRepo.deleteById(orderId);
   return { message: "Pending order deleted successfully" };
+};
+
+const updatePendingOrderQuantity = async ({ userId, orderId, quantity }) => {
+  const client = await Client.findOne({ userId });
+  if (!client) {
+    const err = new Error("Client profile not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const pendingOrder = await orderRepo.findPendingByIdAndClient(orderId, client._id);
+  if (!pendingOrder) {
+    const err = new Error("Pending order not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const firstItem = (pendingOrder.items || [])[0];
+  if (!firstItem) {
+    const err = new Error("Pending order has no items");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const productId = firstItem.product?._id || firstItem.product;
+  const product = await Product.findById(productId).select("name quantity");
+  if (!product) {
+    const err = new Error("Product not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  if (quantity > product.quantity) {
+    const err = new Error(`Quantity exceeds available stock for product: ${product.name}`);
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const unitPrice = Number(firstItem.price || firstItem.product?.price || 0);
+  const totalPrice = unitPrice * Number(quantity);
+
+  const updatedOrder = await orderRepo.updatePendingQuantityByIdAndClient(
+    orderId,
+    client._id,
+    quantity,
+    totalPrice
+  );
+
+  if (!updatedOrder) {
+    const err = new Error("Pending order not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  return mapPendingOrderForCart(updatedOrder);
 };
 
 const getClientOrders = async ({ authUserId, clientId }) => {
@@ -274,8 +342,7 @@ module.exports = {
   getPendingOrders,
   getConfirmedOrders,
   deletePendingOrder,
-  getClientOrders,
-  getSellerOrders,
+  updatePendingOrderQuantity,
   getClientOrders,
   getSellerOrders,
   getAdminOrders,

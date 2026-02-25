@@ -87,6 +87,15 @@ export const getPendingOrders = async () =>
     })
   );
 
+export const updatePendingOrderQuantity = async (orderId, quantity) =>
+  handleResponse(
+    await fetch(`${API_BASE_URL}/client/orders/pending/${orderId}`, {
+      method: "PATCH",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ quantity }),
+    })
+  );
+
 export const deletePendingOrder = async (orderId) =>
   handleResponse(
     await fetch(`${API_BASE_URL}/client/orders/pending/${orderId}`, {
