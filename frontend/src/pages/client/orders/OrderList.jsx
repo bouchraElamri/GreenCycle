@@ -8,16 +8,14 @@ import {
   FiSearch,
 } from "react-icons/fi";
 import AuthContext from "../../../contexts/AuthContext";
-import { getClientOrders } from "../../../api/clientApi";
+import { getClientOrders, getConfirmedOrders } from "../../../api/clientApi";
 
 const PAGE_SIZE = 8;
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All" },
   { value: "confirmed", label: "Confirmed" },
-  { value: "shipped", label: "Shipped" },
   { value: "delivered", label: "Delivered" },
-  { value: "canceled", label: "Canceled" },
 ];
 
 function currency(value) {
@@ -45,12 +43,8 @@ function formatDateTime(value) {
 
 function getStatusBadgeClass(status) {
   const normalized = String(status || "").toLowerCase();
-  if (normalized === "pending") return "bg-amber-100 text-amber-700";
   if (normalized === "confirmed") return "bg-blue-100 text-blue-700";
-  if (normalized === "shipped") return "bg-indigo-100 text-indigo-700";
   if (normalized === "delivered") return "bg-green-100 text-green-700";
-  if (normalized === "canceled" || normalized === "cancelled")
-    return "bg-red-100 text-red-700";
   return "bg-gray-100 text-gray-700";
 }
 
@@ -174,15 +168,19 @@ export default function OrderList() {
 
     try {
       const clientId = extractClientId(user);
-      if (!clientId) {
-        setOrders([]);
-        setError(
-          "Client profile ID is not available in your session. Please sign out and sign in again."
-        );
-        return;
+      let rawOrders = [];
+
+      if (clientId) {
+        try {
+          rawOrders = await getClientOrders(clientId);
+        } catch {
+          rawOrders = await getConfirmedOrders();
+        }
+      } else {
+        rawOrders = await getConfirmedOrders();
       }
 
-      const result = normalizeOrders(await getClientOrders(clientId));
+      const result = normalizeOrders(rawOrders);
       const unique = Array.from(
         new Map(result.map((order) => [order.id, order])).values()
       );
@@ -282,7 +280,7 @@ export default function OrderList() {
         </div>
         <div className="rounded-2xl border border-green-light/60 bg-white-intense p-4 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-gray-500">Statuses shown</p>
-          <p className="mt-2 text-sm font-semibold text-gray-700">Confirmed, Shipped, Delivered, Canceled</p>
+          <p className="mt-2 text-sm font-semibold text-gray-700">Confirmed, Delivered</p>
         </div>
       </div>
 
