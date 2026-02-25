@@ -317,7 +317,13 @@ const mapAdminOrderSummary = (order) => ({
 
 const getAdminOrders = async ({ status } = {}) => {
   const orders = await orderRepo.findAdminOrders({ status });
-  return orders.map(mapAdminOrderSummary);
+  const visibleOrders = status
+    ? orders
+    : orders.filter((order) =>
+        ["confirmed", "delivered"].includes(String(order?.status || "").toLowerCase())
+      );
+
+  return visibleOrders.map(mapAdminOrderSummary);
 };
 
 const getAdminOrderDetailsById = async (orderId) => {

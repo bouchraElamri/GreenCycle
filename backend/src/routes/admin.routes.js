@@ -29,6 +29,8 @@ router.get("/dashboard", adminController.getDashboard);
 router.get("/users", authController.getAllUsers);
 
 // categories
+router.get("/categories", categoryController.getAllCategories);
+
 router.post(
   "/categories",
   validate(createCategorySchema),
