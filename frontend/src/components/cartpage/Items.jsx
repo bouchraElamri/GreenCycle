@@ -3,11 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../ui/Button";
 import Quantity from "../common/Quantity";
 import trashIcon from "../../assets/trash.png";
-import {
-  deletePendingOrder,
-  getPendingOrders,
-  updatePendingOrderQuantity,
-} from "../../api/clientApi";
+import useCartActions from "../../hooks/useCartActions";
 
 const API_ORIGIN = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
 
@@ -20,10 +16,17 @@ function resolveImageUrl(path) {
 export default function Items({ onSummaryChange }) {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [actionLoading, setActionLoading] = useState(false);
-  const [updatingOrderId, setUpdatingOrderId] = useState(null);
+
+  const {
+    fetchPendingOrders,
+    removePendingOrder,
+    clearPendingOrders,
+    changePendingOrderQuantity,
+    cartLoading: loading,
+    cartActionLoading: actionLoading,
+    updatingOrderId,
+    cartError: error,
+  } = useCartActions();
 
   const normalizedItems = useMemo(
     () =>
@@ -60,19 +63,13 @@ export default function Items({ onSummaryChange }) {
 
     async function loadPendingOrders() {
       try {
-        setLoading(true);
-        setError("");
-        const data = await getPendingOrders();
+        const data = await fetchPendingOrders();
         if (isMounted) {
           setItems(Array.isArray(data) ? data : []);
         }
-      } catch (err) {
+      } catch (_err) {
         if (isMounted) {
-          setError(err?.message || "Failed to load pending cart items");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
+          setItems([]);
         }
       }
     }
@@ -81,33 +78,28 @@ export default function Items({ onSummaryChange }) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [fetchPendingOrders]);
 
-  const handleDeleteOne = useCallback(async (orderId) => {
-    try {
-      setError("");
-      setActionLoading(true);
-      await deletePendingOrder(orderId);
-      setItems((prev) => prev.filter((row) => row.orderId !== orderId));
-    } catch (err) {
-      setError(err?.message || "Failed to delete cart item");
-    } finally {
-      setActionLoading(false);
-    }
-  }, []);
+  const handleDeleteOne = useCallback(
+    async (orderId) => {
+      try {
+        await removePendingOrder(orderId);
+        setItems((prev) => prev.filter((row) => row.orderId !== orderId));
+      } catch (_err) {
+        // Error is surfaced by hook state.
+      }
+    },
+    [removePendingOrder]
+  );
 
   const handleClearCart = useCallback(async () => {
     try {
-      setError("");
-      setActionLoading(true);
-      await Promise.all(normalizedItems.map((row) => deletePendingOrder(row.orderId)));
+      await clearPendingOrders(normalizedItems.map((row) => row.orderId));
       setItems([]);
-    } catch (err) {
-      setError(err?.message || "Failed to clear cart");
-    } finally {
-      setActionLoading(false);
+    } catch (_err) {
+      // Error is surfaced by hook state.
     }
-  }, [normalizedItems]);
+  }, [clearPendingOrders, normalizedItems]);
 
   const handleQuantityChange = useCallback(
     async (orderId, updater) => {
@@ -132,9 +124,8 @@ export default function Items({ onSummaryChange }) {
       }
 
       try {
-        setError("");
-        setUpdatingOrderId(orderId);
-        const updatedOrder = await updatePendingOrderQuantity(orderId, nextQuantity);
+        const updatedOrder = await changePendingOrderQuantity(orderId, nextQuantity);
+        if (!updatedOrder) return;
 
         setItems((prev) =>
           prev.map((row) => {
@@ -157,13 +148,11 @@ export default function Items({ onSummaryChange }) {
             };
           })
         );
-      } catch (err) {
-        setError(err?.message || "Failed to update cart item quantity");
-      } finally {
-        setUpdatingOrderId(null);
+      } catch (_err) {
+        // Error is surfaced by hook state.
       }
     },
-    [items, updatingOrderId]
+    [changePendingOrderQuantity, items, updatingOrderId]
   );
 
   const handleConfirmOrder = useCallback(() => {
@@ -244,9 +233,7 @@ export default function Items({ onSummaryChange }) {
 
   return (
     <>
-      <div className="max-h-[360px] overflow-y-auto px-4 sm:px-6">
-        {itemRows}
-      </div>
+      <div className="max-h-[360px] overflow-y-auto px-4 sm:px-6">{itemRows}</div>
 
       <div className="flex flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <button
