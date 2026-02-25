@@ -67,6 +67,50 @@ const adminApi = {
       })
     ),
 
+  getAdminCategories: async (token) =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/admin/categories`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ),
+
+  createCategory: async (token, payload) =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/admin/categories`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      })
+    ),
+
+  updateCategory: async (token, categoryId, payload) =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/admin/categories/${categoryId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      })
+    ),
+
+  deleteCategory: async (token, categoryId) =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/admin/categories/${categoryId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    ),
+
   setProductApproval: async (token, productId, isApproved) =>
     handleResponse(
       await fetch(`${API_BASE_URL}/admin/products/approve/${productId}`, {

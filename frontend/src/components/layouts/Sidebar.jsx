@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import {
   FiBox,
+  FiLayers,
   FiGrid,
   FiLogOut,
   FiPackage,
@@ -29,6 +30,7 @@ function getMenuByRole(role) {
         { to: "/admin", label: "Dashboard", icon: <FiGrid />, end: true },
         { to: "/admin/users", label: "Users", icon: <FiUsers /> },
         { to: "/admin/products", label: "Products", icon: <FiBox /> },
+        { to: "/admin/categories", label: "Categories", icon: <FiLayers /> },
         { to: "/admin/orders", label: "Orders", icon: <FiPackage /> },
       ],
     };
