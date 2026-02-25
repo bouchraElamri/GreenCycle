@@ -94,3 +94,12 @@ export const deletePendingOrder = async (orderId) =>
       headers: authHeaders(),
     })
   );
+
+export const confirmPendingOrders = async ({ deliveryAddress, bankAccount }) =>
+  handleResponse(
+    await fetch(`${API_BASE_URL}/client/orders/confirm`, {
+      method: "POST",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ deliveryAddress, bankAccount }),
+    })
+  );
