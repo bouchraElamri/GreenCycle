@@ -4,6 +4,11 @@ const mongoose = require("mongoose");
 // order.service.js
 const Client = require("../models/client.model");
 const Seller = require("../models/seller.model");
+const User = require("../models/user.model");
+const sendEmail = require("../utils/email");
+
+const formatMoney = (value) => Number(value || 0).toFixed(2);
+const fullName = (user = {}) => `${user.firstName || ""} ${user.lastName || ""}`.trim();
 
 const addToCart = async ({ userId, productId, quantity }) => {
   const client = await Client.findOne({ userId });
@@ -94,6 +99,89 @@ const confirmPendingOrders = async ({ userId, deliveryAddress, bankAccount }) =>
   });
 
   await orderRepo.deleteManyByIds(pendingOrders.map((order) => order._id));
+
+  // Send confirmation email to client
+  const clientUser = await User.findById(client.userId)
+    .select("firstName lastName email")
+    .lean();
+
+  if (clientUser?.email) {
+    const clientLines = [
+      `Hello ${fullName(clientUser) || "Client"},`,
+      "",
+      "Your order has been confirmed.",
+      "",
+      `Order ID: ${confirmedOrder._id}`,
+      `Products chosen: ${items.length}`,
+      `Number of items: ${items.reduce((sum, item) => sum + Number(item.quantity || 0), 0)}`,
+      `Total price: ${formatMoney(totalPrice)} DH`,
+      `Delivery address: ${deliveryAddress?.street || "-"}, ${deliveryAddress?.city || "-"}, ${deliveryAddress?.zip || "-"}, ${deliveryAddress?.country || "-"}`,
+      "",
+      "Order summary:",
+      ...items.map(
+        (item) =>
+          `- ${item.name || "Product"} | qty: ${item.quantity} | unit: ${formatMoney(item.price)} DH | subtotal: ${formatMoney(Number(item.price || 0) * Number(item.quantity || 0))} DH`
+      ),
+      "",
+      "Thank you for your purchase.",
+    ];
+
+    await sendEmail(
+      clientUser.email,
+      "Your order has been confirmed",
+      clientLines.join("\n")
+    ).catch(() => null);
+  }
+
+  // Send product purchase email to each seller in the confirmed order
+  const sellerIds = Array.from(new Set(items.map((item) => String(item.seller))));
+  const sellers = await Seller.find({ _id: { $in: sellerIds } })
+    .populate("userId", "firstName lastName email")
+    .lean();
+
+  const sellersById = new Map(sellers.map((seller) => [String(seller._id), seller]));
+  const sellerEmailTasks = [];
+
+  for (const sellerId of sellerIds) {
+    const seller = sellersById.get(String(sellerId));
+    const sellerUser = seller?.userId || {};
+    if (!sellerUser.email) continue;
+
+    const sellerItems = items.filter((item) => String(item.seller) === String(sellerId));
+    const sellerTotal = sellerItems.reduce(
+      (sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0),
+      0
+    );
+
+    const sellerLines = [
+      `Hello ${fullName(sellerUser) || "Seller"},`,
+      "",
+      "One or more of your products has been purchased.",
+      "",
+      `Order ID: ${confirmedOrder._id}`,
+      `Customer: ${fullName(clientUser) || "-"}`,
+      `Status: confirmed`,
+      `Your total in this order: ${formatMoney(sellerTotal)} DH`,
+      "",
+      "Purchased products:",
+      ...sellerItems.map(
+        (item) =>
+          `- ${item.name || "Product"} | qty: ${item.quantity} | unit: ${formatMoney(item.price)} DH | subtotal: ${formatMoney(Number(item.price || 0) * Number(item.quantity || 0))} DH`
+      ),
+    ];
+
+    sellerEmailTasks.push(
+      sendEmail(
+        sellerUser.email,
+        "Your product has been purchased",
+        sellerLines.join("\n")
+      )
+    );
+  }
+
+  if (sellerEmailTasks.length > 0) {
+    await Promise.allSettled(sellerEmailTasks);
+  }
 
   return {
     order: confirmedOrder,
