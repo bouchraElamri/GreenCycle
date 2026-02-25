@@ -2,6 +2,77 @@ const productServ = require("../services/product.service");
 const sellerRepo = require("../repositories/seller.repository");
 const sellerModule = require("../models/seller.model");
 const userModel = require("../models/user.model");
+const sendEmail = require("../utils/email");
+
+const formatPrice = (value) => Number(value || 0).toFixed(2);
+
+const getSellerContact = async (sellerId) => {
+  if (!sellerId) return null;
+  const seller = await sellerModule
+    .findById(sellerId)
+    .populate("userId", "firstName lastName email")
+    .lean();
+  if (!seller?.userId?.email) return null;
+  return {
+    fullName: `${seller.userId.firstName || ""} ${seller.userId.lastName || ""}`.trim(),
+    email: seller.userId.email,
+  };
+};
+
+const sendApprovalEmailToSeller = async (sellerContact, product) => {
+  if (!sellerContact?.email) return;
+
+  const lines = [
+    `Hello ${sellerContact.fullName || "Seller"},`,
+    "",
+    "Good news: your product has been approved by the GreenCycle admin team and is now available on the platform.",
+    "",
+    "Approved product details:",
+    `- Product name: ${product?.name || "-"}`,
+    `- Category: ${product?.category?.name || "-"}`,
+    `- Price: ${formatPrice(product?.price)} DH`,
+    `- Quantity: ${product?.quantity ?? "-"}`,
+    `- Description: ${product?.description || "-"}`,
+    "",
+    "You can now manage this product from your seller space.",
+    "",
+    "GreenCycle Team",
+  ];
+
+  await sendEmail(
+    sellerContact.email,
+    "Product approved and published on GreenCycle",
+    lines.join("\n")
+  );
+};
+
+const sendRejectionEmailToSeller = async (sellerContact, product) => {
+  if (!sellerContact?.email) return;
+
+  const lines = [
+    `Hello ${sellerContact.fullName || "Seller"},`,
+    "",
+    "Your product submission was reviewed by our admin team and was not accepted at this stage.",
+    "",
+    "Product details:",
+    `- Product name: ${product?.name || "-"}`,
+    `- Category: ${product?.category?.name || "-"}`,
+    `- Price: ${formatPrice(product?.price)} DH`,
+    `- Quantity: ${product?.quantity ?? "-"}`,
+    `- Description: ${product?.description || "-"}`,
+    "",
+    "Reason: the product does not currently meet GreenCycle publication requirements.",
+    "Please review your product information and submit an updated version.",
+    "",
+    "GreenCycle Team",
+  ];
+
+  await sendEmail(
+    sellerContact.email,
+    "Product not approved on GreenCycle",
+    lines.join("\n")
+  );
+};
 
 const getProducts = async (req, res, next)=>{
     try{
@@ -52,7 +123,15 @@ const deleteProduct = async (req, res, next) => {
     const product = await productServ.getProductById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
     const adminUser = await userModel.findById(req.user.id);
-    if (adminUser && adminUser.role == 'admin') {
+    const adminRoles = Array.isArray(adminUser?.role) ? adminUser.role : [adminUser?.role];
+    const isAdminUser = adminRoles.map((r) => String(r).toLowerCase()).includes("admin");
+    if (adminUser && isAdminUser) {
+      const sellerContact = await getSellerContact(product.seller);
+      if (sellerContact) {
+        await sendRejectionEmailToSeller(sellerContact, product).catch((err) => {
+          console.warn("Failed to send product rejection email:", err?.message);
+        });
+      }
       await productServ.deleteProduct(req.params.id);
       return res.status(204).send();
     }
@@ -122,6 +201,17 @@ const approveProduct = async (req, res, next) => {
 
     const product = await productServ.updateProduct(req.params.id, { isApproved });
     if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    if (isApproved) {
+      const fullProduct = await productServ.getProductById(req.params.id);
+      const sellerContact = await getSellerContact(fullProduct?.seller);
+      if (sellerContact) {
+        await sendApprovalEmailToSeller(sellerContact, fullProduct).catch((err) => {
+          console.warn("Failed to send product approval email:", err?.message);
+        });
+      }
+    }
+
     res.status(200).json(product);
   } catch (error) {
     next(error);

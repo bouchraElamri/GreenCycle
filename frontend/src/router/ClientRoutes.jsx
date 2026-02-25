@@ -1,9 +1,11 @@
-import { useContext } from "react";
+﻿import { useContext } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AuthContext from "../contexts/AuthContext";
 import ClientLayout from "../components/layouts/ClientLayout";
 import ProfileEdit from "../pages/client/profile/ProfileEdit";
 import OrderList from "../pages/client/orders/OrderList";
+import CartPage from "../pages/client/cart/CartPage";
+import PuchasePage from "../pages/client/cart/PuchasePage";
 
 export default function ClientRoutes() {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -19,12 +21,15 @@ export default function ClientRoutes() {
   return (
     <Routes>
       <Route element={<ClientLayout />}>
-        <Route index element={<Navigate to="orders" replace />} />
-        <Route path="orders" element={<OrderList />} />
-        <Route path="profile" element={<ProfileEdit />} />
-        <Route path="edit-profile" element={<ProfileEdit />} />
+      <Route index element={<Navigate to="profile" replace />} />
+      <Route path="orders" element={<OrderList />} />
+      <Route path="profile" element={<ProfileEdit />} />
+      <Route path="cart" element={<CartPage/>}/>
+      <Route path="purchase" element={<PuchasePage/>}/>
+      <Route path="edit-profile" element={<ProfileEdit />} />
       </Route>
-      <Route path="*" element={<Navigate to="/client/orders" replace />} />
+      <Route path="*" element={<Navigate to="/client/profile" replace />} />
     </Routes>
   );
 }
+    
