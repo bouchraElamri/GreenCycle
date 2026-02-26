@@ -18,15 +18,22 @@ export default function CategoryList() {
     setShowAddForm,
     addForm,
     setAddForm,
+    addImageFile,
+    addImagePreview,
+    handleAddImageChange,
     editingId,
     editForm,
     setEditForm,
+    editImageFile,
+    editImagePreview,
+    handleEditImageChange,
     submitting,
     handleAdd,
     startEdit,
     cancelEdit,
     handleUpdate,
     handleDelete,
+    resolveImageUrl,
   } = useAdminCategories();
 
   return (
@@ -36,6 +43,9 @@ export default function CategoryList() {
         setShowAddForm={setShowAddForm}
         addForm={addForm}
         setAddForm={setAddForm}
+        addImageFile={addImageFile}
+        addImagePreview={addImagePreview}
+        handleAddImageChange={handleAddImageChange}
         handleAdd={handleAdd}
         submitting={submitting}
       />
@@ -45,19 +55,20 @@ export default function CategoryList() {
 
       {!loading && !error && (
         <div className="overflow-x-auto rounded-2xl border border-white-broken bg-white-intense">
-          <table className="w-full min-w-[760px] text-left">
+          <table className="w-full min-w-[820px] text-left">
             <thead className="bg-green-light/35 text-gray">
               <tr>
                 <th className="px-4 py-3 text-sm font-bold">Name</th>
                 <th className="px-4 py-3 text-sm font-bold">Description</th>
+                <th className="px-4 py-3 text-sm font-bold">Image</th>
                 <th className="px-4 py-3 text-sm font-bold">Created At</th>
-                <th className="px-4 py-3 text-sm font-bold text-center">Action</th>
+                <th className="px-4 py-3 text-center text-sm font-bold">Action</th>
               </tr>
             </thead>
             <tbody>
               {categories.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-4 text-gray">
+                  <td colSpan={5} className="px-4 py-4 text-gray">
                     No categories found.
                   </td>
                 </tr>
@@ -71,12 +82,16 @@ export default function CategoryList() {
                         isEditing={isEditing}
                         editForm={editForm}
                         setEditForm={setEditForm}
+                        editImageFile={editImageFile}
+                        editImagePreview={editImagePreview}
+                        handleEditImageChange={handleEditImageChange}
                         submitting={submitting}
                         startEdit={startEdit}
                         handleUpdate={handleUpdate}
                         cancelEdit={cancelEdit}
                         handleDelete={handleDelete}
                         formatDate={formatDate}
+                        resolveImageUrl={resolveImageUrl}
                       />
                     </tr>
                   );

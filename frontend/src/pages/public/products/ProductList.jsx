@@ -6,8 +6,8 @@ import useProductListState from "./hooks/useProductListState";
 import ProductListToolbar from "./components/ProductListToolbar";
 import ProductGridSection from "./components/ProductGridSection";
 import MobileFiltersPanel from "./components/MobileFiltersPanel";
-import { useSearchParams  } from "react-router-dom";
-
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const ProductList = () => {
   const [searchParams] = useSearchParams();
@@ -15,6 +15,17 @@ const ProductList = () => {
   const hasNavbarSearch = Boolean(nameFromNavbar.trim());
   const { products, loading, error } = useProducts(null, null, null, nameFromNavbar);
   const { categories, loadingCat } = useCategories();
+
+  const initialCategoryId = searchParams.get("categoryId") || "";
+  const initialCategoryName = searchParams.get("categoryName") || "Category";
+
+  const initialFilters = useMemo(
+    () => ({
+      initialCategoryId,
+      initialCategoryName,
+    }),
+    [initialCategoryId, initialCategoryName]
+  );
 
   const {
     openSort,
@@ -48,7 +59,7 @@ const ProductList = () => {
     totalPages,
     handleResetFilters,
     handleShowResult,
-  } = useProductListState(products);
+  } = useProductListState( products, initialFilters );
 
   if (loading) return <div className="text-center py-10">Loading products...</div>;
   if (error) return <div>Something went wrong: {error}</div>;
@@ -56,7 +67,7 @@ const ProductList = () => {
 
   return (
     <MainLayout>
-      <main className="mt-24 mx-6 md:mt-32 md:px-0 md:mx-24  ">
+      <main className="mt-24 mx-6 md:mt-28 md:px-0 md:mx-24  ">
         <ProductListToolbar
           mobileToggleRef={mobileToggleRef}
           setMobileFiltersOpen={setMobileFiltersOpen}

@@ -1,36 +1,47 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import CategoriesCard from "../common/CategoriesCard";
-import imgPets from "../../assets/Pets&Accessories.png";
-import imgFashion from "../../assets/Fashion&Accessories.png";
-import imgOutdoor from "../../assets/Outdoor&Mobility.png";
-import imgKids from "../../assets/Kids&Toys.png";
-import imgHouse from "../../assets/House&Deco.png";
-import imgTech from "../../assets/Techitems.png";
-import imgWellness from "../../assets/Wellness&Lifestyle.png";
-import imgArt from "../../assets/Art&handmake.png";
 import Symbol1 from "../../assets/Symbol1.png";
 import Symbol2 from "../../assets/Symbol2.png";
+import useCategories from "../../hooks/useCategories";
+
+const API_ORIGIN = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
+
+function resolveCategoryImage(path) {
+  if (!path) return "/assets/images/placeholder_product.png";
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/")) return `${API_ORIGIN}${path}`;
+  return `${API_ORIGIN}/${path}`;
+}
 
 const Categories = () => {
   const mobileScrollerRef = useRef(null);
   const isInteractingRef = useRef(false);
+  const { categories } = useCategories();
 
-  const cards = [
-    { title: "Pet Accessories", image: imgPets },
-    { title: "Fashion &\nAccessories", image: imgFashion },
-    { title: "Outdoor &\nMobility", image: imgOutdoor },
-    { title: "Kids & Toys", image: imgKids },
-    { title: "House &\nDeco", image: imgHouse },
-    { title: "Tech Items", image: imgTech },
-    { title: "Wellness &\nLifestyle", image: imgWellness },
-    { title: "Art &\nHandmade", image: imgArt },
-  ];
-  const columns = [
-    cards.filter((_, index) => index % 4 === 0),
-    cards.filter((_, index) => index % 4 === 1),
-    cards.filter((_, index) => index % 4 === 2),
-    cards.filter((_, index) => index % 4 === 3),
-  ];
+  const cards = useMemo(
+    () =>
+      (Array.isArray(categories) ? categories : []).map((category) => ({
+        id: category?._id || category?.name,
+        title: category?.name || "Category",
+        image: resolveCategoryImage(category?.img),
+        to: category?._id
+          ? `/product_list?categoryId=${encodeURIComponent(category._id)}&categoryName=${encodeURIComponent(
+              category?.name || ""
+            )}`
+          : "/product_list",
+      })),
+    [categories]
+  );
+
+  const columns = useMemo(
+    () => [
+      cards.filter((_, index) => index % 4 === 0),
+      cards.filter((_, index) => index % 4 === 1),
+      cards.filter((_, index) => index % 4 === 2),
+      cards.filter((_, index) => index % 4 === 3),
+    ],
+    [cards]
+  );
 
   useEffect(() => {
     const scroller = mobileScrollerRef.current;
@@ -100,9 +111,10 @@ const Categories = () => {
           >
             {[...cards, ...cards].map((card, index) => (
               <CategoriesCard
-                key={`mobile-${card.title}-${index}`}
+                key={`mobile-${card.id}-${index}`}
                 title={card.title}
                 image={card.image}
+                to={card.to}
                 className="min-w-[210px] w-[210px] h-64 flex-shrink-0"
               />
             ))}
@@ -130,9 +142,10 @@ const Categories = () => {
                 >
                   {[...columnCards, ...columnCards].map((card, itemIndex) => (
                     <CategoriesCard
-                      key={`${card.title}-${itemIndex}`}
+                      key={`${card.id}-${itemIndex}`}
                       title={card.title}
                       image={card.image}
+                      to={card.to}
                       className="mx-auto w-[68%] h-64 md:w-[70%] md:h-80 mb-3 md:mb-4"
                     />
                   ))}
