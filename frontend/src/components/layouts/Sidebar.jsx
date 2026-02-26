@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   FiBox,
   FiLayers,
@@ -68,9 +68,17 @@ export default function Sidebar({
   mobileOpen = false,
   onCloseMobile = () => {},
 }) {
+  const location = useLocation();
   const menu = getMenuByRole(role);
   const normalizedRoles = normalizeRoles(role);
   const isSeller = normalizedRoles.includes("seller");
+  const normalizedPathname = location.pathname.replace(/\/+$/, "") || "/";
+
+  const isItemActive = (item, isActive) => {
+    if (isActive) return true;
+    const normalizedTo = item.to.replace(/\/+$/, "") || "/";
+    return Boolean(item.end) && normalizedPathname === normalizedTo;
+  };
 
   return (
     <>
@@ -89,7 +97,7 @@ export default function Sidebar({
                   onClick={onCloseMobile}
                   className={({ isActive }) =>
                     `flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-all duration-300 ${
-                      isActive
+                      isItemActive(item, isActive)
                         ? "bg-white-intense text-green-dark shadow-[0_8px_16px_rgba(0,0,0,0.14)]"
                         : "bg-white/8 text-green-light/95 hover:bg-white/16 hover:text-white-intense"
                     }`
@@ -136,7 +144,7 @@ export default function Sidebar({
                   end={Boolean(item.end)}
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-full px-4 py-3 text-[15px] transition-all duration-300 ${
-                      isActive
+                      isItemActive(item, isActive)
                         ? "bg-white-intense text-green-dark shadow-[0_8px_18px_rgba(0,0,0,0.12)]"
                         : "text-green-light/90 hover:bg-white/12 hover:text-white-intense hover:translate-x-1 hover:shadow-[0_0_18px_rgba(151,255,210,0.18)]"
                     }`

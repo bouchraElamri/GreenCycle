@@ -38,7 +38,7 @@ export default function Login() {
       const redirectTo = location.state?.from || "/";
 
       if (roles.includes("admin")) {
-        navigate("/admin/");
+        navigate("/admin", { replace: true });
       } else {
         navigate(redirectTo, { replace: true });
       }

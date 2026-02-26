@@ -3,7 +3,8 @@ import MainLayout from '../../../components/layouts/MainLayout';
 import useProducts from '../../../hooks/useProducts';
 import useUsers from '../../../hooks/useUsers';
 import useCartActions from '../../../hooks/useCartActions';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams , Link} from 'react-router-dom';
+import { RiArrowLeftLine } from "react-icons/ri";
 import defaultSellerAvatar from "../../../assets/profile-picture.png";
 import toast from 'react-hot-toast';
 import ProductMediaGallery from './components/ProductMediaGallery';
@@ -12,6 +13,32 @@ import ProductDetailsTabs from './components/ProductDetailsTabs';
 import RelatedProductsSection from './components/RelatedProductsSection';
 
 const apiOrigin = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api$/, "");
+const productDetailToastOptions = {
+    position: "top-center",
+    duration: 2600,
+    style: {
+        borderRadius: "14px",
+        border: "1px solid #2E6650",
+        background: "#F4FBF7",
+        color: "#1F3A2F",
+        boxShadow: "0 10px 28px rgba(31, 58, 47, 0.15)",
+        padding: "12px 16px",
+        fontWeight: 600,
+        textAlign: "center",
+        maxWidth: "460px",
+    },
+};
+
+const productDetailErrorToastOptions = {
+    ...productDetailToastOptions,
+    style: {
+        ...productDetailToastOptions.style,
+        border: "1px solid #BE3A34",
+        background: "#FFF4F4",
+        color: "#7A1E1A",
+    },
+};
+
 const ProductDetail = () => {
     const { id } = useParams();
     const { product } = useProducts(id);
@@ -39,7 +66,6 @@ const ProductDetail = () => {
         const startIndex = (currentPage - 1) * productsPerPage;
         return relatedProducts.slice(startIndex, startIndex + productsPerPage);
     }, [relatedProducts, currentPage]);
-
 
     React.useEffect(() => {
         setGalleryImages(Array.isArray(product?.images) ? product.images : []);
@@ -81,16 +107,25 @@ const ProductDetail = () => {
                 quantity: Math.max(1, quantity),
             });
             if (!response?.redirectedToLogin) {
-                toast.success('Product added to cart successfully');
+                toast.success('Product added to cart successfully', productDetailToastOptions);
             }
         } catch (err) {
-            toast.error(err?.message || 'Failed to add product to cart');
+            toast.error(err?.message || 'Failed to add product to cart', productDetailErrorToastOptions);
         }
     };
 
     return (
         <MainLayout>
-            <section className='my-24  mx-6 md:px-0 md:mx-24 md:my-32 '>
+            <section className='my-24  mx-6 md:px-0 md:mx-24 md:my-28 '>
+                 <Link
+                  to="/product_list"
+                  aria-label="Back to product list"
+                  className='mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full border
+                   border-green-dark text-green-dark bg-white-intense transition-all duration-300 
+                   hover:border-white-intense hover:bg-green-dark hover:text-white-intense 
+                   hover:opacity-80 md:h-12 md:w-12' >
+                    <RiArrowLeftLine size={16} />
+                </Link>
                 <section className='md:flex md:gap-4 '>
                     <ProductMediaGallery
                         galleryImages={galleryImages}

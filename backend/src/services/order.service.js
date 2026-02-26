@@ -55,10 +55,48 @@ const addToCart = async ({ userId, productId, quantity }) => {
     throw err;
   }
 
-  if (!quantity || quantity < 1 || quantity > product.quantity) {
+  const requestedQuantity = Number(quantity);
+  if (!Number.isFinite(requestedQuantity) || requestedQuantity < 1 || requestedQuantity > product.quantity) {
     const err = new Error("Invalid quantity for product: " + product.name);
     err.statusCode = 400;
     throw err;
+  }
+
+  const pendingOrders = await orderRepo.findPendingByClient(client._id);
+  const existingPendingOrder = pendingOrders.find((order) => {
+    const firstItem = (order.items || [])[0];
+    const existingProductId = firstItem?.product?._id || firstItem?.product;
+    return String(existingProductId) === String(product._id);
+  });
+
+  if (existingPendingOrder) {
+    const firstItem = (existingPendingOrder.items || [])[0] || {};
+    const currentQuantity = Number(firstItem.quantity || 0);
+    const nextQuantity = currentQuantity + requestedQuantity;
+
+    if (nextQuantity > product.quantity) {
+      const err = new Error(`Quantity exceeds available stock for product: ${product.name}`);
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const unitPrice = Number(firstItem.price || product.price || 0);
+    const totalPrice = unitPrice * nextQuantity;
+
+    const updatedOrder = await orderRepo.updatePendingQuantityByIdAndClient(
+      existingPendingOrder._id,
+      client._id,
+      nextQuantity,
+      totalPrice
+    );
+
+    if (!updatedOrder) {
+      const err = new Error("Pending order not found");
+      err.statusCode = 404;
+      throw err;
+    }
+
+    return updatedOrder;
   }
 
   const created = await orderRepo.create({
@@ -69,10 +107,10 @@ const addToCart = async ({ userId, productId, quantity }) => {
         seller: product.seller,
         name: product.name,
         price: product.price,
-        quantity,
+        quantity: requestedQuantity,
       },
     ],
-    totalPrice: product.price * quantity,
+    totalPrice: Number(product.price || 0) * requestedQuantity,
     status: "pending",
   });
 

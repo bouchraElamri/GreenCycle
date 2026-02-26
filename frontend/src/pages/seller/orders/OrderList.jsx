@@ -1,59 +1,23 @@
-import { useEffect, useMemo, useState } from "react";
-import sellerApi from "../../../api/sellerApi";
+import { useMemo, useState } from "react";
+import useSellerOrders from "../../../hooks/useSellerOrders";
+import { RiArrowDownSLine } from "react-icons/ri";
 
 export default function OrderList() {
-  const [orders, setOrders] = useState([]);
   const [status, setStatus] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [missingSellerId, setMissingSellerId] = useState(false);
+  const { orders, loading, error, missingSellerId } = useSellerOrders();
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadOrders() {
-      setLoading(true);
-      setError("");
-      setMissingSellerId(false);
-
-      try {
-        const profileData = await sellerApi.getSellerProfile().catch(() => null);
-        const profile = profileData?.data || profileData || null;
-        const sellerId =
-          profile?._id ||
-          localStorage.getItem("sellerId") ||
-          JSON.parse(localStorage.getItem("user") || "{}")?.sellerId ||
-          "";
-
-        if (!sellerId) {
-          if (mounted) {
-            setMissingSellerId(true);
-            setOrders([]);
-          }
-          return;
-        }
-
-        const data = await sellerApi.getSellerOrders(sellerId);
-        const safeOrders = Array.isArray(data) ? data : [];
-        if (mounted) {
-          setOrders(
-            safeOrders.filter(
-              (order) => String(order?.status || "").toLowerCase() !== "pending"
-            )
-          );
-        }
-      } catch (err) {
-        if (mounted) setError(err?.message || "Failed to load orders");
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
-    loadOrders();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const [open, setOpen] = useState(false);
+  const statusLabel = useMemo(() => {
+    if (status === "all") return "All statuses";
+    if (status === "confirmed") return "Confirmed";
+    if (status === "delivered") return "Delivered";
+    return "All statuses";
+  }, [status]);
+  const options = [
+    { value: "all", label: "All statuses" },
+    { value: "confirmed", label: "Confirmed" },
+    { value: "delivered", label: "Delivered" },
+  ];
 
   const filteredOrders = useMemo(() => {
     if (status === "all") return orders;
@@ -74,15 +38,37 @@ export default function OrderList() {
       <div className="rounded-2xl bg-white-intense p-5 shadow">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h2 className="text-2xl font-bold text-green-dark">Orders</h2>
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}
-            className="rounded-xl border border-green-light px-3 py-2 bg-white"
-          >
-            <option value="all">All statuses</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="delivered">Delivered</option>
-          </select>
+          <div className="relative w-56">
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              className="w-full rounded-xl border flex justify-between items-center border-green-light bg-white px-3 py-2 text-left"
+            >
+              {statusLabel}
+           <RiArrowDownSLine size={18} />
+            </button>
+
+            {open && (
+              <div className="absolute z-20 mt-2 w-full rounded-xl border border-green-light bg-white-intense shadow-lg">
+                {options.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      setStatus(opt.value);
+                      setOpen(false);
+                    }}
+                    className={`block w-full px-3 py-2 text-left hover:bg-green-light/30 ${status === opt.value ? "bg-green-light/40 font-bold text-green-dark" : "text-gray-700"
+                      }`}
+                  >
+                    {opt.label}
+                    
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -119,11 +105,10 @@ export default function OrderList() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <h3 className="font-bold text-green-dark">Order #{String(order.orderId).slice(-6)}</h3>
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${
-                      order.status === "delivered"
+                    className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${order.status === "delivered"
                         ? "bg-green-100 text-green-700"
                         : "bg-white-broken text-gray-700"
-                    }`}
+                      }`}
                   >
                     {order.status}
                   </span>

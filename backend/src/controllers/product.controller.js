@@ -217,36 +217,6 @@ const approveProduct = async (req, res, next) => {
     next(error);
   }
 };
-const filterByPrice = async (req , res , next ) => {
-  try{
-    const {minP , maxP}= req.body;
-    const products = await productServ.filterByPrice(minP , maxP);
-    res.status(200).json(products);
-  }
-  catch (error){
-    next(error);
-  }
-};
-
-const getNewstProducts = async (req, res, next) => {
-  try{
-    const products = await productServ.getNewstProducts();
-    res.status(200).json(products);
-  }
-  catch (error){
-    next(error);
-  }
-}
-
-const productSortedByPrice = async (req, res, next)=> {
-  try{
-    const products = await productServ.productSortedByPrice(req.body.order);
-    res.status(200).json(products);
-  }
-  catch(error){
-    next(error);
-  }
-};
 
 const searchByCategory = async (req, res, next) => {
   try {
@@ -262,15 +232,26 @@ const searchByCategory = async (req, res, next) => {
   }
 };
 
+const getCurrentSellerProducts = async (req, res, next) => {
+  try {
+    const sellerProfile = await sellerRepo.findByUserId(req.user.id);
+    if (!sellerProfile) {
+      return res.status(403).json({ message: "User is not a seller" });
+    }
+    const products = await productServ.getSellerProductsAll(sellerProfile._id);
+    res.status(200).json(products);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getProducts, 
   createProduct, 
   findProductById, 
   updateProduct , 
   approveProduct,
-  filterByPrice , 
-  deleteProduct , 
-  getNewstProducts , 
-  productSortedByPrice, 
+  deleteProduct ,  
   searchByCategory,
+  getCurrentSellerProducts,
 };

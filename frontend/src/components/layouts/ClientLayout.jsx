@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar";
 
 export default function ClientLayout() {
   const navigate = useNavigate();
-  const { logout, role } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
 
   async function handleLogout() {
     await logout();
@@ -21,8 +21,7 @@ export default function ClientLayout() {
       <div className="pt-28 pb-12">
         <div className="mx-6 md:mx-24">
           <div className="md:flex items-start gap-6 lg:gap-8">
-            <Sidebar role={role} onLogout={handleLogout} />
-
+            <Sidebar role={"client"} onLogout={handleLogout} />
             <main className="min-w-0 flex-1 pb-16">
               <Outlet />
             </main>

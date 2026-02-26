@@ -3,7 +3,7 @@ import React, { memo } from "react";
 function ProductMediaGallery({ galleryImages, productName, resolveImageUrl, onThumbnailClick }) {
   return (
     <div className="w-full md:w-1/2 rounded-3xl flex flex-col gap-1 p-0">
-      <div className="md:w-5/6 md:h-64 w-full rounded-3xl overflow-hidden flex items-center justify-center">
+      <div className="md:w-5/6 md:h-64 w-full h-48 rounded-3xl overflow-hidden flex items-center justify-center">
         <img
           src={resolveImageUrl(galleryImages[0])}
           alt={productName}

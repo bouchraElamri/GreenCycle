@@ -36,9 +36,9 @@ function ProductSummaryPanel({
 
       <div>
         <h1 className="text-2xl font-nexa font-bold mt-4 mb-4">{product?.name}</h1>
-        <div className="inline-flex w-fit whitespace-nowrap bg-green-light text-gray-900 px-4 py-2 rounded-full text-center mb-2">
+        <p className="bg-green-light text-gray-900 px-3 py-2 w-fit rounded-full font-nexa text-center mb-2">
           {product?.category?.name}
-        </div>
+        </p>
         <p className="text-gray-700 mb-2 font-nexa">Quantity: {product?.quantity}</p>
         <p className="text-xl font-bold font-nexa mb-3">{product?.price} MAD</p>
         <div className="flex items-center gap-2 mb-4">

@@ -10,8 +10,6 @@ export default function useProductListState(
   const sortRef = useRef(null);
   const mobilePanelRef = useRef(null);
   const mobileToggleRef = useRef(null);
-  const [searchInput, setSearchInput] = useState("");
-  const [appliedSearch, setAppliedSearch] = useState("");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const [openCategory, setOpenCategory] = useState(false);
@@ -125,13 +123,7 @@ export default function useProductListState(
   );
 
   const searchedAndSortedProducts = useMemo(() => {
-    const normalizedQuery = appliedSearch.trim().toLowerCase();
-
-    let result = normalizedQuery
-      ? filteredProducts.filter((product) =>
-          String(product.name || "").toLowerCase().includes(normalizedQuery)
-        )
-      : filteredProducts;
+    let result = filteredProducts;
 
     if (selectedSortValue === "newest") {
       result = [...result].sort(
@@ -144,7 +136,7 @@ export default function useProductListState(
     }
 
     return result;
-  }, [filteredProducts, appliedSearch, selectedSortValue]);
+  }, [filteredProducts, selectedSortValue]);
 
   const productsPerPage = 9;
   const totalPages = useMemo(
@@ -180,15 +172,6 @@ export default function useProductListState(
     setCurrentPage(1);
   }, [selectedCategoryId, minValue, maxValue]);
 
-  const handleSearchSubmit = useCallback(
-    (e) => {
-      e.preventDefault();
-      setAppliedSearch(searchInput);
-      setCurrentPage(1);
-    },
-    [searchInput]
-  );
-
   return {
     openSort,
     setOpenSort,
@@ -199,8 +182,6 @@ export default function useProductListState(
     sortRef,
     mobilePanelRef,
     mobileToggleRef,
-    searchInput,
-    setSearchInput,
     mobileFiltersOpen,
     setMobileFiltersOpen,
     openCategory,
@@ -225,7 +206,6 @@ export default function useProductListState(
     totalPages,
     handleResetFilters,
     handleShowResult,
-    handleSearchSubmit,
   };
 }
 

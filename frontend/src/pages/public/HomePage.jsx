@@ -1,6 +1,6 @@
 import React from 'react'
 import MainLayout from '../../components/layouts/MainLayout'
-import Hero from '../../components/LandingPage/hero'
+import Hero from '../../components/LandingPage/Hero'
 import Categories from '../../components/LandingPage/Categories'
 import Offers from '../../components/LandingPage/Offers'
 import NewestProducts from '../../components/LandingPage/NewestProducts'

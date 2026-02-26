@@ -10,9 +10,11 @@ import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
 const ProductList = () => {
-  const { products, loading, error } = useProducts();
-  const { categories, loadingCat } = useCategories();
   const [searchParams] = useSearchParams();
+  const nameFromNavbar = searchParams.get("name") || "";
+  const hasNavbarSearch = Boolean(nameFromNavbar.trim());
+  const { products, loading, error } = useProducts(null, null, null, nameFromNavbar);
+  const { categories, loadingCat } = useCategories();
 
   const initialCategoryId = searchParams.get("categoryId") || "";
   const initialCategoryName = searchParams.get("categoryName") || "Category";
@@ -34,8 +36,6 @@ const ProductList = () => {
     sortRef,
     mobilePanelRef,
     mobileToggleRef,
-    searchInput,
-    setSearchInput,
     mobileFiltersOpen,
     setMobileFiltersOpen,
     openCategory,
@@ -59,20 +59,16 @@ const ProductList = () => {
     totalPages,
     handleResetFilters,
     handleShowResult,
-    handleSearchSubmit,
-  } = useProductListState(products, initialFilters);
+  } = useProductListState( products, initialFilters );
 
   if (loading) return <div className="text-center py-10">Loading products...</div>;
-  if (error) return <div>Something went wrong: {error.message}</div>;
+  if (error) return <div>Something went wrong: {error}</div>;
   if (!products || products.length === 0) return <div className="text-center py-10">No products found.</div>;
 
   return (
     <MainLayout>
-      <main className="mt-24  mx-6 md:mt-32 md:px-0 md:mx-24 ">
+      <main className="mt-24 mx-6 md:mt-28 md:px-0 md:mx-24  ">
         <ProductListToolbar
-          handleSearchSubmit={handleSearchSubmit}
-          searchInput={searchInput}
-          setSearchInput={setSearchInput}
           mobileToggleRef={mobileToggleRef}
           setMobileFiltersOpen={setMobileFiltersOpen}
           sortRef={sortRef}
@@ -83,6 +79,7 @@ const ProductList = () => {
           setSelectedSort={setSelectedSort}
           setSelectedSortValue={setSelectedSortValue}
           setCurrentPage={setCurrentPage}
+          hasNavbarSearch={hasNavbarSearch}
         />
 
         <div className="flex flex-col gap-6 mt-8 pb-5 md:flex-row md:gap-10 md:mt-10">
