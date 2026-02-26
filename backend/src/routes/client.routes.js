@@ -6,6 +6,7 @@ const {
   GetPendingOrders,
   GetConfirmedOrders,
   DeletePendingOrder,
+  UpdatePendingOrderQuantity,
   GetClientOrders,
 } = require("../controllers/order.controller");
 const validate = require("../middlewares/validate.middleware"); // <- your existing generic middleware
@@ -14,6 +15,7 @@ const {
   confirmPendingOrdersSchema,
   getClientOrdersParamsSchema,
   orderIdParamsSchema,
+  updatePendingOrderQuantitySchema,
 } = require("../validators/order.validator");
 const { authenticate } = require("../middlewares/auth.middleware");
 const { validateSwitchToSeller } = require("../validators/seller.validator");
@@ -47,6 +49,12 @@ router.post(
 
 router.get("/orders/pending", GetPendingOrders);
 router.get("/orders/confirmed", GetConfirmedOrders);
+router.patch(
+  "/orders/pending/:orderId",
+  validate(orderIdParamsSchema, "params"),
+  validate(updatePendingOrderQuantitySchema),
+  UpdatePendingOrderQuantity
+);
 router.delete(
   "/orders/pending/:orderId",
   validate(orderIdParamsSchema, "params"),

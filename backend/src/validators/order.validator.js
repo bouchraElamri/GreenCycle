@@ -30,11 +30,14 @@ const orderIdParamsSchema = Joi.object({
   orderId: Joi.string().pattern(objectIdRegex).required(),
 });
 
-
+const updatePendingOrderQuantitySchema = Joi.object({
+  quantity: Joi.number().integer().min(1).required(),
+});
 
 module.exports = {
   addToCartSchema,
   confirmPendingOrdersSchema,
   getClientOrdersParamsSchema,
   orderIdParamsSchema,
+  updatePendingOrderQuantitySchema,
 };

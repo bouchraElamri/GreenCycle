@@ -55,12 +55,29 @@ const findPendingByClient = (clientId) => {
 const findByClientAndStatus = (clientId, status) => {
   return Order.find({ clientId, status })
     .sort({ createdAt: -1 })
-    .populate("items.product", "name price images")
+    .populate("items.product", "name price images quantity")
     .lean();
 };
 
 const findPendingByIdAndClient = (orderId, clientId) => {
-  return Order.findOne({ _id: orderId, clientId, status: "pending" }).lean();
+  return Order.findOne({ _id: orderId, clientId, status: "pending" })
+    .populate("items.product", "name price images quantity")
+    .lean();
+};
+
+const updatePendingQuantityByIdAndClient = (orderId, clientId, quantity, totalPrice) => {
+  return Order.findOneAndUpdate(
+    { _id: orderId, clientId, status: "pending" },
+    {
+      $set: {
+        "items.0.quantity": quantity,
+        totalPrice,
+      },
+    },
+    { new: true }
+  )
+    .populate("items.product", "name price images quantity")
+    .lean();
 };
 
 const deleteById = (orderId) => {
@@ -129,6 +146,7 @@ module.exports = {
   findPendingByClient,
   findByClientAndStatus,
   findPendingByIdAndClient,
+  updatePendingQuantityByIdAndClient,
   deleteById,
   deleteManyByIds,
   findAdminOrders,

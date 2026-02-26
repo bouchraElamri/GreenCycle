@@ -13,6 +13,32 @@ import ProductDetailsTabs from './components/ProductDetailsTabs';
 import RelatedProductsSection from './components/RelatedProductsSection';
 
 const apiOrigin = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api$/, "");
+const productDetailToastOptions = {
+    position: "top-center",
+    duration: 2600,
+    style: {
+        borderRadius: "14px",
+        border: "1px solid #2E6650",
+        background: "#F4FBF7",
+        color: "#1F3A2F",
+        boxShadow: "0 10px 28px rgba(31, 58, 47, 0.15)",
+        padding: "12px 16px",
+        fontWeight: 600,
+        textAlign: "center",
+        maxWidth: "460px",
+    },
+};
+
+const productDetailErrorToastOptions = {
+    ...productDetailToastOptions,
+    style: {
+        ...productDetailToastOptions.style,
+        border: "1px solid #BE3A34",
+        background: "#FFF4F4",
+        color: "#7A1E1A",
+    },
+};
+
 const ProductDetail = () => {
     const { id } = useParams();
     const { product } = useProducts(id);
@@ -81,10 +107,10 @@ const ProductDetail = () => {
                 quantity: Math.max(1, quantity),
             });
             if (!response?.redirectedToLogin) {
-                toast.success('Product added to cart successfully');
+                toast.success('Product added to cart successfully', productDetailToastOptions);
             }
         } catch (err) {
-            toast.error(err?.message || 'Failed to add product to cart');
+            toast.error(err?.message || 'Failed to add product to cart', productDetailErrorToastOptions);
         }
     };
 

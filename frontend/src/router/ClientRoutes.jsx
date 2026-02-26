@@ -20,6 +20,9 @@ export default function ClientRoutes() {
 
   return (
     <Routes>
+      <Route path="cart" element={<CartPage />} />
+      <Route path="purchase" element={<PuchasePage />} />
+
       <Route element={<ClientLayout />}>
       <Route index element={<Navigate to="profile" replace />} />
       <Route path="orders" element={<OrderList />} />

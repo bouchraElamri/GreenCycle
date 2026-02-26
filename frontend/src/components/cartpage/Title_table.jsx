@@ -3,7 +3,7 @@ import Items from "./Items";
 
 const TitleTable = () => {
   return (
-    <main className="mx-6 my-10 flex min-h-screen items-center sm:mx-8 md:mx-12 lg:mx-20 xl:mx-32">
+    <main className="mx-6 my-10 flex-1 items-center mt-32 sm:mx-8 md:mx-12 lg:mx-20 xl:mx-32">
       <section className="mx-auto flex w-full max-w-6xl flex-col items-center">
         <h1 className="text-center font-nexa text-3xl font-bold text-green-dark md:text-5xl">
           Your Sustainable Participation

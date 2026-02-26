@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../ui/Button";
 import Quantity from "../common/Quantity";
 import trashIcon from "../../assets/trash.png";
-import { deletePendingOrder, getPendingOrders } from "../../api/clientApi";
+import useCartActions from "../../hooks/useCartActions";
 
 const API_ORIGIN = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
 
@@ -16,9 +16,17 @@ function resolveImageUrl(path) {
 export default function Items({ onSummaryChange }) {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [actionLoading, setActionLoading] = useState(false);
+
+  const {
+    fetchPendingOrders,
+    removePendingOrder,
+    clearPendingOrders,
+    changePendingOrderQuantity,
+    cartLoading: loading,
+    cartActionLoading: actionLoading,
+    updatingOrderId,
+    cartError: error,
+  } = useCartActions();
 
   const normalizedItems = useMemo(
     () =>
@@ -55,19 +63,13 @@ export default function Items({ onSummaryChange }) {
 
     async function loadPendingOrders() {
       try {
-        setLoading(true);
-        setError("");
-        const data = await getPendingOrders();
+        const data = await fetchPendingOrders();
         if (isMounted) {
           setItems(Array.isArray(data) ? data : []);
         }
-      } catch (err) {
+      } catch (_err) {
         if (isMounted) {
-          setError(err?.message || "Failed to load pending cart items");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
+          setItems([]);
         }
       }
     }
@@ -76,93 +78,145 @@ export default function Items({ onSummaryChange }) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [fetchPendingOrders]);
 
-  const handleDeleteOne = useCallback(async (orderId) => {
-    try {
-      setActionLoading(true);
-      await deletePendingOrder(orderId);
-      setItems((prev) => prev.filter((row) => row.orderId !== orderId));
-    } catch (err) {
-      setError(err?.message || "Failed to delete cart item");
-    } finally {
-      setActionLoading(false);
-    }
-  }, []);
+  const handleDeleteOne = useCallback(
+    async (orderId) => {
+      try {
+        await removePendingOrder(orderId);
+        setItems((prev) => prev.filter((row) => row.orderId !== orderId));
+      } catch (_err) {
+        // Error is surfaced by hook state.
+      }
+    },
+    [removePendingOrder]
+  );
 
   const handleClearCart = useCallback(async () => {
     try {
-      setActionLoading(true);
-      await Promise.all(normalizedItems.map((row) => deletePendingOrder(row.orderId)));
+      await clearPendingOrders(normalizedItems.map((row) => row.orderId));
       setItems([]);
-    } catch (err) {
-      setError(err?.message || "Failed to clear cart");
-    } finally {
-      setActionLoading(false);
+    } catch (_err) {
+      // Error is surfaced by hook state.
     }
-  }, [normalizedItems]);
+  }, [clearPendingOrders, normalizedItems]);
 
-  const handleQuantityChange = useCallback((orderId, updater) => {
-    setItems((prev) =>
-      prev.map((row) => {
-        if (row.orderId !== orderId) return row;
-        const currentQuantity = Number(row.quantity || 0);
-        const nextQuantity =
-          typeof updater === "function" ? updater(currentQuantity) : Number(updater);
-        return { ...row, quantity: nextQuantity };
-      })
-    );
-  }, []);
+  const handleQuantityChange = useCallback(
+    async (orderId, updater) => {
+      if (updatingOrderId) return;
+
+      const targetItem = items.find((row) => row.orderId === orderId);
+      if (!targetItem) return;
+
+      const currentQuantity = Number(targetItem.quantity || 0);
+      const nextRequestedQuantity =
+        typeof updater === "function" ? updater(currentQuantity) : Number(updater);
+
+      const availableQuantity = Number(targetItem?.product?.availableQuantity);
+      const safeMax =
+        Number.isFinite(availableQuantity) && availableQuantity > 0
+          ? availableQuantity
+          : currentQuantity;
+
+      const nextQuantity = Math.max(1, Math.min(nextRequestedQuantity, safeMax));
+      if (!Number.isFinite(nextQuantity) || nextQuantity === currentQuantity) {
+        return;
+      }
+
+      try {
+        const updatedOrder = await changePendingOrderQuantity(orderId, nextQuantity);
+        if (!updatedOrder) return;
+
+        setItems((prev) =>
+          prev.map((row) => {
+            if (row.orderId !== orderId) return row;
+
+            const updatedAvailableQuantity = Number(updatedOrder?.product?.availableQuantity);
+
+            return {
+              ...row,
+              quantity: Number(updatedOrder?.quantity || nextQuantity),
+              totalPrice: Number(updatedOrder?.totalPrice || row.totalPrice || 0),
+              product: {
+                ...row.product,
+                ...updatedOrder?.product,
+                availableQuantity:
+                  Number.isFinite(updatedAvailableQuantity) && updatedAvailableQuantity > 0
+                    ? updatedAvailableQuantity
+                    : row?.product?.availableQuantity,
+              },
+            };
+          })
+        );
+      } catch (_err) {
+        // Error is surfaced by hook state.
+      }
+    },
+    [changePendingOrderQuantity, items, updatingOrderId]
+  );
 
   const handleConfirmOrder = useCallback(() => {
     navigate("/client/purchase");
   }, [navigate]);
 
+  const isBusy = actionLoading || Boolean(updatingOrderId);
+
   const itemRows = useMemo(
     () =>
-      normalizedItems.map((item) => (
-        <div
-          key={item.orderId}
-          className="grid grid-cols-12 items-center gap-2 border-b border-green-dark/15 py-4 md:gap-4"
-        >
-          <div className="col-span-12 flex items-center gap-3 md:col-span-5">
-            <div className="h-16 w-16 overflow-hidden rounded-2xl bg-white-broken">
-              <img
-                src={resolveImageUrl(item?.product?.image)}
-                alt={item?.product?.name || "Product"}
-                className="h-full w-full object-cover"
+      normalizedItems.map((item) => {
+        const availableQuantity = Number(item?.product?.availableQuantity);
+        const maxQuantity =
+          Number.isFinite(availableQuantity) && availableQuantity > 0
+            ? availableQuantity
+            : Math.max(1, Number(item.quantity || 1));
+        const isRowUpdating = updatingOrderId === item.orderId;
+
+        return (
+          <div
+            key={item.orderId}
+            className="grid grid-cols-12 items-center gap-2 border-b border-green-dark/15 py-4 md:gap-4"
+          >
+            <div className="col-span-12 flex items-center gap-3 md:col-span-5">
+              <div className="h-16 w-16 overflow-hidden rounded-2xl bg-white-broken">
+                <img
+                  src={resolveImageUrl(item?.product?.image)}
+                  alt={item?.product?.name || "Product"}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <p className="font-nexa text-base font-bold text-green-dark">{item?.product?.name || "Product name"}</p>
+            </div>
+
+            <div className="col-span-6 flex items-center justify-center md:col-span-3">
+              <Quantity
+                quantity={item.quantity}
+                setQuantity={(updater) => handleQuantityChange(item.orderId, updater)}
+                maxQuantity={maxQuantity}
+                minQuantity={1}
+                compact
+                disabled={actionLoading || isRowUpdating}
               />
             </div>
-            <p className="font-nexa text-base font-bold text-green-dark">{item?.product?.name || "Product name"}</p>
-          </div>
 
-          <div className="col-span-6 flex items-center justify-center md:col-span-3">
-            <Quantity
-              quantity={item.quantity}
-              setQuantity={(updater) => handleQuantityChange(item.orderId, updater)}
-              minQuantity={1}
-              compact
-            />
-          </div>
+            <p className="col-span-4 text-center font-nexa text-lg text-green-dark md:col-span-3 md:text-2xl">
+              {item.lineTotal.toFixed(2)} DH
+            </p>
 
-          <p className="col-span-4 text-center font-nexa text-lg text-green-dark md:col-span-3 md:text-2xl">
-            {item.lineTotal.toFixed(2)} DH
-          </p>
-
-          <div className="col-span-2 flex justify-end md:col-span-1">
-            <button
-              type="button"
-              onClick={() => handleDeleteOne(item.orderId)}
-              disabled={actionLoading}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-medium hover:bg-green-dark disabled:opacity-60"
-              aria-label="Delete item"
-            >
-              <img src={trashIcon} alt="" className="h-5 w-5 object-contain" />
-            </button>
+            <div className="col-span-2 flex justify-end md:col-span-1">
+              <button
+                type="button"
+                onClick={() => handleDeleteOne(item.orderId)}
+                disabled={actionLoading || isRowUpdating}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-medium hover:bg-green-dark disabled:opacity-60"
+                aria-label="Delete item"
+              >
+                <img src={trashIcon} alt="" className="h-5 w-5 object-contain" />
+              </button>
+            </div>
           </div>
-        </div>
-      )),
-    [actionLoading, handleDeleteOne, handleQuantityChange, normalizedItems]
+        );
+      }),
+    [actionLoading, handleDeleteOne, handleQuantityChange, normalizedItems, updatingOrderId]
   );
 
   if (loading) {
@@ -179,15 +233,13 @@ export default function Items({ onSummaryChange }) {
 
   return (
     <>
-      <div className="max-h-[360px] overflow-y-auto px-4 sm:px-6">
-        {itemRows}
-      </div>
+      <div className="max-h-[360px] overflow-y-auto px-4 sm:px-6">{itemRows}</div>
 
       <div className="flex flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <button
           type="button"
           onClick={handleClearCart}
-          disabled={actionLoading}
+          disabled={isBusy}
           className="font-nexa text-2xl text-green-dark/80 hover:text-green-dark disabled:opacity-60"
         >
           Clear Cart
@@ -199,7 +251,7 @@ export default function Items({ onSummaryChange }) {
           </p>
           <Button
             className="h-12 w-44 text-xl"
-            disabled={normalizedItems.length === 0 || actionLoading}
+            disabled={normalizedItems.length === 0 || isBusy}
             onClick={handleConfirmOrder}
           >
             Confirm Order
