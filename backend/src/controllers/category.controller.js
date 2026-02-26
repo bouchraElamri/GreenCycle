@@ -2,7 +2,12 @@ const categoryService = require("../services/category.service");
 
 const createCategory = async (req, res, next) => {
   try {
-    const category = await categoryService.createCategory(req.body);
+    const payload = { ...req.body };
+    if (req.file) {
+      payload.img = `/uploads/categories/${req.file.filename}`;
+    }
+
+    const category = await categoryService.createCategory(payload);
     return res.status(201).json(category);
   } catch (err) {
     return next(err);
@@ -29,7 +34,18 @@ const getCategoryById = async (req, res, next) => {
 
 const updateCategory = async (req, res, next) => {
   try {
-    const category = await categoryService.updateCategory(req.params.id, req.body);
+    const payload = { ...req.body };
+    if (req.file) {
+      payload.img = `/uploads/categories/${req.file.filename}`;
+    }
+
+    if (!Object.keys(payload).length) {
+      const err = new Error("No category fields provided for update");
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const category = await categoryService.updateCategory(req.params.id, payload);
     return res.status(200).json(category);
   } catch (err) {
     return next(err);

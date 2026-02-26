@@ -6,10 +6,24 @@ import useProductListState from "./hooks/useProductListState";
 import ProductListToolbar from "./components/ProductListToolbar";
 import ProductGridSection from "./components/ProductGridSection";
 import MobileFiltersPanel from "./components/MobileFiltersPanel";
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const ProductList = () => {
   const { products, loading, error } = useProducts();
   const { categories, loadingCat } = useCategories();
+  const [searchParams] = useSearchParams();
+
+  const initialCategoryId = searchParams.get("categoryId") || "";
+  const initialCategoryName = searchParams.get("categoryName") || "Category";
+
+  const initialFilters = useMemo(
+    () => ({
+      initialCategoryId,
+      initialCategoryName,
+    }),
+    [initialCategoryId, initialCategoryName]
+  );
 
   const {
     openSort,
@@ -46,7 +60,7 @@ const ProductList = () => {
     handleResetFilters,
     handleShowResult,
     handleSearchSubmit,
-  } = useProductListState(products);
+  } = useProductListState(products, initialFilters);
 
   if (loading) return <div className="text-center py-10">Loading products...</div>;
   if (error) return <div>Something went wrong: {error.message}</div>;

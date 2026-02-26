@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
-export default function useProductListState(products) {
+export default function useProductListState(
+  products,
+  { initialCategoryId = "", initialCategoryName = "Category" } = {}
+) {
   const [openSort, setOpenSort] = useState(false);
   const [selectedSort, setSelectedSort] = useState("Sort by");
   const [selectedSortValue, setSelectedSortValue] = useState("");
@@ -12,10 +15,14 @@ export default function useProductListState(products) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const [openCategory, setOpenCategory] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Category");
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(
+    initialCategoryName || "Category"
+  );
+  const [selectedCategoryId, setSelectedCategoryId] = useState(
+    initialCategoryId || ""
+  );
   const [appliedFilters, setAppliedFilters] = useState({
-    categoryId: "",
+    categoryId: initialCategoryId || "",
     min: null,
     max: null,
   });
@@ -65,6 +72,14 @@ export default function useProductListState(products) {
   useEffect(() => {
     setCurrentPage(1);
   }, [products.length]);
+
+  useEffect(() => {
+    const nextCategoryId = initialCategoryId || "";
+    setSelectedCategoryId(nextCategoryId);
+    setSelectedCategory(nextCategoryId ? initialCategoryName || "Category" : "Category");
+    setAppliedFilters((prev) => ({ ...prev, categoryId: nextCategoryId }));
+    setCurrentPage(1);
+  }, [initialCategoryId, initialCategoryName]);
 
   useEffect(() => {
     setMinValue(min);

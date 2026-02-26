@@ -2,11 +2,21 @@ import { useEffect, useMemo, useState } from "react";
 import adminApi from "../../../api/adminApi";
 import toast from "react-hot-toast";
 
+const API_ORIGIN = (process.env.REACT_APP_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
+const MAX_CATEGORY_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+
 const formatDate = (value) => {
   if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "-";
   return date.toLocaleDateString();
+};
+
+const resolveImageUrl = (path) => {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/")) return `${API_ORIGIN}${path}`;
+  return `${API_ORIGIN}/${path}`;
 };
 
 export default function CategoryList() {
@@ -16,13 +26,24 @@ export default function CategoryList() {
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [addForm, setAddForm] = useState({ name: "", description: "" });
+  const [addImageFile, setAddImageFile] = useState(null);
+  const [addImagePreview, setAddImagePreview] = useState("");
 
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ name: "", description: "" });
+  const [editImageFile, setEditImageFile] = useState(null);
+  const [editImagePreview, setEditImagePreview] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
 
   const token = useMemo(() => localStorage.getItem("authToken"), []);
+
+  const validateImageFile = (file) => {
+    if (!file) return "";
+    if (!file.type?.startsWith("image/")) return "Image must be a valid image file";
+    if (file.size > MAX_CATEGORY_IMAGE_SIZE) return "Image file must not exceed 5MB";
+    return "";
+  };
 
   const loadCategories = async () => {
     try {
@@ -42,6 +63,22 @@ export default function CategoryList() {
     loadCategories();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (addImagePreview && addImagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(addImagePreview);
+      }
+    };
+  }, [addImagePreview]);
+
+  useEffect(() => {
+    return () => {
+      if (editImagePreview && editImagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(editImagePreview);
+      }
+    };
+  }, [editImagePreview]);
+
   const handleAdd = async (event) => {
     event.preventDefault();
     const name = addForm.name.trim();
@@ -58,8 +95,11 @@ export default function CategoryList() {
       await adminApi.createCategory(token, {
         name,
         description,
+        imgFile: addImageFile,
       });
       setAddForm({ name: "", description: "" });
+      setAddImageFile(null);
+      setAddImagePreview("");
       setShowAddForm(false);
       await loadCategories();
     } catch (err) {
@@ -75,11 +115,15 @@ export default function CategoryList() {
       name: category.name || "",
       description: category.description || "",
     });
+    setEditImageFile(null);
+    setEditImagePreview(resolveImageUrl(category.img));
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setEditForm({ name: "", description: "" });
+    setEditImageFile(null);
+    setEditImagePreview("");
   };
 
   const handleUpdate = async (event) => {
@@ -99,6 +143,7 @@ export default function CategoryList() {
       await adminApi.updateCategory(token, editingId, {
         name,
         description,
+        imgFile: editImageFile,
       });
       cancelEdit();
       await loadCategories();
@@ -147,7 +192,7 @@ export default function CategoryList() {
           noValidate
           className="mb-4 rounded-2xl border border-white-broken bg-white-intense p-4"
         >
-          <div className="grid gap-3 md:grid-cols-[1fr_1.2fr_auto] md:items-end">
+          <div className="grid gap-3 md:grid-cols-[1fr_1.2fr_1.3fr_auto] md:items-end">
             <div>
               <label className="mb-1 block text-sm font-semibold text-gray">Name</label>
               <input
@@ -170,6 +215,41 @@ export default function CategoryList() {
                 className="h-10 w-full rounded-full border border-white-broken px-4 text-sm text-gray outline-none focus:border-green-tolerated"
               />
             </div>
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-gray">Image file</label>
+              <label
+                htmlFor="add-category-image"
+                className="flex h-10 w-full cursor-pointer items-center justify-center rounded-full border border-white-broken bg-white-intense px-4 text-sm font-semibold text-green-dark transition hover:bg-green-light/30"
+              >
+                {addImageFile ? "Change image" : "Choose image"}
+              </label>
+              <input
+                id="add-category-image"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  const fileError = validateImageFile(file);
+                  if (fileError) {
+                    toast.error(fileError);
+                    setAddImageFile(null);
+                    setAddImagePreview("");
+                    e.target.value = "";
+                    return;
+                  }
+
+                  setAddImageFile(file);
+                  setAddImagePreview(file ? URL.createObjectURL(file) : "");
+                }}
+                className="hidden"
+              />
+              <p className="mt-1 truncate text-xs text-gray">
+                {addImageFile?.name || "No file selected"}
+              </p>
+              {addImagePreview ? (
+                <img src={addImagePreview} alt="New category preview" className="mt-2 h-12 w-20 rounded object-cover" />
+              ) : null}
+            </div>
             <button
               type="submit"
               disabled={submitting}
@@ -191,6 +271,7 @@ export default function CategoryList() {
               <tr>
                 <th className="px-4 py-3 text-sm font-bold">Name</th>
                 <th className="px-4 py-3 text-sm font-bold">Description</th>
+                <th className="px-4 py-3 text-sm font-bold">Image</th>
                 <th className="px-4 py-3 text-sm font-bold">Created At</th>
                 <th className="px-4 py-3 text-sm font-bold text-center">Action</th>
               </tr>
@@ -198,7 +279,7 @@ export default function CategoryList() {
             <tbody>
               {categories.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-4 text-gray">
+                  <td colSpan={5} className="px-4 py-4 text-gray">
                     No categories found.
                   </td>
                 </tr>
@@ -236,6 +317,56 @@ export default function CategoryList() {
                           />
                         ) : (
                           category.description || "-"
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-gray">
+                        {isEditing ? (
+                          <div className="space-y-2">
+                            <label
+                              htmlFor={`edit-category-image-${category._id}`}
+                              className="flex h-9 w-full cursor-pointer items-center justify-center rounded-full border border-white-broken bg-white-intense px-auto text-xs font-semibold text-green-dark transition hover:bg-green-light/30"
+                            >
+                              {editImageFile ? "Change image" : "Choose image"}
+                            </label>
+                            <input
+                              id={`edit-category-image-${category._id}`}
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0] || null;
+                                const fileError = validateImageFile(file);
+                                if (fileError) {
+                                  toast.error(fileError);
+                                  setEditImageFile(null);
+                                  setEditImagePreview(resolveImageUrl(category.img));
+                                  e.target.value = "";
+                                  return;
+                                }
+
+                                setEditImageFile(file);
+                                setEditImagePreview(file ? URL.createObjectURL(file) : resolveImageUrl(category.img));
+                              }}
+                              className="hidden"
+                            />
+                            <p className="truncate text-xs text-gray">
+                              {editImageFile?.name || "No file selected"}
+                            </p>
+                            {editImagePreview ? (
+                              <img
+                                src={editImagePreview}
+                                alt={category.name || "Category preview"}
+                                className="h-10 w-16 rounded object-cover"
+                              />
+                            ) : null}
+                          </div>
+                        ) : resolveImageUrl(category.img) ? (
+                          <img
+                            src={resolveImageUrl(category.img)}
+                            alt={category.name || "Category"}
+                            className="h-10 w-16 rounded object-cover"
+                          />
+                        ) : (
+                          "-"
                         )}
                       </td>
                       <td className="px-4 py-3 text-gray">{formatDate(category.createdAt)}</td>

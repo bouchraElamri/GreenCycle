@@ -9,6 +9,7 @@ const {
   createCategorySchema,
   updateCategorySchema,
 } = require("../validators/category.validator");
+const uploadCategory = require("../middlewares/uploadCategory.middleware");
 const { getProducts, approveProduct, deleteProduct } = require("../controllers/product.controller");
 const {
   GetAdminOrders,
@@ -33,11 +34,17 @@ router.get("/categories", categoryController.getAllCategories);
 
 router.post(
   "/categories",
+  uploadCategory.single("img"),
   validate(createCategorySchema),
   categoryController.createCategory
 );
 
-router.patch("/categories/:id",validate(updateCategorySchema),categoryController.updateCategory);
+router.patch(
+  "/categories/:id",
+  uploadCategory.single("img"),
+  validate(updateCategorySchema),
+  categoryController.updateCategory
+);
 
 router.delete("/categories/:id", categoryController.deleteCategory);
 
