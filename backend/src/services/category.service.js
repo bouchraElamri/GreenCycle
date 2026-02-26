@@ -19,6 +19,7 @@ const createCategory = async (payload) => {
   return categoryRepository.create({
     name,
     description: payload.description || "",
+    img: payload.img?.trim() || "",
   });
 };
 
@@ -61,6 +62,10 @@ const updateCategory = async (id, payload) => {
     }
 
     payload.name = name;
+  }
+
+  if (payload.img !== undefined) {
+    payload.img = payload.img.trim();
   }
 
   const updated = await categoryRepository.updateById(id, payload);

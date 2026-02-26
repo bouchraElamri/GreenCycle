@@ -6,12 +6,30 @@ export default function useCategories() {
   const [loadingCat, setLoadingCat] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     async function fetchCategories() {
-      const data = await publicApi.getCategories();
-      setCategories(data);
-      setLoadingCat(false);
+      try {
+        const data = await publicApi.getCategories();
+        if (mounted) {
+          setCategories(Array.isArray(data) ? data : []);
+        }
+      } catch (_err) {
+        if (mounted) {
+          setCategories([]);
+        }
+      } finally {
+        if (mounted) {
+          setLoadingCat(false);
+        }
+      }
     }
+
     fetchCategories();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
 
