@@ -46,7 +46,7 @@ function ProductFiltring({
 
                 <div className="my-9 w-full text-left">
                     <p className="text-base mb-4 font-nexa text-green-dark">Category</p>
-                    <div ref={catRef} className=" ">
+                    <div ref={catRef} className="relative w-full">
                         <button
                             onClick={() => setOpenCategory((v) => !v)}
                             className="w-full bg-white-intense text-green-dark px-4 py-2 text-xs font-nexa 
@@ -58,7 +58,7 @@ function ProductFiltring({
 
                         {openCategory && (
                             <div
-                                className="absolute mt-2 w-full bg-white-intense rounded-2xl text-xs font-nexa
+                                className="absolute left-0 right-0 mt-2 bg-white-intense rounded-2xl text-xs font-nexa
                                   hadow-lg z-10 max-h-40 overflow-y-auto">
                                 {loadingCat && <div className="px-3 py-2 text-gray-600 text-center">Loading...</div>}
 

@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001/api";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 const handleResponse = async (response) => {
   const contentType = response.headers.get("content-type") || "";
@@ -77,29 +77,47 @@ const adminApi = {
       })
     ),
 
-  createCategory: async (token, payload) =>
-    handleResponse(
+  createCategory: async (token, { name, description, imgFile }) => {
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    if (imgFile) {
+      formData.append("img", imgFile);
+    }
+
+    return handleResponse(
       await fetch(`${API_BASE_URL}/admin/categories`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
+        body: formData,
       })
-    ),
+    );
+  },
 
-  updateCategory: async (token, categoryId, payload) =>
-    handleResponse(
+  updateCategory: async (token, categoryId, { name, description, imgFile }) => {
+    const formData = new FormData();
+    if (name !== undefined) {
+      formData.append("name", name);
+    }
+    if (description !== undefined) {
+      formData.append("description", description);
+    }
+    if (imgFile) {
+      formData.append("img", imgFile);
+    }
+
+    return handleResponse(
       await fetch(`${API_BASE_URL}/admin/categories/${categoryId}`, {
         method: "PATCH",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
+        body: formData,
       })
-    ),
+    );
+  },
 
   deleteCategory: async (token, categoryId) =>
     handleResponse(
