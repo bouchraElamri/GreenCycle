@@ -47,6 +47,9 @@ const updateProduct = async (id, data) => {
   return productRepo.updateProduct(id, data);
 };
 
+const searchByCategory = async (categoryName) => productRepo.searchByCategory(categoryName);
+const getSellerProductsAll = async (sellerId) => productRepo.findBySellerId(sellerId);
+
 
 module.exports = { 
   getAllProducts, 
@@ -54,4 +57,6 @@ module.exports = {
   createProduct, 
   updateProduct, 
   deleteProduct , 
+  searchByCategory,
+  getSellerProductsAll,
 };

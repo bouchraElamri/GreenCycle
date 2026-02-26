@@ -1,6 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { RiMenuSearchFill } from "react-icons/ri";
 import AuthContext from "../../contexts/AuthContext";
 import logo from "../../assets/Logo-white 2.png";
 import searchicon from "../../assets/zoom.png";
@@ -120,7 +119,7 @@ export default function ClientNav() {
               <li>
                 <Link
                   to="/product_list"
-                  className="inline-flex h-10 w-28 items-center justify-center rounded-full font-nexa text-lg font-bold text-white-intense transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
+                  className="inline-flex h-10 w-28 items-center border border-white-intense  justify-center rounded-full font-nexa text-lg font-bold text-white-intense transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
                 >
                   Products
                 </Link>
@@ -147,7 +146,7 @@ export default function ClientNav() {
               <li>
                 <button
                   onClick={switchToSeller}
-                  className="inline-flex items-center justify-center h-10 text-white-intense text-lg font-nexa font-bold px-3 py-1 rounded-full transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
+                  className="inline-flex items-center border border-white-intense  justify-center h-10 text-white-intense text-lg font-nexa font-bold px-3 py-1 rounded-full transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
                 >
                   Switch To Seller
                 </button>

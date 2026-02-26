@@ -24,11 +24,11 @@ export default function ClientRoutes() {
       <Route index element={<Navigate to="profile" replace />} />
       <Route path="orders" element={<OrderList />} />
       <Route path="profile" element={<ProfileEdit />} />
-      <Route path="cart" element={<CartPage/>}/>
-      <Route path="purchase" element={<PuchasePage/>}/>
       <Route path="edit-profile" element={<ProfileEdit />} />
       </Route>
       <Route path="*" element={<Navigate to="/client/profile" replace />} />
+      <Route path="cart" element={<CartPage/>}/>
+      <Route path="purchase" element={<PuchasePage/>}/>
     </Routes>
   );
 }

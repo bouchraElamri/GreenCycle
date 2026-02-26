@@ -24,6 +24,21 @@ const searchByName = (name) =>
 
   }).sort({ createdAt: -1 });
 
+const findBySellerId = (sellerId) =>
+  Product.find({ seller: sellerId }).populate("category").sort({ createdAt: -1 });
+
+  const searchByCategory = async (categoryName) => {
+    const category = await categoryModel.findOne({name: { $regex: categoryName, $options: "i" }});
+    if(!category){
+      const error = new Error("No category found with the specified name");
+      error.status = 404;
+      throw error;
+    };
+    const categoryId = category._id;
+    const products = await Product.find({ category: categoryId  }).populate("category");
+  return products;
+};
+
 const countByFilter = (filter = {}) => Product.countDocuments(filter);
 
 const findSellerProducts = (sellerId, type = "remaining") => {
@@ -50,6 +65,8 @@ module.exports = {
     updateProduct, 
     deleteProduct , 
     searchByName, 
+    findBySellerId,
     countByFilter,
     findSellerProducts,
+    searchByCategory,
 };

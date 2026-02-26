@@ -16,7 +16,7 @@ function RelatedProductsSection({ currentProducts, totalPages, currentPage, setC
             ))}
           </div>
         ) : (
-          <p className="text-gray-700">No related products found.</p>
+          <p className="text-gray-700 text-center mt-6 text-sm">No related products found.</p>
         )}
       </div>
       {totalPages > 1 && (

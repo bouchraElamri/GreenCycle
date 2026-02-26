@@ -66,6 +66,14 @@ const sellerApi = {
     );
   },
 
+  getSellerProducts: async () =>
+    handleResponse(
+      await fetch(`${API_BASE_URL}/seller/products`, {
+        method: "GET",
+        headers: authHeaders(),
+      })
+    ),
+
   addProduct: async ({ name, description, price, quantity, category, images = [] }) => {
     const formData = new FormData();
     formData.append("name", name);
@@ -103,7 +111,7 @@ const sellerApi = {
 
     return handleResponse(
       await fetch(`${API_BASE_URL}/seller/editProduct/${productId}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: authHeaders(),
         body: formData,
       })

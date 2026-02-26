@@ -58,8 +58,8 @@ function ProductFiltring({
 
                         {openCategory && (
                             <div
-                                className="absolute mt-2 w-full bg-white-intense rounded-2xl text-xs font-nexa
-                                  hadow-lg z-10 max-h-40 overflow-y-auto">
+                                className="absolute mt-2 w-64 bg-white-intense rounded-lg text-xs font-nexa
+                                  shadow-lg z-10 max-h-40  overflow-y-scroll">
                                 {loadingCat && <div className="px-3 py-2 text-gray-600 text-center">Loading...</div>}
 
                                 {!loadingCat &&

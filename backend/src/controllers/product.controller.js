@@ -218,6 +218,32 @@ const approveProduct = async (req, res, next) => {
   }
 };
 
+const searchByCategory = async (req, res, next) => {
+  try {
+    if(req.body){
+      const products = await productServ.searchByCategory(req.body.categoryName);
+      return res.status(200).json(products);
+    }
+    const products = await productServ.searchByCategory(req.query.categoryName);
+    res.status(200).json(products);
+  }
+  catch(error){
+    next(error);
+  }
+};
+
+const getCurrentSellerProducts = async (req, res, next) => {
+  try {
+    const sellerProfile = await sellerRepo.findByUserId(req.user.id);
+    if (!sellerProfile) {
+      return res.status(403).json({ message: "User is not a seller" });
+    }
+    const products = await productServ.getSellerProductsAll(sellerProfile._id);
+    res.status(200).json(products);
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   getProducts, 
@@ -226,4 +252,6 @@ module.exports = {
   updateProduct , 
   approveProduct,
   deleteProduct ,  
+  searchByCategory,
+  getCurrentSellerProducts,
 };
