@@ -154,12 +154,31 @@ const publicApi = {
     return payload?.data ?? payload;
   },
   getProductByCategory: async (category) => {
-    const res = await fetch(`${API_BASE_URL}/searchByCategory?categoryName=${encodeURIComponent(category || "")}`);
-    if (!res.ok) {
-      const errorData = await res.json();
+    const categoryName = String(category || "").trim().toLowerCase();
+    if (!categoryName) return [];
+
+    // Primary path (if backend route exists)
+    const res = await fetch(`${API_BASE_URL}/searchByCategory?categoryName=${encodeURIComponent(categoryName)}`);
+    if (res.ok) {
+      const payload = await res.json();
+      return Array.isArray(payload) ? payload : payload?.data || [];
+    }
+
+    // Fallback path: fetch products and filter client-side by populated category name
+    const allProductsRes = await fetch(`${API_BASE_URL}/getProducts`);
+    if (!allProductsRes.ok) {
+      const errorData = await allProductsRes.json();
       throw new Error(errorData.message || "Error fetching related products");
     }
-    return res.json();
+
+    const products = await allProductsRes.json();
+    return (Array.isArray(products) ? products : []).filter((product) => {
+      const productCategoryName =
+        typeof product?.category === "object" && product?.category !== null
+          ? String(product.category.name || "").toLowerCase()
+          : "";
+      return productCategoryName === categoryName;
+    });
   },
 
   sendContactMessage: async ({ name, email, phone, message }) => {

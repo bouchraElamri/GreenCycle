@@ -97,7 +97,7 @@ export default function SellerNav() {
               <li>
                 <button
                   onClick={switchToBuyer}
-                  className="inline-flex items-center justify-center h-10 text-white-intense text-lg font-nexa font-bold px-3 py-1 rounded-full transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
+                  className="inline-flex items-center justify-center h-10 border  border-white-intense  text-white-intense text-lg font-nexa font-bold px-3 py-1 rounded-full transition-colors duration-300 hover:bg-white-intense hover:text-green-dark"
                 >
                   Switch To Buyer
                 </button>

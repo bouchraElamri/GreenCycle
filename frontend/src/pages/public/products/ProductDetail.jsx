@@ -3,7 +3,8 @@ import MainLayout from '../../../components/layouts/MainLayout';
 import useProducts from '../../../hooks/useProducts';
 import useUsers from '../../../hooks/useUsers';
 import useCartActions from '../../../hooks/useCartActions';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams , Link} from 'react-router-dom';
+import { RiArrowLeftLine } from "react-icons/ri";
 import defaultSellerAvatar from "../../../assets/profile-picture.png";
 import toast from 'react-hot-toast';
 import ProductMediaGallery from './components/ProductMediaGallery';
@@ -39,7 +40,6 @@ const ProductDetail = () => {
         const startIndex = (currentPage - 1) * productsPerPage;
         return relatedProducts.slice(startIndex, startIndex + productsPerPage);
     }, [relatedProducts, currentPage]);
-
 
     React.useEffect(() => {
         setGalleryImages(Array.isArray(product?.images) ? product.images : []);
@@ -90,7 +90,16 @@ const ProductDetail = () => {
 
     return (
         <MainLayout>
-            <section className='my-24  mx-6 md:px-0 md:mx-24 md:my-32 '>
+            <section className='my-24  mx-6 md:px-0 md:mx-24 md:my-28 '>
+                 <Link
+                  to="/product_list"
+                  aria-label="Back to product list"
+                  className='mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full border
+                   border-green-dark text-green-dark bg-white-intense transition-all duration-300 
+                   hover:border-white-intense hover:bg-green-dark hover:text-white-intense 
+                   hover:opacity-80 md:h-12 md:w-12' >
+                    <RiArrowLeftLine size={16} />
+                </Link>
                 <section className='md:flex md:gap-4 '>
                     <ProductMediaGallery
                         galleryImages={galleryImages}

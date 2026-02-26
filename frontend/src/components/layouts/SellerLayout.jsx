@@ -23,7 +23,7 @@ export default function SellerLayout() {
   }, []);
 
   return (
-    <div className="min-h-screen font-sans bg-gradient-to-br from-green-light/60 via-white-intense to-white-intense text-gray-700">
+    <div className="min-h-screen font-nexa bg-gradient-to-br from-green-light/60 via-white-intense to-white-intense text-gray-700">
       <Navbar />
 
       <div className="pt-28 pb-12">

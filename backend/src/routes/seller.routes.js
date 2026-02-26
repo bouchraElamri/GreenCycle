@@ -4,7 +4,7 @@ const { GetSellerOrders } = require("../controllers/order.controller");
 const upload = require("../middlewares/upload.middleware");
 const validate = require("../middlewares/validate.middleware");
 const { productSchema } = require("../validators/product.validator");
-const { createProduct, updateProduct, deleteProduct } = require("../controllers/product.controller");
+const { createProduct, updateProduct, deleteProduct, getCurrentSellerProducts } = require("../controllers/product.controller");
 const sellerController = require("../controllers/seller.controller");
 
 const { authenticate } = require('../middlewares/auth.middleware');
@@ -13,6 +13,7 @@ const router = express.Router();
 router.use(authenticate); // protège toutes les routes du vendeur
 router.get('/', (req, res) => res.json({ message: 'Seller API root' }));
 router.get('/profile', sellerController.getProfile);
+router.get('/products', getCurrentSellerProducts);
 router.post('/addProduct',upload.array('images', 5), validate(productSchema ) ,createProduct );
 
 // Reject attempts to set `isApproved` from seller endpoints (multer has populated req.body at this point)
@@ -23,10 +24,10 @@ const forbidIsApprovedField = (req, res, next) => {
 	next();
 };
 
-router.put('/editProduct/:id', upload.array('images', 5), forbidIsApprovedField, validate(updateProductSchema), updateProduct );
+router.patch('/editProduct/:id', upload.array('images', 5), forbidIsApprovedField, validate(updateProductSchema), updateProduct );
 router.delete('/deleteProduct/:id' ,deleteProduct );
 
-router.get("/orders/:sellerId", GetSellerOrders); // use req.user.id inside controller/service
+router.get("/orders/:sellerId", GetSellerOrders);
 
 
 module.exports = router;

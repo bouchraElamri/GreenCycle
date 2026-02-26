@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import publicApi from "../api/publicApi";
 
-export default function useProducts(productId = null, category = null, seller = null) {
+export default function useProducts(productId = null, category = null, seller = null, searchName = "") {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [products, setProducts] = useState([]);
@@ -22,14 +22,14 @@ export default function useProducts(productId = null, category = null, seller = 
         } 
         else if (category) {
           const data = await publicApi.getProductByCategory(category);
-          setProductsRelated(data);
+          setProductsRelated(toArray(data));
         }
         else if (seller) {
            const data = await publicApi.getProductBySeller(seller);
           setProducts(toArray(data));
         }
         else {
-          const data = await publicApi.getProducts();
+          const data = await publicApi.getProducts(searchName);
           setProducts(data);
         }
       } catch (err) {
@@ -39,7 +39,7 @@ export default function useProducts(productId = null, category = null, seller = 
       }
     };
     fetchData();
-  }, [productId, category, seller]);
+  }, [productId, category, seller, searchName]);
    
 
   return { products, product, loading, error, productsRelated };
