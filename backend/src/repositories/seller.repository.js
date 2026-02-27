@@ -12,17 +12,17 @@ const findByUserId = async (userId) => {
 const findByUserIdWithUser = async (userId) => {
   return Seller.findOne({ userId }).populate(
     "userId",
-    "firstName lastName email phone"
+    "firstName lastName email phone profileImage"
   );
 };
 
 const findByIdWithUser = async (id) => {
-  return Seller.findById(id).populate("userId", "firstName lastName email phone");
+  return Seller.findById(id).populate("userId", "firstName lastName email phone profileImage");
 };
 
 const findAllWithUser = async () => {
   return Seller.find()
-    .populate("userId", "firstName lastName email")
+    .populate("userId", "firstName lastName email profileImage")
     .sort({ createdAt: -1 });
 };
 

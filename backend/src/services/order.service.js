@@ -455,7 +455,7 @@ const getAdminOrderDetailsById = async (orderId) => {
     items: (order.items || []).map((item) => ({
       productId: item.product?._id || item.product,
       sellerName: getFullName(item.seller?.userId) || "-",
-      sellerProfileUrl: item.seller?.profileUrl || null,
+      sellerProfileUrl: item.seller?.userId?.profileImage || null,
       name: item.product?.name || item.name,
       price: item.price ?? item.product?.price,
       photos: item.product?.images || [],

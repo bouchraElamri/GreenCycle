@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 
 class SellerService {
   formatPublicSellerProfile(seller) {
+    const profileImage = seller.userId?.profileImage || null;
     return {
       _id: seller._id,
       fullName: seller.userId
@@ -12,12 +13,16 @@ class SellerService {
         : "",
       email: seller.userId?.email,
       description: seller.description,
-      profileUrl: seller.profileUrl,
+      profileImage,
+      // Kept for backward compatibility with existing frontend fields.
+      profileUrl: profileImage,
+      user: { profileImage },
       rating: seller.rating,
     };
   }
 
   formatAdminSellerProfile(seller) {
+    const profileImage = seller.userId?.profileImage || null;
     return {
       _id: seller._id,
       userId: seller.userId?._id || seller.userId,
@@ -29,7 +34,9 @@ class SellerService {
       email: seller.userId?.email,
       phone: seller.userId?.phone,
       description: seller.description,
-      profileUrl: seller.profileUrl,
+      profileImage,
+      // Kept for backward compatibility with existing frontend fields.
+      profileUrl: profileImage,
       bannerUrl: seller.bannerUrl,
       address: seller.address,
       isVerified: seller.isVerified,
