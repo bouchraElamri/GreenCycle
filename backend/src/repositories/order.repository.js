@@ -100,7 +100,7 @@ const findAdminOrders = async ({ status } = {}) => {
       select: "userId",
       populate: {
         path: "userId",
-        select: "firstName lastName",
+        select: "firstName lastName profileImage",
       },
     })
     .lean();
@@ -113,7 +113,7 @@ const findAdminOrderDetailsById = async (orderId) => {
       select: "userId",
       populate: {
         path: "userId",
-        select: "firstName lastName",
+        select: "firstName lastName profileImage",
       },
     })
     .populate({
@@ -122,10 +122,10 @@ const findAdminOrderDetailsById = async (orderId) => {
     })
     .populate({
       path: "items.seller",
-      select: "userId profileUrl",
+      select: "userId",
       populate: {
         path: "userId",
-        select: "firstName lastName",
+        select: "firstName lastName profileImage",
       },
     })
     .lean();

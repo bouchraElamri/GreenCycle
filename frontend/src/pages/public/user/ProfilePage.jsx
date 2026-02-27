@@ -56,7 +56,7 @@ const ProfilePage = () => {
 
     const SellerName = `${seller?.fullName}`;
     const description = seller?.description || 'Here the user can implement a marketing text to attract his customer regarding his style or his product kind that he sells';
-    const sellerProfilePath = seller?.user?.profileImage || seller?.user?.profileUrl || seller?.profileUrl;
+    const sellerProfilePath = seller?.profileImage || seller?.user?.profileImage || seller?.profileUrl || seller?.user?.profileUrl;
     const profileImage = resolveImageUrl(sellerProfilePath) || defaultSellerAvatar;
 
     if (loading) {

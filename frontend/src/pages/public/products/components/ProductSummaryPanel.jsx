@@ -16,10 +16,10 @@ function ProductSummaryPanel({
   return (
     <div className="w-full md:w-1/2">
       <div className="flex">
-        <div className="w-16 h-16 mt-4 md:mt-0 rounded-full bg-gray-200 overflow-hidden flex md:items-center md:justify-center">
+        <div className="w-16 h-16 mt-4 md:mt-0 rounded-full border-2 border-green-dark bg-gray-200 overflow-hidden flex md:items-center md:justify-center">
           <img
             src={resolveSellerImageUrl(
-              seller?.profileUrl || seller?.user?.profileImage || seller?.user?.profileUrl
+              seller?.profileImage || seller?.user?.profileImage || seller?.profileUrl || seller?.user?.profileUrl
             )}
             alt={seller?.fullName}
             className="w-full h-full object-cover rounded-full cursor-pointer"
